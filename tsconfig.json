@@ -5,7 +5,8 @@
     "baseUrl": "src"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "gulpfile.js"
   ],
   "exclude": [
     "node_modules"
