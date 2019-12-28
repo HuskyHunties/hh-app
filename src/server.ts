@@ -3,26 +3,29 @@ import * as debug from 'debug';
 
 import Main from './controller/controller';
 
-debug('ts-express:server');
-
-const port = normalizePort(process.env.PORT || 3000);
-Main.set('port', port);
-
 const server = http.createServer(Main);
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
 
+/**
+ * Coerce a port number into its integer representation
+ * @param val a number or string representing port number
+ */
 function normalizePort(val: number|string): number|string|boolean {
-  let port: number = (typeof val === 'string') ? parseInt(val, 10) : val;
+  const port: number = (typeof val === 'string') ? parseInt(val, 10) : val;
   if (isNaN(port)) return val;
   else if (port >= 0) return port;
   else return false;
 }
+const port = normalizePort(process.env.PORT || 3000);
 
+debug('ts-express:server');
+
+/**
+ * Event handler for error events in the ExpressJS server.
+ * @param error NodeJS error, typically thrown by Express middleware
+ */
 function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== 'listen') throw error;
-  let bind = (typeof port === 'string') ? 'Pipe ' + port : 'Port ' + port;
+  const bind = (typeof port === 'string') ? 'Pipe ' + port : 'Port ' + port;
   switch(error.code) {
     case 'EACCES':
       console.error(`${bind} requires elevated privileges`);
@@ -37,9 +40,20 @@ function onError(error: NodeJS.ErrnoException): void {
   }
 }
 
+
+Main.set('port', port);
+
+/**
+ * Event handler for listening event (this is basically a hook for late-startup)
+ */
 function onListening(): void {
-  let addr = server.address();
-  let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
+  const addr = server.address();
+  const bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
   debug(`Listening on ${bind}`);
 }
 
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+console.log(`The server is listening on port ${port}.`)
