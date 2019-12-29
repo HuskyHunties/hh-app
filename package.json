@@ -7,9 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha --reporter spec --require ts-node/register 'test/**/*.test.ts'",
+    "test": "gulp scripts && mocha --inspect-brk --reporter spec --require ts-node/register 'test/**/*.test.ts'",
     "build": "gulp scripts",
-    "start": "node build/server.js",
+    "start": "gulp scripts && node build/server.js",
+    "debug": "gulp scripts && node --inspect-brk build/server.js",
     "lint": "eslint -f unix \"src/**/*.{ts,tsx}\""
   },
   "keywords": [],
@@ -28,6 +29,7 @@
     "eslint-plugin-tsdoc": "^0.2.0",
     "gulp": "^4.0.0",
     "gulp-eslint": "^6.0.0",
+    "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^6.0.0-alpha.1",
     "morgan": "^1.9.1",
     "ts-node": "^8.5.4",

@@ -1,18 +1,21 @@
 const gulp = require('gulp');
 const ts = require('gulp-typescript');
 const eslint = require('gulp-eslint');
+const sourcemaps = require('gulp-sourcemaps');
 const JSON_FILES = ['src/*.json', 'src/**/*.json'];
 
 // pull in the project TypeScript config
 const tsProject = ts.createProject('tsconfig.json');
 
 gulp.task('scripts', () => {
-  const tsResult = tsProject.src()
+  return tsProject.src()
   .pipe(eslint())
   .pipe(eslint.format())
-  //.pipe(eslint.failAfterError())
-  .pipe(tsProject());
-  return tsResult.js.pipe(gulp.dest('build'));
+  .pipe(sourcemaps.init())
+    .pipe(tsProject())
+  .pipe(sourcemaps.write('maps'))
+  .pipe(gulp.dest('build'));
+  
 });
 
 gulp.task('watch', gulp.series('scripts', () => {
