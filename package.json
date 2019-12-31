@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "gulp scripts && mocha --inspect-brk --reporter spec --require ts-node/register 'test/**/*.test.ts'",
+    "test": "gulp scripts && mocha --reporter spec --require ts-node/register 'test/**/*.test.ts'",
     "build": "gulp scripts",
     "start": "gulp scripts && node build/server.js",
     "debug": "gulp scripts && node --inspect-brk build/server.js",
