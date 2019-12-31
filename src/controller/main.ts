@@ -1,7 +1,7 @@
 import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
-import sr from './subRouter'; // note, the name sr is arbitrary and doesn't correspond to any literals in subRouter.ts
+import sr from './subrouter'; // note, the name sr is arbitrary and doesn't correspond to any literals in subRouter.ts
 
 
 class Main {
