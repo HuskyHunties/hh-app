@@ -5,6 +5,7 @@ This is a boilerplate for the Husky Hunt App API. Please see [this](https://mher
 ## Logistics
 
 **API Team**: 
+- *Co-lead* Michael
 - *Co-lead* Matt
 - *Co-lead* Dan
 - Ben
