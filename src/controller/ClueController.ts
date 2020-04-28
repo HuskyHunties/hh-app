@@ -156,17 +156,17 @@ export interface ClueController {
     /**
      * Return a list of all clues, finished and unfinished.
      */
-    clues(): Clue[];
+    getClues(): Clue[];
     
     /**
      * Return a list of all unfinished clues.
      */
-    unfinishedClues(): Clue[];
+    getUnfinishedClues(): Clue[];
 
     /**
      * Return a list of all finished clues.
      */
-    finishedClues(): Clue[];
+    getFinishedClues(): Clue[];
 
     /**
      * Delete a clue.
