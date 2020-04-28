@@ -33,11 +33,11 @@ CREATE TABLE paths_join_clues (
 
     PRIMARY KEY (path_id, clue_id),
     FOREIGN KEY (path_id)
-        REFERENCES paths (path_id)
+        REFERENCES crawls (path_id)
             ON DELETE CASCADE
             ON UPDATE NO ACTION,
     FOREIGN KEY (clue_id)
-        REFERENCES clues (clue_id)
-            ON DELETE CASCADE
-            ON UPDATE NO ACTION
+        REFERENCES crawls (clue_id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION
 );
