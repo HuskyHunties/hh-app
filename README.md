@@ -29,3 +29,8 @@ In the code, the implementations for different routes are similarly partitioned.
 
 # Funky Behavior Notes
 - I couldn't get breakpoints working in VS Code. Breakpoints only function if, when evaluating code.js, VS Code "knows about" (?) the source map. The Source Map is a build artifact of the typescript compilation, so first I had to tell gulp to generate these map files. Then I had to tell VS Code to look for source files (launch.json) then I had to tell Typesript that sources files existed ("sourceFiles": true in tsconfig.json). The last setting is required to set breakpoints in typescript source, but without it, I can still set and use breakpoints in js build files. This is weird, since it doesn't seem that "sourceFiles": true has any concrete effect on the creation or linking of the source files. 
+
+
+# Initializing the database
+- Run the following command in the src directory
+```sqlite3 database.db < initDB.sql```
