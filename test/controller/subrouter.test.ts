@@ -32,7 +32,7 @@ describe('test subrouter', () => {
   it('Has a special message when ID is 641', () => {
     return chai.request(app).get('/r/641') 
     .then(res => {
-      let msg = res.body.response; // aka res.body["response"] -> we get back the dictionary we sent out
+      const msg = res.body.response; // aka res.body["response"] -> we get back the dictionary we sent out
       expect(msg).to.eql("ID is the special one, 641.");
     });
   });

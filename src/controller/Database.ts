@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as sqlite3 from 'sqlite3';
 import { Clue, Crawl } from './ClueController';
+import { isNullOrUndefined } from 'util';
 
 /**
  * Wrapper class for the database to provide various ways to interact with it
@@ -46,18 +47,52 @@ export class DatabaseWrapper {
 
 
   addCrawl(crawl: Crawl): number {
-    
+    let crawlId: number
+
+    this.db.run("INSERT INTO crawls(name) SELECT " + crawl.name + 
+    " WHERE NOT EXISTS(SELECT 1 FROM crawls WHERE name = " + crawl.name + ")", (err) => {
+        if (err){
+          throw console.error(err.message);
+        }
+        console.log("Added crawl to database")
+    }).get("SELECT crawl_id FROM crawls WHERE crawls.name = " + crawl.name, (err, row) => {
+      if (err){
+        throw console.error(err.message);
+      }
+      else if (isNullOrUndefined(row)){
+        throw new Error("did not insert desired crawl")
+      }
+      crawlId = row.crawl_id
+    })
+
+    return crawlId
   }
 
   /**
    * 
    * @param clue 
    */
-  addClue(clue: Clue) {
+  addClue(clue: Clue): number {
+
     if (clue.hasCrawl()) {
-      
+      const crawlId: number= this.addCrawl(clue.getCrawl())
+      this.db.run("INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)", 
+      [crawlId, clue.getName(), clue.getPlace().getLocation(), 0])
     }
-    this.db.run("INSERT INTO clues(crawl_id, name, address, image, finished) VALUES(?)", 
-    [clue.])
+    this.db.run("INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)", 
+    [clue.getName(), clue.getPlace().getLocation(), 0])
+
+    let clueId: number
+    this.db.get("SELECT clue_id FROM clues WHERE clues.name = " + clue.getName(),(err, row) => {
+      if (err){
+        throw console.error(err.message);
+      }
+      else if (isNullOrUndefined(row)){
+        throw new Error("did not insert desired clue")
+      }
+      clueId = row.clue_id
+    })
+
+    return clueId
   }
 }
