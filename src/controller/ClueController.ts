@@ -32,13 +32,15 @@ export class Image {
  * Represents a single husky hunt clue, its location, and its associated metadata.
  */
 export class Clue {
-    protected name: string;
-    protected address: Address;
-    protected assocCrawl:  Crawl;
-    protected assocPaths: Path[];
-    protected assocImage: Image;
-    protected finished: boolean;
-    protected id: number; 
+	constructor(
+        protected name: string,
+        protected address: Address,
+        protected assocPaths: Path[],
+        protected assocImage: Image,
+        protected finished: boolean,
+        protected id: number,
+        protected assocCrawl?:  Crawl,
+    ) {}
 
     /**
      * === GETTERS AND SETTERS ===
@@ -131,3 +133,47 @@ export interface ClueController {
 
 }
 
+/**
+ * Manages interactions with clues.
+ */
+export class ClueController {
+    
+    /**
+     * Add a new clue. 
+     * @param name name of the clue
+     * @param address address of the clue
+     * @param assocCrawl crawl, if any, which contains this clue
+     */
+    addClue(name: string, address: Address, assocCrawl: Crawl): void {
+
+    }
+
+    /**
+     * Finish a clue by submitting an image for points.
+     * @param img an image taken at the clue location to store with this clue.
+     * @param id ID of the completed clue.
+     */
+    finishClue(img: Image, id: number): void;
+
+    /**
+     * Return a list of all clues, finished and unfinished.
+     */
+    getClues(): Clue[];
+    
+    /**
+     * Return a list of all unfinished clues.
+     */
+    getUnfinishedClues(): Clue[];
+
+    /**
+     * Return a list of all finished clues.
+     */
+    getFinishedClues(): Clue[];
+
+    /**
+     * Delete a clue.
+     * @param id ID of the clue to delete.
+     */
+    deleteClue(id: number): Clue;
+
+}
