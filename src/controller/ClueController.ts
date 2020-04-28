@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from "util";
 
 /**
  * List of associated clues making up a crawl.
@@ -32,18 +33,18 @@ export class Image {
  * Represents a single husky hunt clue, its location, and its associated metadata.
  */
 export class Clue {
-	constructor(
+    constructor (
         protected name: string,
         protected address: Address,
-        protected assocPaths: Path[],
-        protected assocImage: Image,
+        protected paths: Path[],
+        protected image: Image,
         protected finished: boolean,
         protected id: number,
-        protected assocCrawl?:  Crawl,
-    ) {}
+        protected crawl?:  Crawl
+    ){};
 
     /**
-     * === GETTERS AND SETTERS ===
+     * GETTERS AND SETTERS
      */
 
     public getName(): string {
@@ -62,20 +63,35 @@ export class Clue {
         this.address = address;
     }
 
-    public getAssocCrawl(): Crawl {
-        return this.assocCrawl;
+    public hasCrawl(): boolean {
+        return !isNullOrUndefined(this.crawl);
     }
 
-    public setAssocCrawl(assocCrawl: Crawl): void {
-        this.assocCrawl = assocCrawl;
+    public getCrawl(): Crawl {
+        if (!this.hasCrawl()){
+            throw new Error("no crawl");
+        }
+        return this.crawl;
     }
 
-    public getAssocPaths(): Path[] {
-        return this.assocPaths;
+    public setCrawl(crawl: Crawl): void {
+        this.crawl = crawl;
     }
 
-    public setAssocPaths(assocPaths: Path[]): void {
-        this.assocPaths = assocPaths;
+    public getPaths(): Path[] {
+        return this.paths;
+    }
+
+    public setPaths(paths: Path[]): void {
+        this.paths = paths;
+    }
+
+    public getImage(): Image {
+        return this.image;
+    }
+
+    public setImage(image: Image): void {
+        this.image = image;
     }
 
     public isFinished(): boolean {
@@ -89,6 +105,12 @@ export class Clue {
     public getId(): number {
         return this.id;
     }
+
+    public setId(id: number): void {
+        this.id = id;
+    }
+
+
 }
 
 /**
@@ -133,47 +155,3 @@ export interface ClueController {
 
 }
 
-/**
- * Manages interactions with clues.
- */
-export class ClueController {
-    
-    /**
-     * Add a new clue. 
-     * @param name name of the clue
-     * @param address address of the clue
-     * @param assocCrawl crawl, if any, which contains this clue
-     */
-    addClue(name: string, address: Address, assocCrawl: Crawl): void {
-
-    }
-
-    /**
-     * Finish a clue by submitting an image for points.
-     * @param img an image taken at the clue location to store with this clue.
-     * @param id ID of the completed clue.
-     */
-    finishClue(img: Image, id: number): void;
-
-    /**
-     * Return a list of all clues, finished and unfinished.
-     */
-    getClues(): Clue[];
-    
-    /**
-     * Return a list of all unfinished clues.
-     */
-    getUnfinishedClues(): Clue[];
-
-    /**
-     * Return a list of all finished clues.
-     */
-    getFinishedClues(): Clue[];
-
-    /**
-     * Delete a clue.
-     * @param id ID of the clue to delete.
-     */
-    deleteClue(id: number): Clue;
-
-}
