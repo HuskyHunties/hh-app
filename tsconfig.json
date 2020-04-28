@@ -5,6 +5,17 @@
     "sourceMap": true,
     "baseUrl": "src"
   },
+<<<<<<< HEAD
   "include": ["src/**/*.ts", "gulpfile.js", "test/**/*.test.ts", "src/**.js"],
   "exclude": ["node_modules"]
+=======
+  "include": [
+    "src/**/*.ts",
+    "gulpfile.js",
+    "test/**/*.test.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+>>>>>>> 584b962... added addClue and addCrawl
 }

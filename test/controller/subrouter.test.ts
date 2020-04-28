@@ -32,6 +32,7 @@ describe("test subrouter", () => {
       });
   });
 
+<<<<<<< HEAD
   it("Has a special message when ID is 641", () => {
     return chai
       .request(app)
@@ -40,6 +41,21 @@ describe("test subrouter", () => {
         const msg = res.body.response; // aka res.body["response"] -> we get back the dictionary we sent out
         expect(msg).to.eql("ID is the special one, 641.");
       });
+=======
+  it('Has a special message when ID is 641', () => {
+    return chai.request(app).get('/r/641') 
+    .then(res => {
+      const msg = res.body.response; // aka res.body["response"] -> we get back the dictionary we sent out
+      expect(msg).to.eql("ID is the special one, 641.");
+    });
+  });
+ 
+  it('Responds in JSON when ID is 641', () => {
+    return chai.request(app).get('/r/641')
+    .then(res => {
+      expect(res.type).to.eql('application/json');
+    });
+>>>>>>> 584b962... added addClue and addCrawl
   });
 
   it("Responds in JSON when ID is 641", () => {
