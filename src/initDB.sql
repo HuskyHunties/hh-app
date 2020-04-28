@@ -42,14 +42,13 @@ CREATE TABLE IF NOT EXISTS paths_join_clues (
             ON DELETE CASCADE
             ON UPDATE NO ACTION,
     FOREIGN KEY (clue_id)
-<<<<<<< HEAD
+        REFERENCES clues (clue_id)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
+        REFERENCES crawls (clue_id)
+            ON DELETE CASCADE
+            ON UPDATE NO ACTION
         REFERENCES clues (clue_id)
             ON DELETE CASCADE
             ON UPDATE NO ACTION
 );
-=======
-        REFERENCES crawls (clue_id)
-        ON DELETE CASCADE
-        ON UPDATE NO ACTION
-);
->>>>>>> 4d162f9... - safer database creation
