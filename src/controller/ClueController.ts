@@ -35,11 +35,11 @@ export class Clue {
 	constructor(
         protected name: string,
         protected address: Address,
-        protected assocCrawl:  Crawl,
         protected assocPaths: Path[],
         protected assocImage: Image,
         protected finished: boolean,
         protected id: number,
+        protected assocCrawl?:  Crawl,
     ) {}
 
     /**
@@ -146,8 +146,6 @@ export class ClueController {
      * @param assocCrawl crawl, if any, which contains this clue
      */
     addClue(name: string, address: Address, assocCrawl: Crawl): void {
-        Clue c = new Clue()
-        this.clues.append
     }
 
     /**
