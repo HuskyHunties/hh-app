@@ -38,6 +38,7 @@ export class Image {
  */
 export class Clue {
 <<<<<<< HEAD
+<<<<<<< HEAD
   constructor(
     protected name: string,
     protected place: Place,
@@ -77,17 +78,20 @@ export class Clue {
       throw new Error("no crawl");
 =======
 	constructor(
+=======
+    constructor (
+>>>>>>> e7119ae... worked on database wrapper
         protected name: string,
         protected address: Address,
-        protected assocPaths: Path[],
-        protected assocImage: Image,
+        protected paths: Path[],
+        protected image: Image,
         protected finished: boolean,
         protected id: number,
-        protected assocCrawl?:  Crawl,
-    ) {}
+        protected crawl?:  Crawl
+    ){};
 
     /**
-     * === GETTERS AND SETTERS ===
+     * GETTERS AND SETTERS
      */
 
     public getName(): string {
@@ -109,6 +113,7 @@ export class Clue {
     this.paths = paths;
   }
 
+<<<<<<< HEAD
   public getImage(): Image {
     return this.image;
   }
@@ -120,6 +125,38 @@ export class Clue {
   public isFinished(): boolean {
     return this.finished;
   }
+=======
+    public hasCrawl(): boolean {
+        return !isNullOrUndefined(this.crawl);
+    }
+
+    public getCrawl(): Crawl {
+        if (!this.hasCrawl()){
+            throw new Error("no crawl");
+        }
+        return this.crawl;
+    }
+
+    public setCrawl(crawl: Crawl): void {
+        this.crawl = crawl;
+    }
+
+    public getPaths(): Path[] {
+        return this.paths;
+    }
+
+    public setPaths(paths: Path[]): void {
+        this.paths = paths;
+    }
+
+    public getImage(): Image {
+        return this.image;
+    }
+
+    public setImage(image: Image): void {
+        this.image = image;
+    }
+>>>>>>> e7119ae... worked on database wrapper
 
   public setFinished(finished: boolean): void {
     this.finished = finished;
@@ -129,9 +166,21 @@ export class Clue {
     return this.id;
   }
 
+<<<<<<< HEAD
   public setId(id: number): void {
     this.id = id;
   }
+=======
+    public getId(): number {
+        return this.id;
+    }
+
+    public setId(id: number): void {
+        this.id = id;
+    }
+
+
+>>>>>>> e7119ae... worked on database wrapper
 }
 
 /**
@@ -214,6 +263,7 @@ export interface ClueController {
 
 }
 
+<<<<<<< HEAD
 /**
  * Manages interactions with clues.
  */
@@ -259,3 +309,5 @@ export class ClueController {
 
 }
 >>>>>>> 09a315c... merged with database branch and started on database wrapper
+=======
+>>>>>>> e7119ae... worked on database wrapper
