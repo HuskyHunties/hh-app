@@ -8,7 +8,7 @@ import recipesRouter from './recipes'
 class Main {
   public express: express.Application;
   constructor() {
-    this.express = express();
+    this.express = express(); 
     this.middleware();
     this.routes();
   }
@@ -24,7 +24,7 @@ class Main {
 
     router.get('/', (req, res, next) => {
       res.json({
-        message: 'Hello World!'
+        dan: 'dumb'
       }); // this ends the req res cycle and sends a json response
     });
 
