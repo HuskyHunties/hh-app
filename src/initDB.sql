@@ -9,7 +9,7 @@ CREATE TABLE clues (
     clue_id INTEGER PRIMARY KEY,
     crawl_id INTEGER,
     name TEXT NOT NULL,
-    address TEXT NOT NULL,
+    place TEXT NOT NULL,
     image BLOB,
     finished INTEGER, -- 0 for unfinished, 1 for finished
 

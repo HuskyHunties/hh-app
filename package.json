@@ -9,8 +9,8 @@
   "scripts": {
     "test": "gulp scripts && mocha --reporter spec --require ts-node/register 'test/**/*.test.ts'",
     "build": "gulp scripts",
-    "start": "gulp scripts && node build/server.js",
-    "debug": "gulp scripts && node --inspect-brk build/server.js",
+    "start": "gulp scripts && node build/src/server.js",
+    "debug": "gulp scripts && node --inspect-brk build/src/server.js",
     "lint": "eslint -f unix \"src/**/*.{ts,tsx}\""
   },
   "keywords": [],

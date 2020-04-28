@@ -11,8 +11,12 @@ export class Crawl {
 /**
  * Abstract representation of a real world location.
  */
-export class Address {
-    name: string;
+export class Place {
+    location: string;
+
+    public getLocation(): string{
+        return this.location
+    }
 }
 
 /**
@@ -35,12 +39,12 @@ export class Image {
 export class Clue {
     constructor (
         protected name: string,
-        protected address: Address,
+        protected place: Place,
         protected paths: Path[],
-        protected image: Image,
         protected finished: boolean,
         protected id: number,
-        protected crawl?:  Crawl
+        protected crawl?:  Crawl,
+        protected image?: Image,
     ){};
 
     /**
@@ -55,12 +59,12 @@ export class Clue {
         this.name = name;
     }
 
-    public getAddress(): Address {
-        return this.address;
+    public getPlace(): Place {
+        return this.place;
     }
 
-    public setAddress(address: Address): void {
-        this.address = address;
+    public setPlace(place: Place): void {
+        this.place = place;
     }
 
     public hasCrawl(): boolean {
@@ -123,7 +127,7 @@ export interface ClueController {
      * @param address address of the clue
      * @param assocCrawl crawl, if any, which contains this clue
      */
-    addClue(name: string, address: Address, assocCrawl: Crawl): void;
+    addClue(name: string, place: Place, assocCrawl: Crawl): void;
 
     /**
      * Finish a clue by submitting an image for points.
