@@ -1,4 +1,5 @@
 import { isNullOrUndefined } from "util";
+import { Path } from "./PathController";
 
 /**
  * List of associated clues making up a crawl.
@@ -33,14 +34,6 @@ export class Place {
 
         throw new Error("The Place does not currently have a description field.");
     }
-}
-
-/**
- * Ordered list of clues for players to follow.
- */
-export class Path {
-    protected name: string;
-    protected clues: Clue[];
 }
 
 /**
