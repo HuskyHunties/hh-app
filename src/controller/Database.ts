@@ -46,6 +46,11 @@ export class DatabaseWrapper {
   }
 
 
+  /**
+   * Add a Crawl to the database.
+   * @param crawl the crawl to add
+   * @return the id of the crawl in the database
+   */
   addCrawl(crawl: Crawl): number {
     let crawlId: number
 
@@ -69,20 +74,26 @@ export class DatabaseWrapper {
   }
 
   /**
-   * 
-   * @param clue 
+   * Add a Clue to the database as well as its associated Crawl as needed
+   * @param clue the clue to add to the database
+   * @return the id of the clue in the database
    */
   addClue(clue: Clue): number {
 
+    // if the clue has a crawl, add its crawl to the database; else, only add the clue
     if (clue.hasCrawl()) {
-      const crawlId: number= this.addCrawl(clue.getCrawl())
+      const crawlId : number = this.addCrawl(clue.getCrawl())
       this.db.run("INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)", 
-      [crawlId, clue.getName(), clue.getPlace().getLocation(), 0])
+                  [crawlId, clue.getName(), clue.getPlace().getLocation(), 0], (err) => {
+                      if(err) throw console.error(err.message)})
+    } else {
+        this.db.run("INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)",
+                    [clue.getName(), clue.getPlace().getLocation(), 0], (err) => {
+                        if(err) throw console.error(err.message)})
     }
-    this.db.run("INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)", 
-    [clue.getName(), clue.getPlace().getLocation(), 0])
 
-    let clueId: number
+    // retrieve the clue ID registered from the database
+    let clueId : number
     this.db.get("SELECT clue_id FROM clues WHERE clues.name = " + clue.getName(),(err, row) => {
       if (err){
         throw console.error(err.message);
@@ -95,4 +106,24 @@ export class DatabaseWrapper {
 
     return clueId
   }
+
+    // TODO
+    // - add picture to clue
+    // - 'complete' clue
+    // - delete clue
+    // - other information to update with clue?
+    //
+    // - create crawl without clue
+    // - create crawl with clue -- this could end up getting recursive ! make helper methods to handle this without recurring
+    // - delete crawl (and all clues)
+    // - delete crawl without clues
+    // - add clue to crawl
+    //
+    // - create path with clue(s)
+    // - create path without clue
+    // - add clue to path
+    // - delete path
+    //
+    // other:
+    // - add address table that clues reference
 }
