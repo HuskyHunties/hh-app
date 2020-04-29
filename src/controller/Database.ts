@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 import * as fs from "fs";
 import * as sqlite3 from "sqlite3";
 import { Clue, Crawl } from "./ClueController";
 import { isNullOrUndefined } from "util";
-=======
-import * as fs from 'fs';
-import * as sqlite3 from 'sqlite3';
-import { Clue, Crawl } from './ClueController';
-import { isNullOrUndefined } from 'util';
->>>>>>> 584b962... added addClue and addCrawl
 
 /**
  * Wrapper class for the database to provide various ways to interact with it
