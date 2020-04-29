@@ -1,4 +1,5 @@
 import { isNullOrUndefined } from "util";
+import { Path } from "./PathController";
 
 /**
  * List of associated clues making up a crawl.
@@ -21,7 +22,7 @@ export class Place {
     }
 
     /* determines whether this place has a description */
-    public hasDescription() : boolean {
+    public hasDescription(): boolean {
         return !isNullOrUndefined(this.description);
     }
 
@@ -35,13 +36,6 @@ export class Place {
     }
 }
 
-/**
- * Ordered list of clues for players to follow.
- */
-export class Path {
-    protected name: string;
-    protected clues: Clue[];
-}
 
 /**
  * Abstract representation of a clue image.
@@ -173,6 +167,14 @@ export interface ClueController {
      * @param id ID of the clue to delete.
      */
     deleteClue(id: number): Clue;
+
+    /**
+     * Get the clue's image
+     * @param id ID or the clue
+     * @throws if the clue is incomplete or does not exist
+     * @returns the Image
+     */
+    getImage(id: number): Image;
 
 }
 
