@@ -21,7 +21,7 @@ export class Place {
     }
 
     /* determines whether this place has a description */
-    public hasDescription() : boolean {
+    public hasDescription(): boolean {
         return !isNullOrUndefined(this.description);
     }
 
