@@ -36,6 +36,7 @@ export class Place {
     }
 }
 
+
 /**
  * Abstract representation of a clue image.
  */
@@ -166,6 +167,14 @@ export interface ClueController {
      * @param id ID of the clue to delete.
      */
     deleteClue(id: number): Clue;
+
+    /**
+     * Get the clue's image
+     * @param id ID or the clue
+     * @throws if the clue is incomplete or does not exist
+     * @returns the Image
+     */
+    getImage(id: number): Image;
 
 }
 

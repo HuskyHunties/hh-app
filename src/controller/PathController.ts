@@ -52,17 +52,31 @@ export interface PathController {
     removeClueFromPath(pathID: number, clueID: number): Clue;
 
     /**
-     * Orders the path, from the starting point to take the least total amount of distance.
+     * Orders the path, from the starting point to take the least total amount of distance.  Note: this should only reorder incomplete clues.
      * @param id the path id
      * @param startingPoint the starting point
      */
     orderPath(id: number, startingPoint: Place): void;
 
     /**
-     * Orders the path, from the starting point to the ending point to take the least total amount of distance.
+     * Orders the path, from the starting point to the ending point to take the least total amount of distance. Note: this should only reorder incomplete clues.
      * @param id the path id
      * @param startingPoint the starting point
      * @param endingPoint the ending point
      */
     orderPath(id: number, startingPoint: Place, endingPoint: Place): void;
+
+    /**
+     * Gets a list of the clues along the path that have not yet been completed.
+     * @param id the path id
+     * @returns the list of incomplete clues
+     */
+    getIncompleteClues(id: number): Clue[];
+
+    /**
+     * Gets a list of the clues along the path that have been completed.
+     * @param id the path id
+     * @returns the list of complete clues
+     */
+    getCompleteClues(id: number): Clue[];
 }
