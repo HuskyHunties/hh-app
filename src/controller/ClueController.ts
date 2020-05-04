@@ -11,12 +11,8 @@ export class Crawl {
 /**
  * Abstract representation of a real world location.
  */
-export class Place {
-    location: string;
-
-    public getLocation(): string{
-        return this.location
-    }
+export class Address {
+    name: string;
 }
 
 /**
@@ -39,12 +35,12 @@ export class Image {
 export class Clue {
     constructor (
         protected name: string,
-        protected place: Place,
+        protected address: Address,
         protected paths: Path[],
+        protected image: Image,
         protected finished: boolean,
         protected id: number,
-        protected crawl?:  Crawl,
-        protected image?: Image,
+        protected crawl?:  Crawl
     ){};
 
     /**
@@ -59,12 +55,12 @@ export class Clue {
         this.name = name;
     }
 
-    public getPlace(): Place {
-        return this.place;
+    public getAddress(): Address {
+        return this.address;
     }
 
-    public setPlace(place: Place): void {
-        this.place = place;
+    public setAddress(address: Address): void {
+        this.address = address;
     }
 
     public hasCrawl(): boolean {
@@ -128,7 +124,7 @@ export interface ClueController {
      * @param address address of the clue
      * @param assocCrawl crawl, if any, which contains this clue
      */
-    addClue(name: string, place: Place, assocCrawl: Crawl): void;
+    addClue(name: string, address: Address, assocCrawl: Crawl): void;
 
     /**
      * Finish a clue by submitting an image for points.
@@ -160,49 +156,3 @@ export interface ClueController {
 
 }
 
-<<<<<<< HEAD
-/**
- * Manages interactions with clues.
- */
-export class ClueController {
-    
-    /**
-     * Add a new clue. 
-     * @param name name of the clue
-     * @param address address of the clue
-     * @param assocCrawl crawl, if any, which contains this clue
-     */
-    addClue(name: string, address: Address, assocCrawl: Crawl): void {
-    }
-
-    /**
-     * Finish a clue by submitting an image for points.
-     * @param img an image taken at the clue location to store with this clue.
-     * @param id ID of the completed clue.
-     */
-    finishClue(img: Image, id: number): void;
-
-    /**
-     * Return a list of all clues, finished and unfinished.
-     */
-    getClues(): Clue[];
-    
-    /**
-     * Return a list of all unfinished clues.
-     */
-    getUnfinishedClues(): Clue[];
-
-    /**
-     * Return a list of all finished clues.
-     */
-    getFinishedClues(): Clue[];
-
-    /**
-     * Delete a clue.
-     * @param id ID of the clue to delete.
-     */
-    deleteClue(id: number): Clue;
-
-}
-=======
->>>>>>> e7119ae... worked on database wrapper
