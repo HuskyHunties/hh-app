@@ -45,10 +45,4 @@ CREATE TABLE IF NOT EXISTS paths_join_clues (
         REFERENCES clues (clue_id)
             ON DELETE CASCADE
             ON UPDATE NO ACTION
-        REFERENCES crawls (clue_id)
-            ON DELETE CASCADE
-            ON UPDATE NO ACTION
-        REFERENCES clues (clue_id)
-            ON DELETE CASCADE
-            ON UPDATE NO ACTION
 );
