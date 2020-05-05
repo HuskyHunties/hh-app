@@ -154,4 +154,8 @@ export interface ClueController {
    * @param id ID of the clue to delete.
    */
   deleteClue(id: number): Clue;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 69fccd6384ef794fc2fc445d984e9c8cfb47d4d2
