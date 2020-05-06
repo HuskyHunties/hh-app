@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as sqlite3 from "sqlite3";
-import { Clue, Crawl } from "./ClueController";
+import { Clue, Crawl, Image } from "./ClueController";
 import { isNullOrUndefined } from "util";
 
 /**
@@ -55,8 +55,9 @@ export class DatabaseWrapper {
 
     this.db
       .run(
-        "INSERT INTO crawls(name) SELECT " +
+        "INSERT INTO crawls(name) VALUES(" +
           crawl.name +
+          ")" +
           " WHERE NOT EXISTS(SELECT 1 FROM crawls WHERE name = " +
           crawl.name +
           ")",
@@ -68,7 +69,7 @@ export class DatabaseWrapper {
         }
       )
       .get(
-        "SELECT crawl_id FROM crawls WHERE crawls.name = " + crawl.name,
+        "SELECT crawl_id FROM crawls WHERE name = " + crawl.name,
         (err, row) => {
           if (err) {
             throw console.error(err.message);
@@ -111,7 +112,7 @@ export class DatabaseWrapper {
     // retrieve the clue ID registered from the database
     let clueId: number;
     this.db.get(
-      "SELECT clue_id FROM clues WHERE clues.name = " + clue.getName(),
+      "SELECT clue_id FROM clues WHERE name = " + clue.getName(),
       (err, row) => {
         if (err) {
           throw console.error(err.message);
@@ -125,10 +126,78 @@ export class DatabaseWrapper {
     return clueId;
   }
 
+  /**
+   *
+   * @param clueName the name of the clue this method is modifying
+   * @param picture the picture being added to this clue
+   * @return the id of the clue being modified
+   */
+  addPictureToClue(clueName: string, picture: Image): number {
+    // can we assume that this method will only be called with the names
+    // of clues which we know to have beena added, and don't have to check for a clue?
+
+    this.db.run(
+      "UPDATE clues SET image = picture where name = " + clueName,
+      (err) => {
+        if (err) throw console.error(err.message);
+      }
+    );
+
+    // retrieve the clue ID registered from the database
+    let clueId: number;
+    this.db.get(
+      "SELECT clue_id FROM clues WHERE name = " + clueName,
+      (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        } else if (isNullOrUndefined(row)) {
+          throw new Error("did not insert desired clue");
+        }
+        clueId = row.clue_id;
+      }
+    );
+
+    return clueId;
+  }
+
+  /**
+   *
+   * @param clueName
+   * @return the id of the clue being modified
+   */
+  completeClue(clueName: string): number {
+    this.db.run("UPDATE clues SET finished = 1 where name = " + clueName);
+
+    // retrieve the clue ID registered from the database
+    let clueId: number;
+    this.db.get(
+      "SELECT clue_id FROM clues WHERE name = " + clueName,
+      (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        } else if (isNullOrUndefined(row)) {
+          throw new Error("did not insert desired clue");
+        }
+        clueId = row.clue_id;
+      }
+    );
+
+    return clueId;
+  }
+
+  /**
+   *
+   * @param clueName name of the clue being modified
+   * @return the id of the clue being deleted?? idk if this is accessible
+   * after the row has been deleted from the table
+   */
+  deleteClue(clueName: string): void {
+    this.db.run("DELETE FROM clues WHERE name = " + clueName);
+  }
   // TODO
-  // - add picture to clue
-  // - 'complete' clue
-  // - delete clue
+  // - add picture to clue - draft done
+  // - 'complete' clue - draft done
+  // - delete clue - draft done
   // - other information to update with clue?
   //
   // - create crawl without clue
