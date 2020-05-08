@@ -1,11 +1,12 @@
 import { isNullOrUndefined } from "util";
+import { Path } from "./PathController";
 
 /**
  * List of associated clues making up a crawl.
  */
 export class Crawl {
-  name: string;
-  clues: Clue[];
+    protected name: string;
+    protected clues: Clue[];
 }
 
 /**
@@ -24,13 +25,35 @@ export class Place {
  */
 export class Path {
   name: string;
+    protected location: string;
+    protected description?: string;
+
+    /* retrieves the location information */
+    public getLocation(): string{
+        return this.location
+    }
+
+    /* determines whether this place has a description */
+    public hasDescription(): boolean {
+        return !isNullOrUndefined(this.description);
+    }
+
+    /* gets the description if it exists */
+    public getDescription(): string {
+        if(this.hasDescription()) {
+            return this.description;
+        }
+
+        throw new Error("The Place does not currently have a description field.");
+    }
 }
+
 
 /**
  * Abstract representation of a clue image.
  */
 export class Image {
-  name: string;
+    protected name: string;
 }
 
 /**
@@ -119,6 +142,7 @@ export class Clue {
  * Manages interactions with clues.
  */
 export interface ClueController {
+
   /**
    * Add a new clue.
    * @param name name of the clue
@@ -154,4 +178,13 @@ export interface ClueController {
    * @param id ID of the clue to delete.
    */
   deleteClue(id: number): Clue;
+
+  /**
+   * Get the clue's image
+   * @param id ID or the clue
+   * @throws if the clue is incomplete or does not exist
+   * @returns the Image
+   */
+  getImage(id: number): Image;
 }
+
