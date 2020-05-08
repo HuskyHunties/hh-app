@@ -17,13 +17,8 @@ export class Place {
  */
 export class Path {
   name: string;
-  protected location: string;
+  protected clues: Clue[];
   protected description?: string;
-
-  /* retrieves the location information */
-  public getLocation(): string {
-    return this.location;
-  }
 
   /* determines whether this place has a description */
   public hasDescription(): boolean {
@@ -37,6 +32,16 @@ export class Path {
     }
 
     throw new Error("The Place does not currently have a description field.");
+  }
+
+  /* gets the clues in this path */
+  public getClues(): Clue[]{
+      return this.clues;
+  }
+
+  /* sets the clues of this object */
+  public setClues(clues: Clue[]): void {
+      this.clues = clues;
   }
 }
 
