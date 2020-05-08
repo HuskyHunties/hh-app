@@ -1,82 +1,113 @@
-import { Clue, Place } from "./ClueController";
+import { isNullOrUndefined } from "util";
+import { Clue } from "./ClueController";
+
+/**
+ * Abstract representation of a real world location.
+ */
+export class Place {
+  location: string;
+
+  public getLocation(): string {
+    return this.location;
+  }
+}
 
 /**
  * Ordered list of clues for players to follow.
  */
 export class Path {
-    protected name: String;
-    protected clues: Clue[];
-    protected id: number;
+  name: string;
+  protected location: string;
+  protected description?: string;
+
+  /* retrieves the location information */
+  public getLocation(): string {
+    return this.location;
+  }
+
+  /* determines whether this place has a description */
+  public hasDescription(): boolean {
+    return !isNullOrUndefined(this.description);
+  }
+
+  /* gets the description if it exists */
+  public getDescription(): string {
+    if (this.hasDescription()) {
+      return this.description;
+    }
+
+    throw new Error("The Place does not currently have a description field.");
+  }
 }
 
 /**
  * Manages interactions with Paths.
  */
 export interface PathController {
-    /**
-     * Makes a new path from the list of clues, does not guarantee any specific order.
-     * @param clues the clues that will make up the path
-     * @returns the new path
-     */
-    newPath(clues: Clue[]): Path;
-    
-    /**
-     * Remove the specified path.
-     * @param id the path to remove
-     * @returns the removed path
-     */
-    removePath(id: number): Path;
+  /**
+   * Makes a new path from the list of clues, does not guarantee any specific order.
+   * @param clues the clues that will make up the path
+   * @returns the new path
+   */
+  newPath(clues: Clue[]): Path;
 
-    /**
-     * Gets the list of clues from the specified path
-     * @param id the path to get clues from
-     * @returns the list of clues on the path
-     */
-    getClues(id: number): Clue[];
+  /**
+   * Remove the specified path.
+   * @param id the path to remove
+   * @returns the removed path
+   */
+  removePath(id: number): Path;
 
-    /**
-     * Adds an exisitng clue to an an exisiting path.
-     * @param pathID The id of the path
-     * @param clueID The id of the clue
-     * @throws if the clue or path does not exist
-     */
-    addClueToPath(pathID: number, clueID: number): void;
+  /**
+   * Gets the list of clues from the specified path
+   * @param id the path to get clues from
+   * @returns the list of clues on the path
+   */
+  getClues(id: number): Clue[];
 
-    /**
-     * Removes a clue from a path
-     * @param pathID The id of the path
-     * @param clueID The id of the clue
-     * @throws if the clue is not a part of the path
-     * @returns the removed clue
-     */
-    removeClueFromPath(pathID: number, clueID: number): Clue;
+  /**
+   * Adds an exisitng clue to an an exisiting path.
+   * @param pathID The id of the path
+   * @param clueID The id of the clue
+   * @throws if the clue or path does not exist
+   */
+  addClueToPath(pathID: number, clueID: number): void;
 
-    /**
-     * Orders the path, from the starting point to take the least total amount of distance.  Note: this should only reorder incomplete clues.
-     * @param id the path id
-     * @param startingPoint the starting point
-     */
-    orderPath(id: number, startingPoint: Place): void;
+  /**
+   * Removes a clue from a path
+   * @param pathID The id of the path
+   * @param clueID The id of the clue
+   * @throws if the clue is not a part of the path
+   * @returns the removed clue
+   */
+  removeClueFromPath(pathID: number, clueID: number): Clue;
 
-    /**
-     * Orders the path, from the starting point to the ending point to take the least total amount of distance. Note: this should only reorder incomplete clues.
-     * @param id the path id
-     * @param startingPoint the starting point
-     * @param endingPoint the ending point
-     */
-    orderPath(id: number, startingPoint: Place, endingPoint: Place): void;
+  /**
+   * Orders the path, from the starting point to take the least total amount of distance.  Note: this should only reorder incomplete clues.
+   * @param id the path id
+   * @param startingPoint the starting point
+   */
+  orderPath(id: number, startingPoint: Place): void;
 
-    /**
-     * Gets a list of the clues along the path that have not yet been completed.
-     * @param id the path id
-     * @returns the list of incomplete clues
-     */
-    getIncompleteClues(id: number): Clue[];
+  /**
+   * Orders the path, from the starting point to the ending point to take the least total amount of distance. Note: this should only reorder incomplete clues.
+   * @param id the path id
+   * @param startingPoint the starting point
+   * @param endingPoint the ending point
+   */
+  orderPath(id: number, startingPoint: Place, endingPoint: Place): void;
 
-    /**
-     * Gets a list of the clues along the path that have been completed.
-     * @param id the path id
-     * @returns the list of complete clues
-     */
-    getCompleteClues(id: number): Clue[];
+  /**
+   * Gets a list of the clues along the path that have not yet been completed.
+   * @param id the path id
+   * @returns the list of incomplete clues
+   */
+  getIncompleteClues(id: number): Clue[];
+
+  /**
+   * Gets a list of the clues along the path that have been completed.
+   * @param id the path id
+   * @returns the list of complete clues
+   */
+  getCompleteClues(id: number): Clue[];
 }

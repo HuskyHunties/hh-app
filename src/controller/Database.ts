@@ -56,10 +56,10 @@ export class DatabaseWrapper {
     this.db
       .run(
         "INSERT INTO crawls(name) VALUES(" +
-          crawl.name +
+          crawl.getName() +
           ")" +
           " WHERE NOT EXISTS(SELECT 1 FROM crawls WHERE name = " +
-          crawl.name +
+          crawl.getName() +
           ")",
         (err) => {
           if (err) {
@@ -69,7 +69,7 @@ export class DatabaseWrapper {
         }
       )
       .get(
-        "SELECT crawl_id FROM crawls WHERE name = " + crawl.name,
+        "SELECT crawl_id FROM crawls WHERE name = " + crawl.getName(),
         (err, row) => {
           if (err) {
             throw console.error(err.message);

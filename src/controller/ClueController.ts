@@ -1,59 +1,51 @@
 import { isNullOrUndefined } from "util";
-import { Path } from "./PathController";
+import { Path, Place } from "./PathController";
 
 /**
  * List of associated clues making up a crawl.
  */
 export class Crawl {
-    protected name: string;
-    protected clues: Clue[];
-}
+  protected name: string;
+  protected clues: Clue[];
 
-/**
- * Abstract representation of a real world location.
- */
-export class Place {
-  location: string;
+  /**
+   * GETTERS AND SETTERS
+   */
 
-  public getLocation(): string {
-    return this.location;
+  public getName(): string {
+    return this.name;
+  }
+
+  public setName(name: string): void {
+    this.name = name;
+  }
+
+  public getClues(): Clue[] {
+    return this.clues;
+  }
+
+  public setClues(clues: Clue[]): void {
+    this.clues = clues;
   }
 }
-
-/**
- * Ordered list of clues for players to follow.
- */
-export class Path {
-  name: string;
-    protected location: string;
-    protected description?: string;
-
-    /* retrieves the location information */
-    public getLocation(): string{
-        return this.location
-    }
-
-    /* determines whether this place has a description */
-    public hasDescription(): boolean {
-        return !isNullOrUndefined(this.description);
-    }
-
-    /* gets the description if it exists */
-    public getDescription(): string {
-        if(this.hasDescription()) {
-            return this.description;
-        }
-
-        throw new Error("The Place does not currently have a description field.");
-    }
-}
-
 
 /**
  * Abstract representation of a clue image.
  */
 export class Image {
-    protected name: string;
+  protected name: string;
+
+  /**
+   * GETTERS AND SETTERS
+   */
+
+  public getName(): string {
+    return this.name;
+  }
+
+  public setName(name: string): void {
+    this.name = name;
+  }
 }
 
 /**
@@ -142,7 +134,6 @@ export class Clue {
  * Manages interactions with clues.
  */
 export interface ClueController {
-
   /**
    * Add a new clue.
    * @param name name of the clue
@@ -187,4 +178,3 @@ export interface ClueController {
    */
   getImage(id: number): Image;
 }
-
