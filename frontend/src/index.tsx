@@ -2,10 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
+import MainPage from "./pages/main-page";
 
 ReactDOM.render(
   <React.StrictMode>
-    <div className="test">Hello World</div>
+    <MainPage />
   </React.StrictMode>,
   document.getElementById('root')
 );

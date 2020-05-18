@@ -1,5 +1,5 @@
 @import "css/colors.css";
 
-.test {
-  background-color: var(--accent1-color);
+.body {
+  margin: 0;
 }
