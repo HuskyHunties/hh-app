@@ -2,6 +2,8 @@ import React from "react";
 import ClueFrame from "../frames/clue-frame";
 import "../css/main-page.css";
 import NavBarFrame from "../frames/nav-bar";
+import PathFrame from "../frames/path-frame";
+import GroupFrame from "../frames/group-frame";
 
 interface MainPageProps {
 
@@ -24,6 +26,8 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
             <div className="main-page">
                 <NavBarFrame />
                 <ClueFrame />
+                <PathFrame />
+                <GroupFrame />
             </div>
             )
         }
