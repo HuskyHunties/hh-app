@@ -1,6 +1,7 @@
 import React from "react";
 import ClueFrame from "../frames/clue-frame";
 import "../css/main-page.css";
+import NavBarFrame from "../frames/nav-bar";
 
 interface MainPageProps {
 
@@ -21,6 +22,7 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
     render() {
         return (
             <div className="main-page">
+                <NavBarFrame />
                 <ClueFrame />
             </div>
             )
