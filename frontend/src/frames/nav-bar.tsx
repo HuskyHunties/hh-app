@@ -19,7 +19,7 @@ export default class NavBarFrame extends React.Component<NavBarFrameProps, NavBa
 
     render() {
         return (
-            <div className="nav-bar">Navigation Bar</div>
+            <div className="nav-bar"><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Navigation Bar</a></div>
             )
         }
 }

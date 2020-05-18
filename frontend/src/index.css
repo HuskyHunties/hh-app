@@ -3,4 +3,7 @@
 body {
   margin: 0;
   background: var(--bg-color);
+  color: var(--secondary-color);
+  text-align: center;
+  font-size: 36pt;
 }
