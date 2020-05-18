@@ -5,3 +5,11 @@
     --font-color: #F9F9F9;
     --accent-color: #F36464;
   }
+
+[data-theme="light"] {
+    --bg-color: #ededed;
+    --primary-color: #aaaaaa;
+    --secondary-color: #A85858;
+    --font-color: #070707;
+    --accent-color: #F36464;
+}
