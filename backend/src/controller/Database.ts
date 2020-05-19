@@ -210,6 +210,7 @@ export class DatabaseWrapper {
   // - create path without clue
   // - add clue to path
   // - delete path
+  // -groups
   //
   // other:
   // - add address table that clues reference

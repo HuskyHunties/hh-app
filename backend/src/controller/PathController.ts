@@ -17,6 +17,7 @@ export class Place {
  */
 export class Path {
   name: string;
+  id: number;
   protected clues: Clue[];
   protected description?: string;
 
@@ -35,13 +36,13 @@ export class Path {
   }
 
   /* gets the clues in this path */
-  public getClues(): Clue[]{
-      return this.clues;
+  public getClues(): Clue[] {
+    return this.clues;
   }
 
   /* sets the clues of this object */
   public setClues(clues: Clue[]): void {
-      this.clues = clues;
+    this.clues = clues;
   }
 }
 
