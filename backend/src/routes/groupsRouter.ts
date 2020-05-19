@@ -99,3 +99,5 @@ groupsRouter.put("/:groupID", (req, res, next) => {
     console.log(error);
   }
 });
+
+export default groupsRouter;
