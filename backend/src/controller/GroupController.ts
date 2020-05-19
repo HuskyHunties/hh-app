@@ -8,16 +8,15 @@ export class Group {
   protected name: string;
   protected id: number;
 
-
-  getName(): string{
+  getName(): string {
     return this.name;
   }
 
-  setName(name: string): void{
+  setName(name: string): void {
     this.name = name;
   }
 
-  getPath(): Path{
+  getPath(): Path {
     return this.assocPath;
   }
 }
