@@ -135,34 +135,35 @@ export class Clue {
  */
 export interface ClueController {
   /**
-   * Add a new clue.
+   * Add a new clue. returns the id of this new clue
    * @param name name of the clue
    * @param address address of the clue
    * @param assocCrawl crawl, if any, which contains this clue
    */
-  addClue(name: string, place: Place, assocCrawl: Crawl): void;
+  addClue(name: string, place: Place, assocCrawl: Crawl): number;
 
   /**
    * Finish a clue by submitting an image for points.
    * @param img an image taken at the clue location to store with this clue.
    * @param id ID of the completed clue.
+   * returns the id of this clue
    */
-  finishClue(img: Image, id: number): void;
+  finishClue(img: Image, id: number): number;
 
   /**
-   * Return a list of all clues, finished and unfinished.
+   * Return a list of all clues ids, finished and unfinished.
    */
-  clues(): Clue[];
+  getAllClues(): number[];
 
   /**
-   * Return a list of all unfinished clues.
+   * Return a list of all the ids of all unfinished clues.
    */
-  unfinishedClues(): Clue[];
+  unfinishedClues(): number[];
 
   /**
-   * Return a list of all finished clues.
+   * Return a list of all the ids of all finished clues.
    */
-  finishedClues(): Clue[];
+  finishedClues(): number[];
 
   /**
    * Delete a clue.
@@ -177,4 +178,29 @@ export interface ClueController {
    * @returns the Image
    */
   getImage(id: number): Image;
+}
+
+export class ClueControllerImp implements ClueController{
+  addClue(name: string, place: Place, assocCrawl: Crawl): number {
+    throw new Error("Method addClue not implemented.");
+  }
+  finishClue(img: Image, id: number): number {
+    throw new Error("Method finishClue not implemented.");
+  }
+  getAllClues(): number[] {
+    throw new Error("Method getAllClues not implemented.");
+  }
+  unfinishedClues(): number[] {
+    throw new Error("Method unfinishedClues not implemented.");
+  }
+  finishedClues(): number[] {
+    throw new Error("Method finishedClues not implemented.");
+  }
+  deleteClue(id: number): Clue {
+    throw new Error("Method deleteClue not implemented.");
+  }
+  getImage(id: number): Image {
+    throw new Error("Method getImage not implemented.");
+  }
+  
 }

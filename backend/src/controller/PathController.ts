@@ -117,3 +117,33 @@ export interface PathController {
    */
   getCompleteClues(id: number): Clue[];
 }
+
+export class PathControllerImp implements PathController{
+  newPath(clues: Clue[]): Path {
+    throw new Error("Method newPath not implemented.");
+  }
+  removePath(id: number): Path {
+    throw new Error("Method removePath not implemented.");
+  }
+  getClues(id: number): Clue[] {
+    throw new Error("Method getClues not implemented.");
+  }
+  addClueToPath(pathID: number, clueID: number): void {
+    throw new Error("Method addClueToPath not implemented.");
+  }
+  removeClueFromPath(pathID: number, clueID: number): Clue {
+    throw new Error("Method removeClueFromPath not implemented.");
+  }
+  orderPath(id: number, startingPoint: Place): void;
+  orderPath(id: number, startingPoint: Place, endingPoint: Place): void;
+  orderPath(id: any, startingPoint: any, endingPoint?: any) {
+    throw new Error("Method orderPath not implemented.");
+  }
+  getIncompleteClues(id: number): Clue[] {
+    throw new Error("Method getIncompleteClues not implemented.");
+  }
+  getCompleteClues(id: number): Clue[] {
+    throw new Error("Method getCompleteClues not implemented.");
+  }
+  
+}
