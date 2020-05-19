@@ -1,6 +1,9 @@
 {
-    "name": "hhapp",
-    "version": "1.0.0",
-    "private": true,
-    "workspaces": ["backend", "frontend"]
-  }
+  "name": "hhapp",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}

@@ -3,6 +3,7 @@ import * as logger from "morgan";
 import * as bodyParser from "body-parser";
 import sr from "./subrouter"; // note, the name sr is arbitrary and doesn't correspond to any literals in subRouter.ts
 
+import groupsRouter from "../routes/groupsRouter";
 class Main {
   public express: express.Application;
   constructor() {
@@ -28,7 +29,7 @@ class Main {
 
     this.express.use("/", router);
 
-    this.express.use("/subrouter", sr); // register the subrouter
+    this.express.use("/groups", groupsRouter);
   }
 }
 
