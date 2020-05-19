@@ -1,16 +1,8 @@
-<<<<<<< HEAD
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import MainPage from "./pages/main-page";
-=======
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
-import App from "./App";
-import * as serviceWorker from "./serviceWorker";
->>>>>>> backendwork
 
 ReactDOM.render(
   <React.StrictMode>
