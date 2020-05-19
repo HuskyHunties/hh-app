@@ -83,29 +83,29 @@ export interface GroupController {
 
 export class GroupControllerImp implements GroupController {
   getGroups(): number[] {
-    throw new Error("Method not implemented.");
+    throw new Error("Method getGroups not implemented.");
   }
 
   setPath(pathID: number, groupID: number): void;
   setPath(pathID: number, groupID: number, override: boolean): void;
 
   setPath(pathID: any, groupID: any, override?: any) {
-    throw new Error("Method not implemented.");
+    throw new Error("Method setPath not implemented.");
   }
 
   getGroupPath(groupID: number): number {
-    throw new Error("Method not implemented.");
+    throw new Error("Method getGroupPath not implemented.");
   }
 
   createGroup(name: string): number {
-    throw new Error("Method not implemented.");
+    throw new Error("Method createGroup not implemented.");
   }
 
   deleteGroup(id: number): Group {
-    throw new Error("Method not implemented.");
+    throw new Error("Method deleteGroup not implemented.");
   }
 
   changeGroupName(id: number, newName: string): number {
-    throw new Error("Method not implemented.");
+    throw new Error("Method changeGroupName not implemented.");
   }
 }
