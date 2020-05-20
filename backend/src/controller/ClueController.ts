@@ -34,7 +34,11 @@ export class Crawl {
  */
 export class Image {
   protected name: string;
+  protected base64Encoding: string;
 
+  constructor(base64Encoding: string){
+    this.base64Encoding = base64Encoding;
+  }
   /**
    * GETTERS AND SETTERS
    */
@@ -45,6 +49,10 @@ export class Image {
 
   public setName(name: string): void {
     this.name = name;
+  }
+
+  public getEncoding(): string{
+    return this.base64Encoding;
   }
 }
 

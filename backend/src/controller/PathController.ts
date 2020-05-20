@@ -52,17 +52,17 @@ export class Path {
 export interface PathController {
   /**
    * Makes a new path from the list of clues, does not guarantee any specific order.
-   * @param clues the clues that will make up the path
-   * @returns the new path
+   * @param clues the clues IDs that will make up the path
+   * @returns the id of the new path
    */
-  newPath(clues: Clue[]): Path;
+  newPath(clues: number[]): number;
 
   /**
    * Remove the specified path.
    * @param pathID the path to remove
-   * @returns the removed path
+   * @returns the ids of the clues that were in the deleted path
    */
-  removePath(pathID: number): Path;
+  removePath(pathID: number): number[];
 
   /**
    * Gets the list of clues from the specified path
@@ -119,10 +119,10 @@ export interface PathController {
 }
 
 export class PathControllerImp implements PathController{
-  newPath(clues: Clue[]): Path {
+  newPath(clues: number[]): number {
     throw new Error("Method newPath not implemented.");
   }
-  removePath(pathID: number): Path {
+  removePath(pathID: number): number[] {
     throw new Error("Method removePath not implemented.");
   }
   getClues(pathID: number): number[] {

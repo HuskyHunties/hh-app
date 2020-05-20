@@ -132,12 +132,12 @@ export class DatabaseWrapper {
    * @param picture the picture being added to this clue
    * @return the id of the clue being modified
    */
-  addPictureToClue(clueName: string, picture: Image): number {
+  addPictureToClue(clueName: string, pictureEncoding: string): number {
     // can we assume that this method will only be called with the names
     // of clues which we know to have beena added, and don't have to check for a clue?
 
     this.db.run(
-      "UPDATE clues SET image = picture where name = " + clueName,
+      `UPDATE clues SET image = ${pictureEncoding} where name = ` + clueName,
       (err) => {
         if (err) throw console.error(err.message);
       }
