@@ -55,7 +55,7 @@ export class DatabaseWrapper {
    */
   addClue(name: string, place: string, crawlId?: number): number {
     // if the clue has a crawl, add its crawl to the database; else, only add the clue
-    if (isNullOrUndefined(crawlId)) {
+    if (!isNullOrUndefined(crawlId)) {
       this.db.run(
         "INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)",
         [crawlId, name, place, 0],
@@ -114,11 +114,14 @@ export class DatabaseWrapper {
    * @param clueID
    */
   completeClue(clueID: number): number {
-    this.db.run(`UPDATE clues SET finished = 1 where clue_id = ${clueID}`, (err) => {
-      if (err) {
-        throw console.error(err.message);
+    this.db.run(
+      `UPDATE clues SET finished = 1 where clue_id = ${clueID}`,
+      (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
       }
-    });
+    );
 
     return clueID;
   }
@@ -175,7 +178,7 @@ export class DatabaseWrapper {
   /**
    *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
    */
-  AllFinishedClueIDs(): number[] {
+  getAllFinishedClueIDs(): number[] {
     const AllFinishedClueIDs: number[] = [];
 
     this.db.each(
@@ -193,18 +196,142 @@ export class DatabaseWrapper {
     return AllFinishedClueIDs;
   }
 
-  getImageStringOfClue(clueID: number): string{
+  getImageStringOfClue(clueID: number): string {
     let imageString: string;
 
-    this.db.get(`SELECT image FROM clues WHERE clue_id = ${clueID}`, (err, row) => {
+    this.db.get(
+      `SELECT image FROM clues WHERE clue_id = ${clueID}`,
+      (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        } else if (isNullOrUndefined(row)) {
+          throw new Error("desired clue was not selected");
+        }
+        imageString = row.image;
+      }
+    );
+
+    return imageString;
+  }
+
+  // Group Controller Methods
+
+  /**
+   *
+   * @param name
+   * returns the id of the created group
+   */
+  addGroup(name: string): number {
+    this.db.run("INSERT INTO groups(name) VALUES(?)", [name], (err) => {
+      if (err) throw console.error(err.message);
+    });
+
+    let groupID: number;
+
+    this.db.get(
+      `SELECT group_id from groups WHERE name = ${name}`,
+      (err, row) => {
+        if (err) {
+          console.error(err);
+        }
+        groupID = row.group_id;
+      }
+    );
+
+    return groupID;
+  }
+
+  /**
+   * 
+   * @param groupID 
+   * returns the ID of the path this group had
+   */
+  deleteGroup(groupID: number): number{
+    let pathID: number;
+
+    this.db.run(`DELETE FROM groups WHERE group_id = ${groupID}`, (err, row) => {
       if (err) {
         throw console.error(err.message);
-      } else if (isNullOrUndefined(row)) {
-        throw new Error("desired clue was not selected");
       }
-      imageString = row.image;
-    })
+
+      pathID = row.path_id;
+    });
+
+    return pathID;
   }
+
+  /**
+   * returns an array of all the group ids in the groups table
+   */
+  getAllGroups(): number[]{
+    const allGroupIDs: number[] = [];
+
+    this.db.all(`SELECT group_id FROM groups`, [], (err, rows) => {
+      if (err) {
+        throw console.error(err.message);
+      }
+      rows.forEach((row) => {
+        allGroupIDs.push(row.group_id);
+      });
+    });
+    return allGroupIDs;
+  }
+
+  /**
+   * 
+   * @param groupID 
+   * @param pathID 
+   * sets the path_id of the specified group to the specified path
+   */
+  setPathOfGroupTo(groupID: number, pathID: number): void{
+    this.db.run(
+      `UPDATE groups SET path_id = ${pathID} where group_id = ${groupID}`,
+      (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+      }
+    );
+  }
+
+  /**
+   * 
+   * @param groupID
+   * returns the id of the path of the specified group 
+   */
+  getPathOfGroup(groupID: number): number{
+    let pathID: number;
+    this.db.get(`SELECT path_id from groups WHERE group_id = ${groupID}`, (err, row) => {
+      if(err){
+        console.error(err);
+      }
+      pathID = row.path_id;
+    })
+
+    return pathID;
+  }
+
+  /**
+   * 
+   * @param groupID 
+   * @param newName 
+   * returns the given group id that is being modified
+   */
+  changeGroupName(groupID: number, newName: string): number{
+    this.db.run(`UPDATE groups SET name = ${newName} WHERE group_id = ${groupID}`, err => {
+      if(err){
+        console.error(err);
+      }
+    })
+    return groupID;
+  }
+
+
+
+
+
+
+
 
 
   /**
