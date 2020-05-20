@@ -3,6 +3,8 @@ import * as logger from "morgan";
 import * as bodyParser from "body-parser";
 
 import groupsRouter from "../routes/groupsRouter";
+import cluesRouter from "../routes/cluesRouter";
+import pathsRouter from "../routes/pathsRouter";
 
 class Main {
   public express: express.Application;
@@ -30,6 +32,8 @@ class Main {
     this.express.use("/", router);
 
     this.express.use("/groups", groupsRouter);
+    this.express.use("/clues", cluesRouter);
+    this.express.use("/paths", pathsRouter);
   }
 }
 

@@ -59,17 +59,17 @@ export interface PathController {
 
   /**
    * Remove the specified path.
-   * @param id the path to remove
+   * @param pathID the path to remove
    * @returns the removed path
    */
-  removePath(id: number): Path;
+  removePath(pathID: number): Path;
 
   /**
    * Gets the list of clues from the specified path
-   * @param id the path to get clues from
-   * @returns the list of clues on the path
+   * @param pathID the path to get clues from
+   * @returns the list of ids of the clues on the path
    */
-  getClues(id: number): Clue[];
+  getClues(pathID: number): number[];
 
   /**
    * Adds an exisitng clue to an an exisiting path.
@@ -90,42 +90,42 @@ export interface PathController {
 
   /**
    * Orders the path, from the starting point to take the least total amount of distance.  Note: this should only reorder incomplete clues.
-   * @param id the path id
+   * @param pathID the path id
    * @param startingPoint the starting point
    */
-  orderPath(id: number, startingPoint: Place): void;
+  orderPath(pathID: number, startingPoint: Place): void;
 
   /**
    * Orders the path, from the starting point to the ending point to take the least total amount of distance. Note: this should only reorder incomplete clues.
-   * @param id the path id
+   * @param pathID the path id
    * @param startingPoint the starting point
    * @param endingPoint the ending point
    */
-  orderPath(id: number, startingPoint: Place, endingPoint: Place): void;
+  orderPath(pathID: number, startingPoint: Place, endingPoint: Place): void;
 
   /**
    * Gets a list of the clues along the path that have not yet been completed.
-   * @param id the path id
+   * @param pathID the path id
    * @returns the list of incomplete clues
    */
-  getIncompleteClues(id: number): Clue[];
+  getIncompleteClues(pathID: number): Clue[];
 
   /**
    * Gets a list of the clues along the path that have been completed.
-   * @param id the path id
+   * @param pathID the path id
    * @returns the list of complete clues
    */
-  getCompleteClues(id: number): Clue[];
+  getCompleteClues(pathID: number): Clue[];
 }
 
 export class PathControllerImp implements PathController{
   newPath(clues: Clue[]): Path {
     throw new Error("Method newPath not implemented.");
   }
-  removePath(id: number): Path {
+  removePath(pathID: number): Path {
     throw new Error("Method removePath not implemented.");
   }
-  getClues(id: number): Clue[] {
+  getClues(pathID: number): number[] {
     throw new Error("Method getClues not implemented.");
   }
   addClueToPath(pathID: number, clueID: number): void {
@@ -134,15 +134,15 @@ export class PathControllerImp implements PathController{
   removeClueFromPath(pathID: number, clueID: number): Clue {
     throw new Error("Method removeClueFromPath not implemented.");
   }
-  orderPath(id: number, startingPoint: Place): void;
-  orderPath(id: number, startingPoint: Place, endingPoint: Place): void;
-  orderPath(id: any, startingPoint: any, endingPoint?: any) {
+  orderPath(pathID: number, startingPoint: Place): void;
+  orderPath(pathID: number, startingPoint: Place, endingPoint: Place): void;
+  orderPath(pathID: any, startingPoint: any, endingPoint?: any) {
     throw new Error("Method orderPath not implemented.");
   }
-  getIncompleteClues(id: number): Clue[] {
+  getIncompleteClues(pathID: number): Clue[] {
     throw new Error("Method getIncompleteClues not implemented.");
   }
-  getCompleteClues(id: number): Clue[] {
+  getCompleteClues(pathID: number): Clue[] {
     throw new Error("Method getCompleteClues not implemented.");
   }
   
