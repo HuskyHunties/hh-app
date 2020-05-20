@@ -118,7 +118,7 @@ export interface PathController {
   getCompleteClues(pathID: number): number[];
 }
 
-export class PathControllerImp implements PathController{
+export class PathControllerImp implements PathController {
   newPath(clues: number[]): number {
     throw new Error("Method newPath not implemented.");
   }
@@ -145,5 +145,4 @@ export class PathControllerImp implements PathController{
   getCompleteClues(pathID: number): number[] {
     throw new Error("Method getCompleteClues not implemented.");
   }
-  
 }

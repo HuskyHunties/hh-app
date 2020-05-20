@@ -47,38 +47,33 @@ export class DatabaseWrapper {
 
   /**
    * Add a Crawl to the database.
-   * @param crawl the crawl to add
+   * @param crawlName the crawl to add
    * @return the id of the crawl in the database
    */
-  addCrawl(crawl: Crawl): number {
-    let crawlId: number;
+  addCrawl(crawlName: string): number {
+    this.db.run(
+      `INSERT INTO crawls(name) VALUES(${crawlName})
+          WHERE NOT EXISTS(SELECT 1 FROM crawls WHERE name = ${crawlName})`,
+      (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+        console.log("Added crawl to database");
+      }
+    );
 
-    this.db
-      .run(
-        "INSERT INTO crawls(name) VALUES(" +
-          crawl.getName() +
-          ")" +
-          " WHERE NOT EXISTS(SELECT 1 FROM crawls WHERE name = " +
-          crawl.getName() +
-          ")",
-        (err) => {
-          if (err) {
-            throw console.error(err.message);
-          }
-          console.log("Added crawl to database");
+    let crawlId: number;
+    this.db.get(
+      `SELECT crawl_id FROM crawls WHERE name = ${crawlName}`,
+      (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        } else if (isNullOrUndefined(row)) {
+          throw new Error("did not insert desired crawl");
         }
-      )
-      .get(
-        "SELECT crawl_id FROM crawls WHERE name = " + crawl.getName(),
-        (err, row) => {
-          if (err) {
-            throw console.error(err.message);
-          } else if (isNullOrUndefined(row)) {
-            throw new Error("did not insert desired crawl");
-          }
-          crawlId = row.crawl_id;
-        }
-      );
+        crawlId = row.crawl_id;
+      }
+    );
 
     return crawlId;
   }
@@ -88,21 +83,25 @@ export class DatabaseWrapper {
    * @param clue the clue to add to the database
    * @return the id of the clue in the database
    */
-  addClue(clue: Clue): number {
+  addClue(
+    name: string,
+    place: string,
+    finished: number,
+    crawlId?: number
+  ): number {
     // if the clue has a crawl, add its crawl to the database; else, only add the clue
-    if (clue.hasCrawl()) {
-      const crawlId: number = this.addCrawl(clue.getCrawl());
+    if (crawlId) {
       this.db.run(
         "INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)",
-        [crawlId, clue.getName(), clue.getPlace().getLocation(), 0],
+        [crawlId, name, place, 0],
         (err) => {
           if (err) throw console.error(err.message);
         }
       );
     } else {
       this.db.run(
-        "INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)",
-        [clue.getName(), clue.getPlace().getLocation(), 0],
+        "INSERT INTO clues(name, address, finished) VALUES(?)",
+        [name, place, 0],
         (err) => {
           if (err) throw console.error(err.message);
         }
@@ -112,7 +111,7 @@ export class DatabaseWrapper {
     // retrieve the clue ID registered from the database
     let clueId: number;
     this.db.get(
-      "SELECT clue_id FROM clues WHERE name = " + clue.getName(),
+      `SELECT clue_id FROM clues WHERE name = ${name}`,
       (err, row) => {
         if (err) {
           throw console.error(err.message);
@@ -128,36 +127,22 @@ export class DatabaseWrapper {
 
   /**
    *
-   * @param clueName the name of the clue this method is modifying
+   * @param clueID the id of the clue this method is modifying
    * @param picture the picture being added to this clue
    * @return the id of the clue being modified
    */
-  addPictureToClue(clueName: string, pictureEncoding: string): number {
+  addPictureToClue(clueID: number, pictureEncoding: string): number {
     // can we assume that this method will only be called with the names
     // of clues which we know to have beena added, and don't have to check for a clue?
 
     this.db.run(
-      `UPDATE clues SET image = ${pictureEncoding} where name = ` + clueName,
+      `UPDATE clues SET image = ${pictureEncoding} where clue_id = ${clueID}`,
       (err) => {
         if (err) throw console.error(err.message);
       }
     );
 
-    // retrieve the clue ID registered from the database
-    let clueId: number;
-    this.db.get(
-      "SELECT clue_id FROM clues WHERE name = " + clueName,
-      (err, row) => {
-        if (err) {
-          throw console.error(err.message);
-        } else if (isNullOrUndefined(row)) {
-          throw new Error("did not insert desired clue");
-        }
-        clueId = row.clue_id;
-      }
-    );
-
-    return clueId;
+    return clueID;
   }
 
   /**
@@ -165,41 +150,24 @@ export class DatabaseWrapper {
    * @param clueName
    * @return the id of the clue being modified
    */
-  completeClue(clueName: string): number {
-    this.db.run("UPDATE clues SET finished = 1 where name = " + clueName);
+  completeClue(clueID: number): number {
+    this.db.run(`UPDATE clues SET finished = 1 where clue_id = ${clueID}`);
 
-    // retrieve the clue ID registered from the database
-    let clueId: number;
-    this.db.get(
-      "SELECT clue_id FROM clues WHERE name = " + clueName,
-      (err, row) => {
-        if (err) {
-          throw console.error(err.message);
-        } else if (isNullOrUndefined(row)) {
-          throw new Error("did not insert desired clue");
-        }
-        clueId = row.clue_id;
-      }
-    );
-
-    return clueId;
+    return clueID;
   }
 
   /**
    *
-   * @param clueName name of the clue being modified
+   * @param clueID id of the clue being modified
    * @return the id of the clue being deleted?? idk if this is accessible
    * after the row has been deleted from the table
    */
-  deleteClue(clueName: string): void {
-    this.db.run("DELETE FROM clues WHERE name = " + clueName);
+  deleteClue(clueID: number): void {
+    this.db.run(`DELETE FROM clues WHERE clue_id = ${clueID}`);
   }
+
   // TODO
-  // - add picture to clue - draft done
-  // - 'complete' clue - draft done
-  // - delete clue - draft done
-  // - other information to update with clue?
-  //
+ 
   // - create crawl without clue
   // - create crawl with clue -- this could end up getting recursive ! make helper methods to handle this without recurring
   // - delete crawl (and all clues)

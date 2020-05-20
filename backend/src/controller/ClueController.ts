@@ -36,7 +36,7 @@ export class Image {
   protected name: string;
   protected base64Encoding: string;
 
-  constructor(base64Encoding: string){
+  constructor(base64Encoding: string) {
     this.base64Encoding = base64Encoding;
   }
   /**
@@ -51,7 +51,7 @@ export class Image {
     this.name = name;
   }
 
-  public getEncoding(): string{
+  public getEncoding(): string {
     return this.base64Encoding;
   }
 }
@@ -148,7 +148,7 @@ export interface ClueController {
    * @param address address of the clue
    * @param assocCrawl crawl, if any, which contains this clue
    */
-  addClue(name: string, place: Place, assocCrawl?: Crawl): number;
+  addClue(name: string, place: string, assocCrawl?: Crawl): number;
 
   /**
    * Finish a clue by submitting an image for points.
@@ -156,7 +156,7 @@ export interface ClueController {
    * @param id ID of the completed clue.
    * returns the id of this clue
    */
-  finishClue(img: Image, id: number): number;
+  finishClue(imgEncoding: string, id: number): number;
 
   /**
    * Return a list of all clues ids, finished and unfinished.
@@ -176,8 +176,9 @@ export interface ClueController {
   /**
    * Delete a clue.
    * @param id ID of the clue to delete.
+   * returns 
    */
-  deleteClue(id: number): Clue;
+  deleteClue(id: number): void;
 
   /**
    * Get the clue's image
@@ -185,14 +186,14 @@ export interface ClueController {
    * @throws if the clue is incomplete or does not exist
    * @returns the Image
    */
-  getImage(id: number): Image;
+  getImage(id: number): string;
 }
 
-export class ClueControllerImp implements ClueController{
+export class ClueControllerImp implements ClueController {
   addClue(name: string, place: Place, assocCrawl: Crawl): number {
     throw new Error("Method addClue not implemented.");
   }
-  finishClue(img: Image, id: number): number {
+  finishClue(imgEncoding: string, id: number): number {
     throw new Error("Method finishClue not implemented.");
   }
   getAllClues(): number[] {
@@ -210,5 +211,4 @@ export class ClueControllerImp implements ClueController{
   getImage(id: number): Image {
     throw new Error("Method getImage not implemented.");
   }
-  
 }

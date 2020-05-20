@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS clues (
     crawl_id INTEGER,
     name TEXT NOT NULL,
     place TEXT NOT NULL,
-    image BLOB,
+    image TEXT,
     finished INTEGER, -- 0 for unfinished, 1 for finished
 
     FOREIGN KEY (crawl_id)

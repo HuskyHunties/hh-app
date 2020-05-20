@@ -14,7 +14,7 @@ groupsRouter.get("/", (req, res, next) => {
     res.json(responseObj);
   } catch (error) {
     console.log(error);
-    res.status(400).json({allGroups: [1,2,3]});
+    res.status(400).json({ allGroups: [1, 2, 3] });
   }
 });
 
@@ -39,7 +39,7 @@ groupsRouter.put("/:groupID", (req, res, next) => {
     res.json(responseObj);
   } catch (error) {
     console.log(error);
-    res.status(400).send({pathID: 31, groupID: 26});
+    res.status(400).send({ pathID: 31, groupID: 26 });
   }
 });
 
@@ -53,7 +53,7 @@ groupsRouter.get("/:groupID", (req, res, next) => {
     res.json({ pathID: pathID });
   } catch (error) {
     console.log(error);
-    res.status(400).send({pathID: 45});
+    res.status(400).send({ pathID: 45 });
   }
 });
 
@@ -65,7 +65,7 @@ groupsRouter.post("/", (req, res, next) => {
     res.json({ groupID: groupID });
   } catch (error) {
     console.log(error);
-    res.status(400).send({groupID: 23});
+    res.status(400).send({ groupID: 23 });
   }
 });
 
@@ -75,12 +75,10 @@ groupsRouter.delete("/:groupID", (req, res, next) => {
     const groupID = Number(req.params.groupID);
     const deletedGroup = controller.deleteGroup(groupID);
 
-    res.json(
-      {
-        name: deletedGroup.getName(),
-        pathID: deletedGroup.getPath().id,
-      }
-    );
+    res.json({
+      name: deletedGroup.getName(),
+      pathID: deletedGroup.getPath().id,
+    });
   } catch (error) {
     console.log(error);
     res.status(400).send({
