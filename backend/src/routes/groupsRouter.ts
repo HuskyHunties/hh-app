@@ -10,11 +10,11 @@ groupsRouter.get("/", (req, res, next) => {
   try {
     const allGroups = controller.getGroups();
 
-    const responseObj = JSON.stringify({ groups: allGroups });
+    const responseObj = JSON.stringify({ allGroups: allGroups });
     res.json(responseObj);
   } catch (error) {
     console.log(error);
-    res.status(400);
+    res.status(400).json({allGroups: [1,2,3]});
   }
 });
 
@@ -35,7 +35,7 @@ groupsRouter.put("/:groupID", (req, res, next) => {
       }
     }
 
-    const responseObj = JSON.stringify({ pathID: pathID, groupID: groupID });
+    const responseObj = { pathID: pathID, groupID: groupID };
     res.json(responseObj);
   } catch (error) {
     console.log(error);
@@ -50,7 +50,7 @@ groupsRouter.get("/:groupID", (req, res, next) => {
 
     const pathID: number = controller.getGroupPath(groupID);
 
-    res.json(JSON.stringify({ pathID: pathID }));
+    res.json({ pathID: pathID });
   } catch (error) {
     console.log(error);
     res.status(400);
@@ -62,7 +62,7 @@ groupsRouter.post("/", (req, res, next) => {
   try {
     const groupName = req.body.name;
     const groupID = controller.createGroup(groupName);
-    res.json(JSON.stringify({ groupID: groupID }));
+    res.json({ groupID: groupID });
   } catch (error) {
     console.log(error);
     res.status(400);
@@ -76,10 +76,10 @@ groupsRouter.delete("/:groupID", (req, res, next) => {
     const deletedGroup = controller.deleteGroup(groupID);
 
     res.json(
-      JSON.stringify({
+      {
         name: deletedGroup.getName(),
         path: deletedGroup.getPath(),
-      })
+      }
     );
   } catch (error) {
     console.log(error);
@@ -93,7 +93,7 @@ groupsRouter.put("/:groupID", (req, res, next) => {
   const newName = req.body.name;
   try {
     controller.changeGroupName(groupID, newName);
-    res.json(JSON.stringify({ groupID: groupID }));
+    res.json({ groupID: groupID });
   } catch (error) {
     res.status(400).send("broken");
     console.log(error);

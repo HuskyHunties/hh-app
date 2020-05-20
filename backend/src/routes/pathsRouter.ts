@@ -34,7 +34,7 @@ pathsRouter.get('/:pathID/complete', (req, res, next) => {
     try{
         const pathID = Number(req.params.pathID);
         const clueIDs: number[] = controller.getCompleteClues(pathID);
-        res.json(JSON.stringify({clues: clueIDs}))
+        res.json({clues: clueIDs})
     }catch(error){
         console.log(error);
         res.status(400).send();
@@ -47,7 +47,7 @@ pathsRouter.post('/', (req, res, next) => {
     try{
         const clues: number[] = req.body.clueIDs;
         const pathID = controller.newPath(clues);
-        res.json(JSON.stringify({pathID: pathID}))
+        res.json({pathID: pathID})
     }catch(error){
         console.log(error);
         res.status(400).send();
