@@ -45,52 +45,17 @@ export class DatabaseWrapper {
     });
   }
 
-  /**
-   * Add a Crawl to the database.
-   * @param crawlName the crawl to add
-   * @return the id of the crawl in the database
-   */
-  addCrawl(crawlName: string): number {
-    this.db.run(
-      `INSERT INTO crawls(name) VALUES(${crawlName})
-          WHERE NOT EXISTS(SELECT 1 FROM crawls WHERE name = ${crawlName})`,
-      (err) => {
-        if (err) {
-          throw console.error(err.message);
-        }
-        console.log("Added crawl to database");
-      }
-    );
-
-    let crawlId: number;
-    this.db.get(
-      `SELECT crawl_id FROM crawls WHERE name = ${crawlName}`,
-      (err, row) => {
-        if (err) {
-          throw console.error(err.message);
-        } else if (isNullOrUndefined(row)) {
-          throw new Error("did not insert desired crawl");
-        }
-        crawlId = row.crawl_id;
-      }
-    );
-
-    return crawlId;
-  }
+  // CLUE TABLE METHODS
 
   /**
-   * Add a Clue to the database as well as its associated Crawl as needed
-   * @param clue the clue to add to the database
-   * @return the id of the clue in the database
+   *
+   * @param name
+   * @param place
+   * @param crawlId
    */
-  addClue(
-    name: string,
-    place: string,
-    finished: number,
-    crawlId?: number
-  ): number {
+  addClue(name: string, place: string, crawlId?: number): number {
     // if the clue has a crawl, add its crawl to the database; else, only add the clue
-    if (crawlId) {
+    if (isNullOrUndefined(crawlId)) {
       this.db.run(
         "INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)",
         [crawlId, name, place, 0],
@@ -127,9 +92,8 @@ export class DatabaseWrapper {
 
   /**
    *
-   * @param clueID the id of the clue this method is modifying
-   * @param picture the picture being added to this clue
-   * @return the id of the clue being modified
+   * @param clueID
+   * @param pictureEncoding
    */
   addPictureToClue(clueID: number, pictureEncoding: string): number {
     // can we assume that this method will only be called with the names
@@ -147,27 +111,137 @@ export class DatabaseWrapper {
 
   /**
    *
-   * @param clueName
-   * @return the id of the clue being modified
+   * @param clueID
    */
   completeClue(clueID: number): number {
-    this.db.run(`UPDATE clues SET finished = 1 where clue_id = ${clueID}`);
+    this.db.run(`UPDATE clues SET finished = 1 where clue_id = ${clueID}`, (err) => {
+      if (err) {
+        throw console.error(err.message);
+      }
+    });
 
     return clueID;
   }
 
   /**
    *
-   * @param clueID id of the clue being modified
-   * @return the id of the clue being deleted?? idk if this is accessible
-   * after the row has been deleted from the table
+   * @param clueID
    */
   deleteClue(clueID: number): void {
-    this.db.run(`DELETE FROM clues WHERE clue_id = ${clueID}`);
+    this.db.run(`DELETE FROM clues WHERE clue_id = ${clueID}`, (err) => {
+      if (err) {
+        throw console.error(err.message);
+      }
+    });
+  }
+
+  /**
+   * @returns an array of all the clue_ids in the clues table of the database
+   */
+  getAllClueIDs(): number[] {
+    const allClueIDs: number[] = [];
+
+    this.db.all(`SELECT clue_id FROM clues`, [], (err, rows) => {
+      if (err) {
+        throw console.error(err.message);
+      }
+      rows.forEach((row) => {
+        allClueIDs.push(row.clue_id);
+      });
+    });
+    return allClueIDs;
+  }
+  /**
+   *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
+   */
+  getAllUnfinishedClueIDs(): number[] {
+    const allUnfinishedClueIDs: number[] = [];
+
+    this.db.each(
+      `SELECT clue_id FROM clues where finished = 0`,
+      [],
+      (err, rows) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+        rows.forEach((row) => {
+          allUnfinishedClueIDs.push(row.clue_id);
+        });
+      }
+    );
+    return allUnfinishedClueIDs;
+  }
+
+  /**
+   *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
+   */
+  AllFinishedClueIDs(): number[] {
+    const AllFinishedClueIDs: number[] = [];
+
+    this.db.each(
+      `SELECT clue_id FROM clues where finished = 0`,
+      [],
+      (err, rows) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+        rows.forEach((row) => {
+          AllFinishedClueIDs.push(row.clue_id);
+        });
+      }
+    );
+    return AllFinishedClueIDs;
+  }
+
+  getImageStringOfClue(clueID: number): string{
+    let imageString: string;
+
+    this.db.get(`SELECT image FROM clues WHERE clue_id = ${clueID}`, (err, row) => {
+      if (err) {
+        throw console.error(err.message);
+      } else if (isNullOrUndefined(row)) {
+        throw new Error("desired clue was not selected");
+      }
+      imageString = row.image;
+    })
+  }
+
+
+  /**
+   * Add a Crawl to the database.
+   * @param crawlName the crawl to add
+   * @return the id of the crawl in the database
+   */
+  addCrawl(crawlName: string): number {
+    this.db.run(
+      `INSERT INTO crawls(name) VALUES(${crawlName})
+          WHERE NOT EXISTS(SELECT 1 FROM crawls WHERE name = ${crawlName})`,
+      (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+        console.log("Added crawl to database");
+      }
+    );
+
+    let crawlId: number;
+    this.db.get(
+      `SELECT crawl_id FROM crawls WHERE name = ${crawlName}`,
+      (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        } else if (isNullOrUndefined(row)) {
+          throw new Error("did not insert desired crawl");
+        }
+        crawlId = row.crawl_id;
+      }
+    );
+
+    return crawlId;
   }
 
   // TODO
- 
+
   // - create crawl without clue
   // - create crawl with clue -- this could end up getting recursive ! make helper methods to handle this without recurring
   // - delete crawl (and all clues)

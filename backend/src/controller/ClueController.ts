@@ -146,9 +146,9 @@ export interface ClueController {
    * Add a new clue. returns the id of this new clue
    * @param name name of the clue
    * @param address address of the clue
-   * @param assocCrawl crawl, if any, which contains this clue
+   * @param crawlID crawl ID, if any, which contains this clue
    */
-  addClue(name: string, place: string, assocCrawl?: Crawl): number;
+  addClue(name: string, place: string, crawlID?: number): number;
 
   /**
    * Finish a clue by submitting an image for points.
@@ -176,7 +176,7 @@ export interface ClueController {
   /**
    * Delete a clue.
    * @param id ID of the clue to delete.
-   * returns 
+   * returns
    */
   deleteClue(id: number): void;
 
@@ -190,7 +190,7 @@ export interface ClueController {
 }
 
 export class ClueControllerImp implements ClueController {
-  addClue(name: string, place: Place, assocCrawl: Crawl): number {
+  addClue(name: string, place: string, crawlID: number): number {
     throw new Error("Method addClue not implemented.");
   }
   finishClue(imgEncoding: string, id: number): number {
@@ -208,7 +208,7 @@ export class ClueControllerImp implements ClueController {
   deleteClue(id: number): Clue {
     throw new Error("Method deleteClue not implemented.");
   }
-  getImage(id: number): Image {
+  getImage(id: number): string {
     throw new Error("Method getImage not implemented.");
   }
 }
