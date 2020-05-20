@@ -4,23 +4,29 @@ import API from '../utils/API';
 
 interface GroupListProps {
     ids: number[];
+    clickHandler(selection: number): void;
+    selected: number | undefined;
 }
 
-interface GroupListState {
-}
-
-class GroupList extends React.Component<GroupListProps, GroupListState> {
+class GroupList extends React.Component<GroupListProps> {
 
     render() {
         const groups = this.props.ids.map((id) => {
-            const name = String(id); // Change to database logic
-            const assocPath = "No Associated Path";
+            const name = String(id); // TODO Change to database logic
+            const assocPath = "No Associated Path"; //TODO  Change to database logic
             return (
-                <tr key={id}><td>{name}</td><td>{assocPath}</td></tr>
+                <tr key={id} onClick={() => this.props.clickHandler(id)}><td className={id === this.props.selected ? "selected" : ""}>
+                    {name} -- {assocPath}
+                </td></tr>
             );
         })
         return (
-            <table><tbody>{groups}</tbody></table>
+            <div className="table-div">
+                <table>
+                    <thead><tr><th>List of Groups</th></tr></thead>
+                    <tbody>{groups}</tbody>
+                </table>
+            </div>
         );
     }
 }
@@ -31,13 +37,15 @@ interface GroupFrameProps {
 
 interface GroupFrameState {
     ids: number[];
+    selected: number | undefined;
 }
 
 export default class GroupFrame extends React.Component<GroupFrameProps, GroupFrameState> {
     constructor(props: GroupFrameProps) {
         super(props);
         this.state = {
-            ids: []
+            ids: [],
+            selected: undefined
         }
     }
 
@@ -58,7 +66,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
     render() {
         return (
             <div className="group-frame">
-                <GroupList ids={this.state.ids} />
+                <GroupList ids={this.state.ids} clickHandler={(id: number) => this.setState({ selected: id })} selected={this.state.selected} />
                 <button className="add-group">Add Group</button>
                 <button className="remove-group">Remove Group</button>
             </div>

@@ -11,6 +11,48 @@
     border-radius: 25px;
 }
 
+.table-div {
+    position: absolute;
+    left: 0;
+    top: 25px;
+    width: 100%;
+    height: 475px;
+    overflow-y: scroll;
+}
+
+table {
+    position: absolute;
+    border-spacing: 0px;
+    border-collapse: separate;
+    margin: 25px;
+    margin-top: 0px;
+    width: calc(100% - 50px);
+    text-align: center;
+    cursor: default;
+    border: 4px solid var(--accent-color);
+    border-top-width: 0px;
+    border-bottom-width: 2px;
+}
+
+th {
+    position: sticky;
+    top: 0;
+    background: var(--bg-color);
+    border-bottom: 4px solid var(--accent-color);
+    border-top: 4px solid var(--accent-color);
+    font-weight: normal;
+}
+
+td {
+    border-bottom: 2px solid var(--accent-color);
+    cursor: pointer;
+}
+
+.selected {
+    background: var(--accent-color);
+    color: var(--bg-color);
+}
+
 button {
     position: absolute;
     width: 45.5%;
