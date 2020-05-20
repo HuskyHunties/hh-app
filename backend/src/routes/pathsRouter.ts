@@ -13,7 +13,7 @@ pathsRouter.get('/:pathID', (req, res, next) => {
         res.json(JSON.stringify({clues: clueIDs}))
     }catch(error){
         console.log(error);
-        res.status(400).send();
+        res.status(400).send({clueIDs: [1,2,3,4,5,6]});
     }
 })
 
@@ -25,7 +25,7 @@ pathsRouter.get('/:pathID/incomplete', (req, res, next) => {
         res.json(JSON.stringify({clues: clueIDs}))
     }catch(error){
         console.log(error);
-        res.status(400).send();
+        res.status(400).send({clueIDs: [1,2,3]});
     }
 })
 
@@ -37,7 +37,7 @@ pathsRouter.get('/:pathID/complete', (req, res, next) => {
         res.json({clues: clueIDs})
     }catch(error){
         console.log(error);
-        res.status(400).send();
+        res.status(400).send({clueIDs: [4,5,6]});
     }
 })
 
@@ -50,7 +50,7 @@ pathsRouter.post('/', (req, res, next) => {
         res.json({pathID: pathID})
     }catch(error){
         console.log(error);
-        res.status(400).send();
+        res.status(400).send({pathID: 1});
     }
 })
 
@@ -58,12 +58,12 @@ pathsRouter.post('/', (req, res, next) => {
 pathsRouter.delete('/:pathID', (req, res, next) => {
     try{
         const pathID = Number(req.params.pathID);
-        const removedClues = controller.removePath(pathID);
-        res.json({removedClues: removedClues});
+        const removedClues: number[] = controller.removePath(pathID);
+        res.json({clueIDs: removedClues});
 
     }catch(error){
         console.log(error);
-        res.status(400).send();
+        res.status(400).send({clueIDs: [1,2,3,4,5,6]});
     }
 })
 

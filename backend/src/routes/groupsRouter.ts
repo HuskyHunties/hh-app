@@ -39,7 +39,7 @@ groupsRouter.put("/:groupID", (req, res, next) => {
     res.json(responseObj);
   } catch (error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send({pathID: 31, groupID: 26});
   }
 });
 
@@ -53,7 +53,7 @@ groupsRouter.get("/:groupID", (req, res, next) => {
     res.json({ pathID: pathID });
   } catch (error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send({pathID: 45});
   }
 });
 
@@ -65,7 +65,7 @@ groupsRouter.post("/", (req, res, next) => {
     res.json({ groupID: groupID });
   } catch (error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send({groupID: 23});
   }
 });
 
@@ -78,12 +78,15 @@ groupsRouter.delete("/:groupID", (req, res, next) => {
     res.json(
       {
         name: deletedGroup.getName(),
-        path: deletedGroup.getPath(),
+        pathID: deletedGroup.getPath().id,
       }
     );
   } catch (error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send({
+      name: "deletedgroup",
+      pathID: 4,
+    });
   }
 });
 
@@ -95,7 +98,7 @@ groupsRouter.put("/:groupID", (req, res, next) => {
     controller.changeGroupName(groupID, newName);
     res.json({ groupID: groupID });
   } catch (error) {
-    res.status(400).send("broken");
+    res.status(400).send({ groupID: 1 });
     console.log(error);
   }
 });
