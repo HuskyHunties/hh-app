@@ -17,6 +17,30 @@ pathsRouter.get('/:pathID', (req, res, next) => {
     }
 })
 
+// gets the list of all the ids of all the incomplete clues on the specified path
+pathsRouter.get('/:pathID/incomplete', (req, res, next) => {
+    try{
+        const pathID = Number(req.params.pathID);
+        const clueIDs: number[] = controller.getIncompleteClues(pathID);
+        res.json(JSON.stringify({clues: clueIDs}))
+    }catch(error){
+        console.log(error);
+        res.status(400).send();
+    }
+})
+
+// gets the list of all the ids of all the incomplete clues on the specified path
+pathsRouter.get('/:pathID/complete', (req, res, next) => {
+    try{
+        const pathID = Number(req.params.pathID);
+        const clueIDs: number[] = controller.getCompleteClues(pathID);
+        res.json(JSON.stringify({clues: clueIDs}))
+    }catch(error){
+        console.log(error);
+        res.status(400).send();
+    }
+})
+
 // makes a new path based off the list of clues in the request body,
 // sends back the ID of the new path created
 pathsRouter.post('/', (req, res, next) => {
@@ -43,13 +67,21 @@ pathsRouter.delete('/:pathID', (req, res, next) => {
     }
 })
 
-// adds the specified clue to the specified path
+// adds or removes the specified clue to the specified path
+// req.body.clueID is the id of the clue, and req.body.add is 
+// boolean
 pathsRouter.put('/:pathID', (req, res, next) => {
     try{
         const pathID = Number(req.params.pathID);
         const clueID = req.body.clueID;
-        controller.addClueToPath(pathID, clueID);
-        res.send(`Added clue: ${clueID} to path: ${pathID}`) 
+        if(Boolean(req.body.add)){
+            controller.addClueToPath(pathID, clueID);
+            res.send(`Added clue: ${clueID} to path: ${pathID}`)
+        } 
+        else{
+            controller.removeClueFromPath(pathID, clueID);
+            res.send(`Removed clue: ${clueID} from path: ${pathID}`)
+        }
     }catch(error){
         console.log(error);
         res.status(400).send();

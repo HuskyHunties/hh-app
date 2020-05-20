@@ -106,16 +106,16 @@ export interface PathController {
   /**
    * Gets a list of the clues along the path that have not yet been completed.
    * @param pathID the path id
-   * @returns the list of incomplete clues
+   * @returns the list of incomplete clues ids
    */
-  getIncompleteClues(pathID: number): Clue[];
+  getIncompleteClues(pathID: number): number[];
 
   /**
    * Gets a list of the clues along the path that have been completed.
    * @param pathID the path id
-   * @returns the list of complete clues
+   * @returns the list of complete clues ids
    */
-  getCompleteClues(pathID: number): Clue[];
+  getCompleteClues(pathID: number): number[];
 }
 
 export class PathControllerImp implements PathController{
@@ -139,10 +139,10 @@ export class PathControllerImp implements PathController{
   orderPath(pathID: any, startingPoint: any, endingPoint?: any) {
     throw new Error("Method orderPath not implemented.");
   }
-  getIncompleteClues(pathID: number): Clue[] {
+  getIncompleteClues(pathID: number): number[] {
     throw new Error("Method getIncompleteClues not implemented.");
   }
-  getCompleteClues(pathID: number): Clue[] {
+  getCompleteClues(pathID: number): number[] {
     throw new Error("Method getCompleteClues not implemented.");
   }
   

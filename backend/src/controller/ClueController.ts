@@ -148,7 +148,7 @@ export interface ClueController {
    * @param address address of the clue
    * @param assocCrawl crawl, if any, which contains this clue
    */
-  addClue(name: string, place: Place, assocCrawl: Crawl): number;
+  addClue(name: string, place: Place, assocCrawl?: Crawl): number;
 
   /**
    * Finish a clue by submitting an image for points.
