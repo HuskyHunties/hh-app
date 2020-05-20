@@ -5,5 +5,5 @@ body {
   background: var(--bg-color);
   color: var(--font-color);
   text-align: center;
-  font-size: 36pt;
+  font-size: 24pt;
 }

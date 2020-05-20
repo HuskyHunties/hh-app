@@ -2,9 +2,7 @@
 .main-page {
     position: relative;
     width: 100%;
-    height: 1195px;
+    height: 1450px;
     overflow-y: scroll;
     background: var(--bg-color);
-    padding: 0pt;
-    margin: 0;
 }
