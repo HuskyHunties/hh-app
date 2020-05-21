@@ -25,9 +25,7 @@ class Main {
     const router = express.Router();
 
     router.get("/", (req, res, next) => {
-      res.json({
-        dan: "dumb",
-      }); // this ends the req res cycle and sends a json response
+      res.send("Whattup you gotta enter a route extension: groups, clues, paths, or crawls");
     });
 
     this.express.use("/", router);

@@ -886,7 +886,7 @@ class DatabaseWrapper {
 
   /**
    * returns the info of the specified crawl, (crawlID, name)
-   * @param crawlID
+   * @param crawlID - id of the crawl being queried
    */
 
   getInfoOfCrawl(crawlID: number): Promise<object> {
@@ -906,7 +906,7 @@ class DatabaseWrapper {
 
   /**
    * deletes the specified crawl and returns its information as an object
-   * @param crawlID
+   * @param crawlID - id of the crawl being removed
    */
   async removeCrawl(crawlID: number): Promise<object> {
     const db = this.db;

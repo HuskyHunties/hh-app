@@ -1,3 +1,4 @@
+/* eslint-disable tsdoc/syntax */
 import * as express from "express";
 import { dbWrapper } from "../controller/Database";
 
