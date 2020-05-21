@@ -1,5 +1,6 @@
 @import "./colors.css";
 
+/* Styles the ClueFrame container component. */
 .path-frame {
     position: absolute;
     height: 600px;

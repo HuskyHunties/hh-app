@@ -1,5 +1,6 @@
 @import "colors.css";
 
+/* Styles the ClueFrame container component. */
 .clue-frame {
     position: absolute;
     width: 94%;

@@ -5,10 +5,16 @@ import * as serviceWorker from './serviceWorker';
 import MainPage from "./pages/main-page";
 import Popup, { PopupTypes } from "./utils/popup";
 
+/**
+ * Properties type for the PageLoader Component
+ */
 interface PageLoaderProps {
 
 }
 
+/**
+ * State type for the PageLoader Component
+ */
 interface PageLoaderState {
   // Popup information
   showPopup: boolean;
@@ -18,6 +24,10 @@ interface PageLoaderState {
   popupDoConfirm?(): void;
 }
 
+/**
+ * A wrapper component that handles displaying a page and the popup component.
+ * Logic to control which page is displayed is handled in this component.
+ */
 class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
   constructor(props: PageLoaderProps) {
     super(props);
@@ -25,14 +35,27 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
     this.popupFactory = this.popupFactory.bind(this);
   }
 
+  /**
+   * Hides the popup window
+   */
   private hidePopup() {
     this.setState({ showPopup: false })
   }
 
+  /**
+   * Creates a pop up window.
+   * @param type - the type of popup
+   * @param message - the message to be displayed in the popup
+   * @param onInput - the function to be executed when a user inputs a value to the popup
+   * @param onConfirm - the function to be executed when a user confirms the question asked by the popup
+   */
   private popupFactory(type: PopupTypes, message: string, onInput?: (res: string) => void, onConfirm?: () => void) {
     this.setState({showPopup: true, popupType: type, popupMessage: message, popupDoInput: onInput, popupDoConfirm: onConfirm})
 }
 
+  /**
+   * Renders the component as a page and popup window contained in a div.
+   */
   render() {
     return (<div>
       <MainPage popupFactory={this.popupFactory} />
@@ -43,6 +66,9 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
 
 }
 
+/**
+ * The main method to actually display content on the page.  This just displays the PageLoader Component.
+ */
 ReactDOM.render(
   <React.StrictMode>
     <PageLoader />

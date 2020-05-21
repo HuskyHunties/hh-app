@@ -1,4 +1,5 @@
 @import "../css/colors.css";
+/* Styling for the popup box */
 
 .popup {
     position: fixed;
@@ -8,16 +9,19 @@
     width: 40%;
     height: 25%;
     z-index: 25;
-
     background-color: var(--bg-color);
     border: 2px solid var(--accent-color);
     border-radius: 25px;
     box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
+/* A class to hide the pop up box when not in use */
+
 .hidden {
     display: none;
 }
+
+/* Styling for the okay button in the confirm popup */
 
 .okay {
     position: absolute;
@@ -28,6 +32,8 @@
     line-height: 50px;
 }
 
+/* Styling for the cancel button in the confirm popup */
+
 .cancel {
     position: absolute;
     width: 45.5%;
@@ -37,6 +43,8 @@
     line-height: 50px;
 }
 
+/* Styling for the button in the notif popup */
+
 .notif {
     position: absolute;
     width: 50%;
@@ -45,6 +53,8 @@
     height: 50px;
     line-height: 50px;
 }
+
+/* Styling for the text input box in the input popup */
 
 #input {
     width: 94%;
@@ -58,6 +68,8 @@
     padding-left: 10px;
 }
 
+/* Styling for the div containing buttons and input fields in the popup */
+
 .popup-button {
     position: absolute;
     width: 100%;
@@ -65,6 +77,8 @@
     left: 0;
     top: 50%;
 }
+
+/* Styling for the div containing the message in the popup */
 
 .popup-text {
     position: absolute;

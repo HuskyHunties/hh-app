@@ -1,14 +1,24 @@
 import React from 'react';
 import './popup.css';
 
+/**
+ * An enum describing the different types of popup available.
+ */
 export enum PopupTypes {
     Confirm = "confirm",
     Input = "input",
     Notif = "notif"
 }
 
+/**
+ * A function type that is used to create a popup.
+ * This is only implemented by the popupFactory, but this type makes passing the function in props easier.
+ */
 export type PopupCreator = (type: PopupTypes, message: string, onInput?: (res: string) => void, onConfirm?: () => void) => void;
 
+/**
+ * Properties type for the Popup Component
+ */
 interface PopupProps {
     showPopup: boolean;
     popupType: PopupTypes;
@@ -18,16 +28,28 @@ interface PopupProps {
     hidePopup(): void;
 }
 
+/**
+ * State type for the Popup Component
+ */
 interface PopupState {
     inputValue: string;
 }
 
+/**
+ * A component that displays a popup window and takes a response from the user.
+ */
 export default class Popup extends React.Component<PopupProps, PopupState> {
     constructor(props: PopupProps) {
         super(props);
         this.state = { inputValue: "" };
     }
 
+    /**
+     * Handles the clicking on the popup buttons.
+     * @param confirm Was the okay button clicked on a confirm popup?
+     * @param input Was the okay button clicked on a input popup?
+     * @param inputValue The input value on the input popup
+     */
     private handleClick(confirm: boolean, input: boolean, inputValue?: string) {
         if (confirm) {
             (this.props.popupDoConfirm)!();
@@ -35,10 +57,14 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
             (this.props.popupDoInput)!(inputValue!);
         }
 
-        this.setState({inputValue: ""});
+        this.setState({ inputValue: "" });
         this.props.hidePopup();
     }
 
+    /**
+     * Creates the buttons for the confirm popup.
+     * @returns a div containing those buttons
+     */
     private confirm(): JSX.Element {
         return (
             <div className="popup-button">
@@ -47,6 +73,10 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
             </div>);
     }
 
+    /**
+    * Creates the buttons and text field for the input popup.
+    * @returns a div containing those buttons and the field
+    */
     private input(): JSX.Element {
         return (
             <div className="popup-button">
@@ -58,6 +88,10 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         );
     }
 
+    /**
+    * Creates the button for the notif popup.
+    * @returns a div containing that button
+    */
     private notif(): JSX.Element {
         return (
             <div className="popup-button">
@@ -66,8 +100,12 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         );
     }
 
+    /**
+     * Renders the popup box
+     */
     render() {
         let buttons: JSX.Element;
+        // Creates the buttons depending on the popup type.
         switch (this.props.popupType) {
             case PopupTypes.Confirm:
                 buttons = this.confirm();
@@ -85,6 +123,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
                 throw Error("Invalid Type")
         }
 
+        // Combines the buttons with the message.
         return (
             <div className={this.props.showPopup ? "popup" : "hidden"}>
                 <div className="popup-text">
