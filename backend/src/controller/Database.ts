@@ -815,4 +815,4 @@ class DatabaseWrapper {
   // - add place table that clues reference
 }
 
-export const dbWrapper = new DatabaseWrapper("src/hh.db");
+export const dbWrapper = new DatabaseWrapper("build/hh.db");

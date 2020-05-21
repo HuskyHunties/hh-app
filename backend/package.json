@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "gulp scripts && mocha --reporter spec --require ts-node/register 'test/**/*.test.ts'",
-    "build": "gulp scripts",
+    "build": "gulp scripts && node build/src/server.js",
     "start": "ts-node src/server.ts",
     "debug": "gulp scripts && node --inspect-brk build/src/server.js",
     "lint": "eslint -f unix \"src/**/*.{ts,tsx}\""
