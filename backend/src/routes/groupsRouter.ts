@@ -1,3 +1,4 @@
+/* eslint-disable tsdoc/syntax */
 import * as express from "express";
 import { dbWrapper } from "../controller/Database";
 
@@ -19,6 +20,7 @@ groupsRouter.get("/", async (req, res) => {
 
 /**
  * sends an object with all the fields of the requested group in the database
+ * { groupID: groupID, name: name, pathID: pathID }
  */
 groupsRouter.get("/:groupID", async (req, res) => {
   try {
@@ -36,6 +38,7 @@ groupsRouter.get("/:groupID", async (req, res) => {
 /**
  * adds a group to the database, JSON with group name in request body,
  * sends information on the created group
+ * { groupID: row.group_id, name: row.name }
  */
 
 groupsRouter.post("/", async (req, res) => {
@@ -52,6 +55,7 @@ groupsRouter.post("/", async (req, res) => {
 
 /**
  * deletes the group specified by the given ID, sends information on deleted group
+ * { name: name, pathID: pathID }
  */
 
 groupsRouter.delete("/:groupID", async (req, res) => {
@@ -69,6 +73,7 @@ groupsRouter.delete("/:groupID", async (req, res) => {
 /**
  * changes either/or of the name/pathID fields of the specified group,
  * sends information on modified group
+ * { groupID: groupID, name: name, pathID: pathID }
  */
 groupsRouter.put("/:groupID", async (req, res) => {
   const groupID = Number(req.params.groupID);

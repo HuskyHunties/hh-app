@@ -766,24 +766,20 @@ class DatabaseWrapper {
 
   // CRAWL TABLE METHODS
 
-
-  getAllCrawls(): Promise<number[]>{
+  getAllCrawls(): Promise<number[]> {
     const db = this.db;
     const crawlIDs: number[] = [];
     return new Promise((resolve, reject) => {
-      db.all(
-        `SELECT crawl_id FROM crawls`,
-        (err, rows) => {
-          if (err) {
-            reject(console.error());
-          }
-
-          rows.forEach((row) => {
-            crawlIDs.push(row.crawl_id);
-          });
-          resolve(crawlIDs);
+      db.all(`SELECT crawl_id FROM crawls`, (err, rows) => {
+        if (err) {
+          reject(console.error());
         }
-      );
+
+        rows.forEach((row) => {
+          crawlIDs.push(row.crawl_id);
+        });
+        resolve(crawlIDs);
+      });
     });
   }
   /**
@@ -890,49 +886,40 @@ class DatabaseWrapper {
 
   /**
    * returns the info of the specified crawl, (crawlID, name)
-   * @param crawlID 
+   * @param crawlID
    */
 
-  getInfoOfCrawl(crawlID: number): Promise<object>{
+  getInfoOfCrawl(crawlID: number): Promise<object> {
     const db = this.db;
     return new Promise((resolve, reject) => {
-      db.get(`SELECT name FROM crawls WHERE crawl_id = ${crawlID}`, (err, row) => {
-        if(err){
-          reject(err.message)
+      db.get(
+        `SELECT name FROM crawls WHERE crawl_id = ${crawlID}`,
+        (err, row) => {
+          if (err) {
+            reject(err.message);
+          }
+          resolve({ crawlID: crawlID, name: row.name });
         }
-        resolve({crawlID: crawlID, name: row.name});
-      })
+      );
     });
   }
 
   /**
    * deletes the specified crawl and returns its information as an object
-   * @param crawlID 
+   * @param crawlID
    */
   async removeCrawl(crawlID: number): Promise<object> {
     const db = this.db;
     const infoObject = await this.getInfoOfCrawl(crawlID);
     return new Promise((resolve, reject) => {
-      db.run(`DELETE FROM crawls where crawl_id = ${crawlID}`, (err) =>{
-        if(err){
-          reject(err.message)
+      db.run(`DELETE FROM crawls where crawl_id = ${crawlID}`, (err) => {
+        if (err) {
+          reject(err.message);
         }
         resolve(infoObject);
-      })
+      });
     });
   }
-
-  // TODO
-
-  // - create crawl without clue
-  // - create crawl with clue -- this could end up getting recursive ! make helper methods to handle this without recurring
-  // - delete crawl (and all clues)
-  // - delete crawl without clues
-  // - add clue to crawl
-  //
-  //
-  // other:
-  // - add place table that clues reference
 }
 
 export const dbWrapper = new DatabaseWrapper("build/hh.db");

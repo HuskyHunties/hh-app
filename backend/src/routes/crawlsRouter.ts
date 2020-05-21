@@ -1,3 +1,4 @@
+/* eslint-disable tsdoc/syntax */
 import * as express from "express";
 import { dbWrapper } from "../controller/Database";
 
@@ -8,8 +9,8 @@ const crawlsRouter: express.Router = express.Router();
  */
 crawlsRouter.get("/", async (req, res) => {
   try {
-      const crawlIDs = await dbWrapper.getAllCrawls();
-      res.send({crawlIDs: crawlIDs});
+    const crawlIDs = await dbWrapper.getAllCrawls();
+    res.send({ crawlIDs: crawlIDs });
   } catch (error) {
     console.log(error);
     res.status(400).send();
@@ -64,6 +65,7 @@ crawlsRouter.get("/:crawlID/complete", async (req, res) => {
 /**
  * makes a new crawl based off the list of clues in the request body,
  * sends back the information of the crawl created.
+ * { crawlID: crawlID, name: crawlName }
  */
 crawlsRouter.post("/", async (req, res) => {
   try {
@@ -78,6 +80,7 @@ crawlsRouter.post("/", async (req, res) => {
 
 /**
  * deletes the crawl specified by the given crawlID param, sends back information on deleted crawl
+ * { crawlID: crawlID, name: crawlName }
  */
 crawlsRouter.delete("/:crawlID", async (req, res) => {
   try {

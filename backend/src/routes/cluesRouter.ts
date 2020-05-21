@@ -1,3 +1,4 @@
+/* eslint-disable tsdoc/syntax */
 import * as express from "express";
 import { dbWrapper } from "../controller/Database";
 
@@ -18,6 +19,13 @@ cluesRouter.get("/", async (req, res) => {
 
 /**
  * deletes the specified clue from the database, sends information of that clue
+ * {
+            crawlID: crawlID,
+            name: name,
+            place: place,
+            image: image,
+            finished: finished,
+    }
  */
 cluesRouter.get("/:clueID", async (req, res) => {
   const clueID = Number(req.params.clueID);
@@ -59,6 +67,13 @@ cluesRouter.get("/complete", async (req, res) => {
 
 /**
  * adds a clue described by the request body to the table, sends information of that clue
+ * {
+          clueID: clueID,
+          crawlID: crawlID,
+          name: name,
+          place: place,
+          finished: 0,
+        }
  */
 cluesRouter.post("/", async (req, res) => {
   const name: string = req.body.name;
@@ -76,6 +91,13 @@ cluesRouter.post("/", async (req, res) => {
 
 /**
  * deletes the specified clue from the database, sends information of deleted clue
+ * {
+          crawlID: crawlID,
+          name: name,
+          place: place,
+          image: image,
+          finished: finished,
+        }
  */
 cluesRouter.delete("/:clueID", async (req, res) => {
   const clueID = Number(req.params.clueID);

@@ -50,6 +50,7 @@ pathsRouter.get("/:pathID/complete", async (req, res) => {
 /**
  * makes a new path based off the list of clues in the request body,
  * sends back the information of the path created.
+ * { pathID: pathID, name: name }
  */
 pathsRouter.post("/", async (req, res) => {
   try {
@@ -64,6 +65,7 @@ pathsRouter.post("/", async (req, res) => {
 
 /**
  * deletes the path specified by the given pathID param, sends back information on deleted path
+ * { name: name, clueIDs: clueIDs }
  */
 pathsRouter.delete("/:pathID", async (req, res) => {
   try {
@@ -78,6 +80,7 @@ pathsRouter.delete("/:pathID", async (req, res) => {
 
 /**
  * adds or removes the specified clue to the specified path, sends back information on modified path
+ * { pathID: pathID, clueID: clueID }
  */
 pathsRouter.put("/:pathID", async (req, res) => {
   try {
