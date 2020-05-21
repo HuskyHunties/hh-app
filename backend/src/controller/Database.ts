@@ -232,7 +232,7 @@ export class DatabaseWrapper {
       `SELECT group_id from groups WHERE name = ${name}`,
       (err, row) => {
         if (err) {
-          console.error(err);
+          throw console.error(err.message);
         }
         groupID = row.group_id;
       }
@@ -242,20 +242,23 @@ export class DatabaseWrapper {
   }
 
   /**
-   * 
-   * @param groupID 
+   *
+   * @param groupID
    * returns the ID of the path this group had
    */
-  deleteGroup(groupID: number): number{
+  deleteGroup(groupID: number): number {
     let pathID: number;
 
-    this.db.run(`DELETE FROM groups WHERE group_id = ${groupID}`, (err, row) => {
-      if (err) {
-        throw console.error(err.message);
-      }
+    this.db.run(
+      `DELETE FROM groups WHERE group_id = ${groupID}`,
+      (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        }
 
-      pathID = row.path_id;
-    });
+        pathID = row.path_id;
+      }
+    );
 
     return pathID;
   }
@@ -263,7 +266,7 @@ export class DatabaseWrapper {
   /**
    * returns an array of all the group ids in the groups table
    */
-  getAllGroups(): number[]{
+  getAllGroups(): number[] {
     const allGroupIDs: number[] = [];
 
     this.db.all(`SELECT group_id FROM groups`, [], (err, rows) => {
@@ -278,12 +281,12 @@ export class DatabaseWrapper {
   }
 
   /**
-   * 
-   * @param groupID 
-   * @param pathID 
+   *
+   * @param groupID
+   * @param pathID
    * sets the path_id of the specified group to the specified path
    */
-  setPathOfGroupTo(groupID: number, pathID: number): void{
+  setPathOfGroupTo(groupID: number, pathID: number): void {
     this.db.run(
       `UPDATE groups SET path_id = ${pathID} where group_id = ${groupID}`,
       (err) => {
@@ -295,44 +298,236 @@ export class DatabaseWrapper {
   }
 
   /**
-   * 
+   *
    * @param groupID
-   * returns the id of the path of the specified group 
+   * returns the id of the path of the specified group
    */
-  getPathOfGroup(groupID: number): number{
+  getPathOfGroup(groupID: number): number {
     let pathID: number;
-    this.db.get(`SELECT path_id from groups WHERE group_id = ${groupID}`, (err, row) => {
-      if(err){
-        console.error(err);
+    this.db.get(
+      `SELECT path_id from groups WHERE group_id = ${groupID}`,
+      (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+        pathID = row.path_id;
       }
-      pathID = row.path_id;
-    })
+    );
 
     return pathID;
   }
 
   /**
-   * 
-   * @param groupID 
-   * @param newName 
+   *
+   * @param groupID
+   * @param newName
    * returns the given group id that is being modified
    */
-  changeGroupName(groupID: number, newName: string): number{
-    this.db.run(`UPDATE groups SET name = ${newName} WHERE group_id = ${groupID}`, err => {
-      if(err){
-        console.error(err);
+  changeGroupName(groupID: number, newName: string): number {
+    this.db.run(
+      `UPDATE groups SET name = ${newName} WHERE group_id = ${groupID}`,
+      (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
       }
-    })
+    );
     return groupID;
   }
 
+  // PATH CONTROLLER METHODS - path and join tables
+
+  /**
+   *
+   * @param clueIDs
+   * returns the id of the created path
+   */
+  createPath(name: string, clueIDs: number[]): number {
+    this.db.run(`INSERT INTO paths(name) VALUES(?)`, [name], (err) => {
+      if (err) throw console.error(err.message);
+    });
+
+    let pathID: number;
+
+    this.db.get(
+      `SELECT path_id from paths WHERE name = ${name}`,
+      (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+        pathID = row.path_id;
+      }
+    );
+
+    clueIDs.forEach((clueID) => {
+      this.db.run(
+        `INSERT INTO paths_join_clues(path_id, clue_id) VALUES(?)`,
+        [pathID, clueID],
+        (err) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+        }
+      );
+    });
+
+    return pathID;
+  }
+
+  /**
+   *
+   * @param pathID
+   * returns an array of the clueIDs which were on this path
+   */
+  removePath(pathID: number): number[] {
+    const clueIDs: number[] = [];
+
+    // collecting the clue ids from the join table
+    this.db.each(
+      `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID}`,
+      (err, rows) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+
+        rows.forEach((row) => {
+          clueIDs.push(row.clue_id);
+        });
+      }
+    );
+
+    //deleting the path from the path table
+    this.db.run(`DELETE FROM paths WHERE path_id = ${pathID}`, (err) => {
+      if (err) {
+        throw console.error(err.message);
+      }
+    });
+
+    return clueIDs;
+  }
+
+  /**
+   *
+   * @param pathID
+   * returns all the clue IDs associated with the specific clue
+   */
+  getCluesofPath(pathID: number): number[] {
+    const clueIDs: number[] = [];
+
+    // collecting the clue ids from the join table
+    this.db.each(
+      `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID}`,
+      (err, rows) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+
+        rows.forEach((row) => {
+          clueIDs.push(row.clue_id);
+        });
+      }
+    );
+
+    return clueIDs;
+  }
+
+  /**
+   * adds the specified clue to the specified path in the join table
+   * @param pathID
+   * @param clueID
+   */
+  addClueToPath(pathID: number, clueID: number): void {
+    this.db.run(
+      `INSERT INTO paths_join_clues(path_id, clue_id) VALUES(?)`,
+      [pathID, clueID],
+      (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+      }
+    );
+  }
+
+  /**
+   * removes the specified clue from the specified path
+   * @param pathID
+   * @param clueID
+   * returns the clueID removed
+   */
+  removeClueFromPath(pathID: number, clueID: number): number {
+    this.db.run(
+      `DELETE FROM paths_join_clues WHERE path_id = ${pathID} AND clue_id = ${clueID}`,
+      (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+      }
+    );
+
+    return clueID;
+  }
+
+  /**
+   *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
+   */
+  getAllUnfinishedClueIDsOfPath(pathID: number): number[] {
+    const allClues = this.getCluesofPath(pathID);
+    const allUnfinishedClueIDs: number[] = [];
+
+    allClues.forEach((clueID) => {
+      this.db.each(
+        `SELECT finished FROM clues WHERE clue_id = ${clueID}`,
+        [],
+        (err, rows) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+          rows.forEach((row) => {
+            if (row.finished === 0) {
+              allUnfinishedClueIDs.push(row.clue_id);
+            }
+          });
+        }
+      );
+    });
+
+    return allUnfinishedClueIDs;
+  }
+
+  /**
+   *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
+   */
+  getAllFinishedClueIDsOfPath(pathID: number): number[] {
+    const allClues = this.getCluesofPath(pathID);
+    const allFinishedClueIDs: number[] = [];
+
+    allClues.forEach((clueID) => {
+      this.db.each(
+        `SELECT finished FROM clues WHERE clue_id = ${clueID}`,
+        [],
+        (err, rows) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+          rows.forEach((row) => {
+            if (row.finished === 1) {
+              allFinishedClueIDs.push(row.clue_id);
+            }
+          });
+        }
+      );
+    });
+
+    return allFinishedClueIDs;
+  }
+
+  /*
 
 
 
 
 
-
-
+*/
 
   /**
    * Add a Crawl to the database.

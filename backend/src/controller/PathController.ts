@@ -53,9 +53,10 @@ export interface PathController {
   /**
    * Makes a new path from the list of clues, does not guarantee any specific order.
    * @param clues the clues IDs that will make up the path
+   * @param name name of the path
    * @returns the id of the new path
    */
-  newPath(clues: number[]): number;
+  newPath(name: string, clues: number[]): number;
 
   /**
    * Remove the specified path.
@@ -86,7 +87,7 @@ export interface PathController {
    * @throws if the clue is not a part of the path
    * @returns the removed clue
    */
-  removeClueFromPath(pathID: number, clueID: number): Clue;
+  removeClueFromPath(pathID: number, clueID: number): number;
 
   /**
    * Orders the path, from the starting point to take the least total amount of distance.  Note: this should only reorder incomplete clues.
@@ -119,7 +120,7 @@ export interface PathController {
 }
 
 export class PathControllerImp implements PathController {
-  newPath(clues: number[]): number {
+  newPath(name: string, clues: number[]): number {
     throw new Error("Method newPath not implemented.");
   }
   removePath(pathID: number): number[] {
@@ -131,7 +132,7 @@ export class PathControllerImp implements PathController {
   addClueToPath(pathID: number, clueID: number): void {
     throw new Error("Method addClueToPath not implemented.");
   }
-  removeClueFromPath(pathID: number, clueID: number): Clue {
+  removeClueFromPath(pathID: number, clueID: number): number {
     throw new Error("Method removeClueFromPath not implemented.");
   }
   orderPath(pathID: number, startingPoint: Place): void;
