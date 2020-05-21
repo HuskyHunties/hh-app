@@ -44,7 +44,7 @@ groupsRouter.get("/:groupID", async (req, res) => {
 groupsRouter.post("/", async (req, res) => {
   try {
     const groupName = req.body.name;
-    const infoObject: object = await dbWrapper.createGroup(groupName);
+    const infoObject: object = await dbWrapper.addGroup(groupName);
 
     res.send(infoObject);
   } catch (error) {

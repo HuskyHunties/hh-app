@@ -56,7 +56,7 @@ pathsRouter.get("/:pathID/complete", async (req, res) => {
 pathsRouter.post("/", async (req, res) => {
   try {
     const name: string = req.body.name;
-    const infoObject: object = await dbWrapper.createPath(name);
+    const infoObject: object = await dbWrapper.addPath(name);
     res.send(infoObject);
   } catch (error) {
     console.log(error);

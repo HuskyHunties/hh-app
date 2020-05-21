@@ -154,8 +154,9 @@ class DatabaseWrapper {
   }
 
   /**
-   * return an object containing the information on this clue
+   * 
    * @param clueID - the id of the clue being queried
+   * @return an object containing the information on this clue
    */
   getInfoOfClue(clueID: number): Promise<object> {
     const db = this.db;
@@ -253,6 +254,7 @@ class DatabaseWrapper {
    * @param name - the name of the clue being created
    * @param place - the place where the clue is found
    * @param crawlID - the id of the crawl the clue is part of, could be null
+   * @returns - information on the created clue
    */
   addClue(name: string, place: string, crawlID: number): Promise<object> {
     const db = this.db;
@@ -299,6 +301,7 @@ class DatabaseWrapper {
   /**
    *
    * @param clueID - the id of the clue being deleted
+   * @returns - information on the deleted clue
    */
   deleteClue(clueID: number): Promise<object> {
     const db = this.db;
@@ -341,6 +344,7 @@ class DatabaseWrapper {
    *
    * @param clueID - id of the clue being modified
    * @param imageEncoding - the string of the image encoding
+   * @returns the given image string
    */
   addPictureToClue(clueID: number, imageEncoding: string): Promise<string> {
     const db = this.db;
@@ -360,6 +364,7 @@ class DatabaseWrapper {
   /**
    *
    * @param clueID - id of the clue being marked as finished
+   * @returns 1, representing a finished clue
    */
   finishClue(clueID: number): Promise<number> {
     const db = this.db;
@@ -379,7 +384,7 @@ class DatabaseWrapper {
   // Group TABLE Methods
 
   /**
-   * returns an array of all the group ids in the groups table
+   * @returns an array of all the group ids in the groups table
    */
   getAllGroups(): Promise<number[]> {
     const db = this.db;
@@ -405,8 +410,6 @@ class DatabaseWrapper {
    * @param groupID - the id of the group being queried
    * @returns a \{name, pathID\} object of this group
    *
-   *
-   * the return type is Promise<Object>
    * */
   getInfofGroup(groupID: number): Promise<object> {
     const db = this.db;
@@ -431,10 +434,10 @@ class DatabaseWrapper {
 
   /**
    *
-   * @param name - the name of the group being created
-   * returns the id of the created group
+   * @param name - the name of the group being added to the database
+   * @returns information on created group
    */
-  createGroup(groupName: string): Promise<object> {
+  addGroup(groupName: string): Promise<object> {
     const db = this.db;
     return new Promise(function (resolve, reject) {
       db.run(`INSERT INTO groups (name) VALUES(?)`, [groupName], (err) => {
@@ -491,6 +494,7 @@ class DatabaseWrapper {
    * @param groupID - id of the group being modified
    * @param pathID - the id of the path being added to this group
    * sets the path_id of the specified group to the specified path
+   * @returns information on group being modified
    */
   setPathOfGroupTo(groupID: number, newPathID: number): Promise<object> {
     const db = this.db;
@@ -525,7 +529,7 @@ class DatabaseWrapper {
    *
    * @param groupID - id of the group being modified
    * @param newName - new name of the group
-   * returns the given group id that is being modified
+   * @returns information on group being modified
    */
 
   changeGroupName(groupID: number, newName: string): Promise<object> {
@@ -562,7 +566,7 @@ class DatabaseWrapper {
   /**
    *
    * @param pathID - id of the path being queried
-   * returns all the clue IDs associated with the specific clue
+   * @returns all the clue IDs associated with the specific clue
    */
   getCluesofPath(pathID: number): Promise<number[]> {
     const db = this.db;
@@ -587,6 +591,7 @@ class DatabaseWrapper {
   }
 
   /**
+   * @param pathID - ID of path being queried
    *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
    */
   async getAllUnfinishedCluesOfPath(pathID: number): Promise<number[]> {
@@ -621,6 +626,7 @@ class DatabaseWrapper {
   }
 
   /**
+   * @param pathID - ID of path being queried
    *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
    */
   async getAllFinishedCluesOfPath(pathID: number): Promise<number[]> {
@@ -657,10 +663,10 @@ class DatabaseWrapper {
 
   /**
    *
-   * @param name- name of path being created
+   * @param name- name of path being added to the database
    * @returns an object containing the information on the paths
    */
-  createPath(name: string): Promise<object> {
+  addPath(name: string): Promise<object> {
     const db = this.db;
     return new Promise((resolve, reject) => {
       db.run(`INSERT INTO paths (name) VALUES(?)`, [name], (err) => {
@@ -726,6 +732,7 @@ class DatabaseWrapper {
    * adds the specified clue to the specified path in the join table
    * @param pathID - path being modified
    * @param clueID - clue being added to path
+   * @returns - information on this path and clue
    */
   addClueToPath(pathID: number, clueID: number): Promise<object> {
     const db = this.db;
@@ -747,7 +754,7 @@ class DatabaseWrapper {
    * removes the specified clue from the specified path
    * @param pathID - path being modified
    * @param clueID - clue being removed
-   * returns the clueID removed
+   * @returns - the clueID removed
    */
   removeClueFromPath(pathID: number, clueID: number): Promise<object> {
     const db = this.db;
@@ -766,6 +773,9 @@ class DatabaseWrapper {
 
   // CRAWL TABLE METHODS
 
+  /**
+   * @returns - the ids of all the crawls
+   */
   getAllCrawls(): Promise<number[]> {
     const db = this.db;
     const crawlIDs: number[] = [];
@@ -785,6 +795,7 @@ class DatabaseWrapper {
   /**
    *  returns a list of the clues in the specified crawl
    * @param crawlID - id of crawl being queried
+   * @returns - the ids of all the clues in this crawl
    */
   getCluesOfCrawl(crawlID: number): Promise<number[]> {
     const db = this.db;
@@ -809,6 +820,7 @@ class DatabaseWrapper {
   /**
    *  returns a list of the unfinished clues in the specified crawl
    * @param crawlID - id of crawl being queried
+   * @returns - the ids of all the unfinished clues in this crawl
    */
   getAllUnfinishedCluesOfCrawl(crawlID: number): Promise<number[]> {
     const db = this.db;
@@ -832,6 +844,7 @@ class DatabaseWrapper {
   /**
    *  returns a list of the finished clues in the specified crawl
    * @param crawlID - id of crawl being queried
+   * @returns - the ids of all the finished clues in this crawl
    */
   getAllFinishedCluesOfCrawl(crawlID: number): Promise<number[]> {
     const db = this.db;
@@ -856,7 +869,7 @@ class DatabaseWrapper {
   /**
    * Add a Crawl to the database.
    * @param crawlName -the name of the crawl to add
-   * @returns -the id of the crawl in the database
+   * @returns - object representing the information of the removed crawl
    */
   addCrawl(crawlName: string): Promise<object> {
     const db = this.db;
@@ -887,6 +900,7 @@ class DatabaseWrapper {
   /**
    * returns the info of the specified crawl, (crawlID, name)
    * @param crawlID - id of the crawl being queried
+   * @returns - object representing the information of the removed crawl
    */
 
   getInfoOfCrawl(crawlID: number): Promise<object> {
@@ -907,6 +921,7 @@ class DatabaseWrapper {
   /**
    * deletes the specified crawl and returns its information as an object
    * @param crawlID - id of the crawl being removed
+   * @returns - object representing the information of the removed crawl
    */
   async removeCrawl(crawlID: number): Promise<object> {
     const db = this.db;
