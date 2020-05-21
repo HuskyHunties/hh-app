@@ -99,7 +99,7 @@ class DatabaseWrapper {
     // of clues which we know to have beena added, and don't have to check for a clue?
 
     this.db.run(
-      `UPDATE clues SET image = ${pictureEncoding} where clue_id = ${clueID}`,
+      `UPDATE clues SET image = ${pictureEncoding} WHERE clue_id = ${clueID}`,
       (err) => {
         if (err) throw console.error(err.message);
       }
@@ -114,7 +114,7 @@ class DatabaseWrapper {
    */
   completeClue(clueID: number): number {
     this.db.run(
-      `UPDATE clues SET finished = 1 where clue_id = ${clueID}`,
+      `UPDATE clues SET finished = 1 WHERE clue_id = ${clueID}`,
       (err) => {
         if (err) {
           throw console.error(err.message);
@@ -160,7 +160,7 @@ class DatabaseWrapper {
     const allUnfinishedClueIDs: number[] = [];
 
     this.db.each(
-      `SELECT clue_id FROM clues where finished = 0`,
+      `SELECT clue_id FROM clues WHERE finished = 0`,
       [],
       (err, rows) => {
         if (err) {
@@ -181,7 +181,7 @@ class DatabaseWrapper {
     const AllFinishedClueIDs: number[] = [];
 
     this.db.each(
-      `SELECT clue_id FROM clues where finished = 0`,
+      `SELECT clue_id FROM clues WHERE finished = 0`,
       [],
       (err, rows) => {
         if (err) {
@@ -287,7 +287,7 @@ class DatabaseWrapper {
    */
   setPathOfGroupTo(groupID: number, pathID: number): void {
     this.db.run(
-      `UPDATE groups SET path_id = ${pathID} where group_id = ${groupID}`,
+      `UPDATE groups SET path_id = ${pathID} WHERE group_id = ${groupID}`,
       (err) => {
         if (err) {
           throw console.error(err.message);
