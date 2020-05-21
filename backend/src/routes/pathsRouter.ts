@@ -1,8 +1,8 @@
 import * as express from "express";
-import { PathControllerImpError } from "../controller/PathController";
+import { PathControllerImpError, PathControllerImp } from "../controller/PathController";
 
 const pathsRouter: express.Router = express.Router();
-const controller = new PathControllerImpError();
+const controller = new PathControllerImp();
 
 // gets the list of all the ids of all the clues on the specified path
 pathsRouter.get("/:pathID", (req, res, next) => {
@@ -44,8 +44,8 @@ pathsRouter.get("/:pathID/complete", (req, res, next) => {
 // sends back the ID of the new path created
 pathsRouter.post("/", (req, res, next) => {
   try {
-    const clues: number[] = req.body.clueIDs;
-    const pathID = controller.createPath(clues);
+    const name: string = req.body.name;
+    const pathID = controller.createPath(name);
     res.json({ pathID: pathID });
   } catch (error) {
     console.log(error);

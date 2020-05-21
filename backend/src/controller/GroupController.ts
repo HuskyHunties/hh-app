@@ -82,7 +82,7 @@ export interface GroupController {
   changeGroupName(id: number, newName: string): number;
 }
 
-class GroupControllerImp implements GroupController {
+export class GroupControllerImp implements GroupController {
   getGroups(): number[] {
     return dbWrapper.getAllGroups();
   }

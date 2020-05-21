@@ -2,7 +2,7 @@ import * as express from "express";
 import { ClueControllerImpError } from "../controller/ClueController";
 
 const cluesRouter: express.Router = express.Router();
-const controller = new ClueControllerImp();
+const controller = new ClueControllerImpError();
 
 // gets all the clues in the form of their IDs
 cluesRouter.get("/", (req, res, next) => {

@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as sqlite3 from "sqlite3";
 import { isNullOrUndefined } from "util";
 
@@ -13,21 +14,115 @@ class DatabaseWrapper {
    * @param name name is either the path (including ./) or the string ":memory:"
    * if the database should be created in memory
    */
-  constructor(name: string) {
+  constructor(fileName: string) {
     // initialize the database field by opening the database file
-    this.db = new sqlite3.Database(name, (err) => {
+    this.db = new sqlite3.Database("src/hh.db", (err) => {
       if (err) {
         throw console.error(err.message);
       }
       console.log("Connected to the in-memory SQlite database.");
 
-      // run the initialization script on the database
-      this.db.run(fs.readFileSync("./initDB.sql", "utf8"), (err) => {
+      /* // run the initialization script on the database
+      this.db.run(fs.readFileSync(path.resolve(__dirname, "../initDB.sql"), "utf8"), (err) => {
         if (err) {
           throw console.error(err.message);
         }
         console.log("Successfully initialized the database.");
-      });
+      }); */
+
+      
+
+      this.db.run(
+        `CREATE TABLE IF NOT EXISTS crawls (
+          crawl_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          UNIQUE(crawl_id, name) ON CONFLICT ABORT 
+      );`,
+        (err) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+        }
+      );
+
+      this.db.run(
+        `CREATE TABLE IF NOT EXISTS clues (
+          clue_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          crawl_id INTEGER,
+          name TEXT NOT NULL,
+          place TEXT NOT NULL,
+          image TEXT,
+          finished INTEGER NOT NULL, 
+      
+          FOREIGN KEY (crawl_id)
+              REFERENCES crawls (crawl_id)
+              ON DELETE NO ACTION
+              ON UPDATE NO ACTION,
+      
+          UNIQUE(clue_id, name) ON CONFLICT ABORT 
+      );`,
+        (err) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+        }
+      );
+
+      this.db.run(
+        `CREATE TABLE IF NOT EXISTS paths (
+          path_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+      
+          UNIQUE(path_id, name) ON CONFLICT ABORT -- paths cannot have duplicate names or ids
+      );`,
+        (err) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+        }
+      );
+
+      this.db.run(
+        `CREATE TABLE IF NOT EXISTS groups (
+          group_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          path_id INTEGER,
+      
+          FOREIGN KEY (path_id)
+              REFERENCES paths (path_id)
+              ON DELETE NO ACTION
+              ON UPDATE NO ACTION,
+          
+          UNIQUE(group_id, name) ON CONFLICT ABORT  
+      );`,
+        (err) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+        }
+      );
+
+      this.db.run(
+        `CREATE TABLE IF NOT EXISTS paths_join_clues (
+          path_id INTEGER,
+          clue_id INTEGER,
+      
+          PRIMARY KEY (path_id, clue_id),
+          FOREIGN KEY (path_id)
+              REFERENCES paths (path_id)
+                  ON DELETE CASCADE
+                  ON UPDATE NO ACTION,
+          FOREIGN KEY (clue_id)
+              REFERENCES clues (clue_id)
+                  ON DELETE CASCADE
+                  ON UPDATE NO ACTION
+      );`,
+        (err) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+        }
+      );
     });
   }
 
@@ -220,23 +315,23 @@ class DatabaseWrapper {
    * @param name
    * returns the id of the created group
    */
-  createGroup(name: string): number {
-    this.db.run("INSERT INTO groups(name) VALUES(?)", [name], (err) => {
-      if (err) throw console.error(err.message);
-    });
-
+  createGroup(groupName: string): number {
     let groupID: number;
 
-    this.db.get(
-      `SELECT group_id from groups WHERE name = ${name}`,
-      (err, row) => {
-        if (err) {
-          throw console.error(err.message);
+    this.db.run(`INSERT INTO groups (name) VALUES(?)`, [groupName], (err) => {
+      if (err) throw console.error(err.message);
+      this.db.get(
+        `SELECT group_id from groups WHERE name = '${groupName}'`,
+        (err, row) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+          console.log(row.group_id);
+          groupID = row.group_id;
         }
-        groupID = row.group_id;
-      }
-    );
-
+      );
+    });
+    console.log(groupID);
     return groupID;
   }
 
@@ -342,14 +437,14 @@ class DatabaseWrapper {
    * returns the id of the created path
    */
   createPath(name: string): number {
-    this.db.run(`INSERT INTO paths(name) VALUES(?)`, [name], (err) => {
+    this.db.run(`INSERT INTO paths (name) VALUES(?)`, [name], (err) => {
       if (err) throw console.error(err.message);
     });
 
     let pathID: number;
 
     this.db.get(
-      `SELECT path_id from paths WHERE name = ${name}`,
+      `SELECT path_id from paths WHERE name = '${name}'`,
       (err, row) => {
         if (err) {
           throw console.error(err.message);

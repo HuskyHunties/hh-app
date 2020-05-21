@@ -120,7 +120,7 @@ export interface PathController {
   getCompleteClues(pathID: number): number[];
 }
 
-class PathControllerImp implements PathController {
+export class PathControllerImp implements PathController {
   createPath(name: string): number {
     return dbWrapper.createPath(name);
   }

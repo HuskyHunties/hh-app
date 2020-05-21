@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS paths (
 
 CREATE TABLE IF NOT EXISTS groups (
     group_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEST NOT NULL,
+    name TEXT NOT NULL,
     path_id INTEGER,
 
     FOREIGN KEY (path_id)
