@@ -1,9 +1,7 @@
 import * as express from "express";
-import { GroupControllerImpError } from "../controller/GroupController";
 import { dbWrapper } from "../controller/Database";
 
 const groupsRouter: express.Router = express.Router();
-const controller = new GroupControllerImpError();
 
 // gets all the groups in the database
 groupsRouter.get("/", async (req, res, next) => {
@@ -17,14 +15,16 @@ groupsRouter.get("/", async (req, res, next) => {
   }
 });
 
-// sends the id of the path of a specific group in the database based off the given ID
+// sends the name and the id of the path of a specific group in the database based off the given ID
 groupsRouter.get("/:groupID", async (req, res, next) => {
   try {
     const groupID = Number(req.params.groupID);
 
-    const pathID: number = await dbWrapper.getPathOfGroup(groupID);
+    const infoObject: Record<string, any> = await dbWrapper.getInfofGroup(
+      groupID
+    );
 
-    res.send({ pathID: pathID });
+    res.send(infoObject);
   } catch (error) {
     console.log(error);
     res.status(400).send({ pathID: 45 });
@@ -35,9 +35,11 @@ groupsRouter.get("/:groupID", async (req, res, next) => {
 groupsRouter.post("/", async (req, res, next) => {
   try {
     const groupName = req.body.name;
-    const groupID = await dbWrapper.createGroup(groupName);
+    const infoObject: Record<string, any> = await dbWrapper.createGroup(
+      groupName
+    );
 
-    res.send({ groupID: groupID });
+    res.send(infoObject);
   } catch (error) {
     console.log(error);
     res.status(400).send({ groupID: 23 });
@@ -48,11 +50,11 @@ groupsRouter.post("/", async (req, res, next) => {
 groupsRouter.delete("/:groupID", async (req, res, next) => {
   try {
     const groupID = Number(req.params.groupID);
-    const deletedPathID = await dbWrapper.deleteGroup(groupID);
+    const infoObject: Record<string, any> = await dbWrapper.deleteGroup(
+      groupID
+    );
 
-    res.send({
-      pathID: deletedPathID,
-    });
+    res.send(infoObject);
   } catch (error) {
     console.log(error);
     res.status(400).send({
@@ -61,43 +63,28 @@ groupsRouter.delete("/:groupID", async (req, res, next) => {
   }
 });
 
-// sets the path of the specific group to the pathID given in the body,
-// also in the request body is whether or not to override the path assignment
-groupsRouter.put("/:groupID/path", (req, res, next) => {
-  try {
-    const groupID = Number(req.params.groupID);
-    const pathID = Number(req.body.pathID);
+// changes either/or of the name/pathID fields of the specified group
+groupsRouter.put("/:groupID", async (req, res, next) => {
+  const groupID = Number(req.params.groupID);
+  const newPathID = Number(req.body.pathID);
+  const newName: string = req.body.name;
 
-    if (req.body.override) {
-      dbWrapper.setPathOfGroupTo(groupID, pathID, true);
-    } else {
-      try {
-        dbWrapper.setPathOfGroupTo(groupID, pathID);
-      } catch (error) {
-        res.status(400).send(error);
-      }
+  try {
+    if (newPathID) {
+      dbWrapper.setPathOfGroupTo(groupID, newPathID);
     }
 
-    const responseObj = { pathID: pathID, groupID: groupID };
-    res.json(responseObj);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send({ pathID: 31, groupID: 26 });
-  }
-});
+    if (newName) {
+      dbWrapper.changeGroupName(groupID, newName);
+    }
 
-// changes the group name of the group specified by the ID, name in request body
-groupsRouter.put("/:groupID/name", (req, res, next) => {
-  const groupID = Number(req.params.groupID);
-  const newName = req.body.name;
-  try {
-    dbWrapper.changeGroupName(groupID, newName);
-    const responseObj = { groupID: groupID, name: newName };
-    res.json(responseObj);
+    const infoObject: Record<string, any> = await dbWrapper.getInfofGroup(
+      groupID
+    );
+    res.send(infoObject);
   } catch (error) {
-    res.status(400).send({ groupID: 1 });
+    res.status(400).send({ groupID: req.params.groupID });
     console.log(error);
   }
 });
-
 export default groupsRouter;

@@ -310,65 +310,6 @@ class DatabaseWrapper {
   // Group Controller Methods
 
   /**
-   *
-   * @param name
-   * returns the id of the created group
-   */
-  createGroup(groupName: string): Promise<number> {
-    const db = this.db;
-    return new Promise(function (resolve, reject) {
-      let groupID: number;
-
-      db.run(`INSERT INTO groups (name) VALUES(?)`, [groupName], (err) => {
-        if (err) reject(err);
-      });
-
-      db.get(
-        `SELECT group_id from groups WHERE name = '${groupName}'`,
-        (err, row) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(row.group_id);
-          }
-          /* console.log(row.group_id);
-          groupID = row.group_id; */
-        }
-      );
-    });
-  }
-
-  /**
-   *
-   * @param groupID
-   * returns the ID of the path this group had
-   */
-  deleteGroup(groupID: number): Promise<number> {
-    const db = this.db;
-    return new Promise(function (resolve, reject) {
-      let pathID: number;
-
-      db.get(
-        `SELECT path_id from groups WHERE group_id = ${groupID}`,
-        (err, row) => {
-          if (err) {
-            throw console.error(err.message);
-          }
-          pathID = row.path_id;
-        }
-      );
-
-      db.run(`DELETE FROM groups WHERE group_id = ${groupID}`, (err, row) => {
-        if (err) {
-          throw console.error(err.message);
-        } else {
-          resolve(pathID);
-        }
-      });
-    });
-  }
-
-  /**
    * returns an array of all the group ids in the groups table
    */
   getAllGroups(): Promise<number[]> {
@@ -393,6 +334,94 @@ class DatabaseWrapper {
   /**
    *
    * @param groupID
+   * returns a {name, pathID} object of this group
+   *
+   *
+   * the return type is Promise<Object>
+   * */
+  getInfofGroup(groupID: number): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      let name: string;
+      let pathID: number;
+
+      db.get(
+        `SELECT name, path_id from groups WHERE group_id = ${groupID}`,
+        (err, row) => {
+          if (err) {
+            reject(err);
+          } else {
+            name = row.name;
+            pathID = row.path_id;
+            resolve({ groupID: groupID, name: name, pathID: pathID });
+          }
+        }
+      );
+    });
+  }
+
+  /**
+   *
+   * @param name
+   * returns the id of the created group
+   */
+  createGroup(groupName: string): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      let groupID: number;
+
+      db.run(`INSERT INTO groups (name) VALUES(?)`, [groupName], (err) => {
+        if (err) reject(err);
+      });
+
+      db.get(
+        `SELECT group_id, name from groups WHERE name = '${groupName}'`,
+        (err, row) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve({ groupID: row.group_id, name: row.name });
+          }
+        }
+      );
+    });
+  }
+
+  /**
+   *
+   * @param groupID
+   * returns the ID of the path this group had
+   */
+  deleteGroup(groupID: number): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      let name: string;
+      let pathID: number;
+
+      db.get(
+        `SELECT name, path_id from groups WHERE group_id = ${groupID}`,
+        (err, row) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+          name = row.name;
+          pathID = row.path_id;
+        }
+      );
+
+      db.run(`DELETE FROM groups WHERE group_id = ${groupID}`, (err, row) => {
+        if (err) {
+          throw console.error(err.message);
+        } else {
+          resolve({ name: name, pathID: pathID });
+        }
+      });
+    });
+  }
+
+  /**
+   *
+   * @param groupID
    * @param pathID
    * sets the path_id of the specified group to the specified path
    */
@@ -405,30 +434,6 @@ class DatabaseWrapper {
         }
       }
     );
-  }
-
-  /**
-   *
-   * @param groupID
-   * returns the id of the path of the specified group
-   */
-  getPathOfGroup(groupID: number): Promise<number> {
-    const db = this.db;
-    return new Promise(function (resolve, reject) {
-      let pathID: number;
-
-      db.get(
-        `SELECT path_id from groups WHERE group_id = ${groupID}`,
-        (err, row) => {
-          if (err) {
-            reject(err);
-          } else {
-            pathID = row.path_id;
-            resolve(pathID);
-          }
-        }
-      );
-    });
   }
 
   /**

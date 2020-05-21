@@ -1,11 +1,9 @@
 import * as express from "express";
-import {
-  PathControllerImpError,
-  PathControllerImp,
-} from "../controller/PathController";
+import { PathControllerImpError } from "../controller/PathController";
+import { dbWrapper } from "../controller/Database";
 
 const pathsRouter: express.Router = express.Router();
-const controller = new PathControllerImp();
+const controller = new PathControllerImpError();
 
 // gets the list of all the ids of all the clues on the specified path
 pathsRouter.get("/:pathID", (req, res, next) => {

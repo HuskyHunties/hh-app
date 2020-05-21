@@ -190,30 +190,6 @@ export interface ClueController {
   getImage(id: number): string;
 }
 
-class ClueControllerImp implements ClueController {
-  addClue(name: string, place: string, crawlID?: number): number {
-    return dbWrapper.addClue(name, place, crawlID);
-  }
-  completeClue(imgEncoding: string, clueID: number): number {
-    dbWrapper.addPictureToClue(clueID, imgEncoding);
-    return dbWrapper.completeClue(clueID);
-  }
-  getAllClues(): number[] {
-    return dbWrapper.getAllClueIDs();
-  }
-  getIncompleteClues(): number[] {
-    return dbWrapper.getAllIncompleteClueIDs();
-  }
-  getCompleteClues(): number[] {
-    return dbWrapper.getAllCompleteClueIDs();
-  }
-  deleteClue(clueID: number): void {
-    return dbWrapper.deleteClue(clueID);
-  }
-  getImage(clueID: number): string {
-    return dbWrapper.getImageStringOfClue(clueID);
-  }
-}
 export class ClueControllerImpError implements ClueController {
   addClue(name: string, place: string, crawlID: number): number {
     throw new Error("Method addClue not implemented.");

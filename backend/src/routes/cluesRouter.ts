@@ -1,5 +1,6 @@
 import * as express from "express";
 import { ClueControllerImpError } from "../controller/ClueController";
+import { dbWrapper } from "../controller/Database";
 
 const cluesRouter: express.Router = express.Router();
 const controller = new ClueControllerImpError();
