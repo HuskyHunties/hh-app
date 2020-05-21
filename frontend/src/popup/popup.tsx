@@ -8,23 +8,36 @@ export enum PopupTypes {
     NotifAck = "notifAck"
 }
 
+export type PopupCreator = (type: PopupTypes, message: String, onInput: (res: String) => void, onConfirm: () => void) => void;
+
 interface PopupProps {
-    type: PopupTypes;
-    show: boolean;
-    hide(): void;
+    showPopup: boolean;
+    popupType: PopupTypes;
+    popupMessage: String;
+    popupDoInput?(res: String): void;
+    popupDoConfirm?(): void;
+    hidePopup(): void;
 }
 
 interface PopupState {
-    res: boolean | string | null;
 }
 
 export default class Popup extends React.Component<PopupProps, PopupState> {
+    private handleClick() {
+        if (this.props.popupType === PopupTypes.Confirm) {
+            (this.props.popupDoConfirm)!();
+        } else if (this.props.popupType === PopupTypes.Input) {
+            (this.props.popupDoInput)!("Fill this in");
+        }
 
+        this.props.hidePopup();
+    }
     render() {
+
         return (
-            <div className={this.props.show ? "popup" : "hidden"}
-                onClick={() => this.props.hide()}>
-                this.props.type
+            <div className={this.props.showPopup ? "popup" : "hidden"}
+                onClick={() => this.handleClick()}>
+                {this.props.popupMessage}
             </div>
         );
     }

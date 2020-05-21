@@ -10,19 +10,33 @@ interface PageLoaderProps {
 }
 
 interface PageLoaderState {
+  // Popup information
   showPopup: boolean;
+  popupType: PopupTypes;
+  popupMessage: String;
+  popupDoInput?(res: String): void;
+  popupDoConfirm?(): void;
 }
 
 class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
   constructor(props: PageLoaderProps) {
     super(props);
-    this.state = { showPopup: false };
+    this.state = { showPopup: false, popupType: PopupTypes.Confirm, popupMessage: "Message Not Intialized" };
   }
 
+  private hidePopup() {
+    this.setState({ showPopup: false })
+  }
+
+  private popupFactory(type: PopupTypes, message: String, onInput?: (res: String) => void, onConfirm?: () => void) {
+    this.setState({showPopup: true, popupType: type, popupMessage: message, popupDoInput: onInput, popupDoConfirm: onConfirm})
+}
+
   render() {
-    return (<div onDoubleClick={() => this.setState({showPopup: true})}>
+    return (<div onDoubleClick={() => this.popupFactory(PopupTypes.Confirm, "It works!", undefined, () => this.hidePopup())}>
       <MainPage />
-      <Popup type={PopupTypes.Confirm} show={this.state.showPopup} hide={() => this.setState({showPopup: false})}/>
+      <Popup showPopup={this.state.showPopup} popupType={this.state.popupType} popupMessage={this.state.popupMessage}
+        popupDoInput={this.state.popupDoInput} popupDoConfirm={this.state.popupDoConfirm} hidePopup={() => this.hidePopup()} />
     </div>);
   }
 
