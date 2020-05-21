@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as sqlite3 from "sqlite3";
-import { Clue, Crawl, Image } from "./ClueController";
 import { isNullOrUndefined } from "util";
 
 /**
@@ -35,7 +34,7 @@ export class DatabaseWrapper {
   /**
    * Close the database connection, returning whether it was successfully closed
    */
-  public close() {
+  public close(): void {
     this.db.close((err) => {
       if (err) {
         return false;

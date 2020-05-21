@@ -137,7 +137,7 @@ export class PathControllerImp implements PathController {
   }
   orderPath(pathID: number, startingPoint: Place): void;
   orderPath(pathID: number, startingPoint: Place, endingPoint: Place): void;
-  orderPath(pathID: any, startingPoint: any, endingPoint?: any) {
+  orderPath(pathID: number, startingPoint: Place, endingPoint?: Place): void {
     throw new Error("Method orderPath not implemented.");
   }
   getIncompleteClues(pathID: number): number[] {
