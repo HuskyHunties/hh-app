@@ -1,4 +1,5 @@
 import { Path } from "./PathController";
+import { dbWrapper } from "./Database";
 
 /**
  * A class to represent a group of people.
@@ -70,7 +71,7 @@ export interface GroupController {
    * @throws if the group with the id does not exist
    * @returns the id group that was deleted
    */
-  deleteGroup(id: number): Group;
+  deleteGroup(id: number): number;
 
   /**
    * Changes the group name to be the given name.
@@ -81,7 +82,30 @@ export interface GroupController {
   changeGroupName(id: number, newName: string): number;
 }
 
-export class GroupControllerImp implements GroupController {
+class GroupControllerImp implements GroupController {
+  getGroups(): number[] {
+    return dbWrapper.getAllGroups();
+  }
+  setPath(pathID: number, groupID: number): void;
+  setPath(pathID: number, groupID: number, override: boolean): void;
+  setPath(pathID: any, groupID: any, override?: any) {
+    return dbWrapper.setPathOfGroupTo(groupID, pathID);
+    // need to implement overriding
+  }
+  getGroupPath(groupID: number): number {
+    return dbWrapper.getPathOfGroup(groupID);
+  }
+  createGroup(name: string): number {
+    return dbWrapper.createGroup(name);
+  }
+  deleteGroup(groupID: number): number {
+    return dbWrapper.deleteGroup(groupID);
+  }
+  changeGroupName(groupID: number, newName: string): number {
+    return dbWrapper.changeGroupName(groupID, newName);
+  }
+}
+export class GroupControllerImpError implements GroupController {
   getGroups(): number[] {
     throw new Error("Method getGroups not implemented.");
   }
@@ -101,7 +125,7 @@ export class GroupControllerImp implements GroupController {
     throw new Error("Method createGroup not implemented.");
   }
 
-  deleteGroup(id: number): Group {
+  deleteGroup(id: number): number {
     throw new Error("Method deleteGroup not implemented.");
   }
 

@@ -1,5 +1,5 @@
 import * as express from "express";
-import { GroupControllerImp } from "../controller/GroupController";
+import { GroupControllerImpError } from "../controller/GroupController";
 import { Path } from "controller/PathController";
 
 const groupsRouter: express.Router = express.Router();

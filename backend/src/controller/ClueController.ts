@@ -1,5 +1,6 @@
 import { isNullOrUndefined } from "util";
 import { Path, Place } from "./PathController";
+import { dbWrapper } from "./Database";
 
 /**
  * List of associated clues making up a crawl.
@@ -156,7 +157,7 @@ export interface ClueController {
    * @param id ID of the completed clue.
    * returns the id of this clue
    */
-  finishClue(imgEncoding: string, id: number): number;
+  completeClue(imgEncoding: string, id: number): number;
 
   /**
    * Return a list of all clues ids, finished and unfinished.
@@ -166,12 +167,12 @@ export interface ClueController {
   /**
    * Return a list of all the ids of all unfinished clues.
    */
-  unfinishedClues(): number[];
+  getIncompleteClues(): number[];
 
   /**
    * Return a list of all the ids of all finished clues.
    */
-  finishedClues(): number[];
+  getCompleteClues(): number[];
 
   /**
    * Delete a clue.
@@ -189,20 +190,44 @@ export interface ClueController {
   getImage(id: number): string;
 }
 
-export class ClueControllerImp implements ClueController {
+class ClueControllerImp implements ClueController {
+  addClue(name: string, place: string, crawlID?: number): number {
+    return dbWrapper.addClue(name, place, crawlID);
+  }
+  completeClue(imgEncoding: string, clueID: number): number {
+    dbWrapper.addPictureToClue(clueID, imgEncoding);
+    return dbWrapper.completeClue(clueID);
+  }
+  getAllClues(): number[] {
+    return dbWrapper.getAllClueIDs();
+  }
+  getIncompleteClues(): number[] {
+    return dbWrapper.getAllIncompleteClueIDs();
+  }
+  getCompleteClues(): number[] {
+    return dbWrapper.getAllCompleteClueIDs();
+  }
+  deleteClue(clueID: number): void {
+    return dbWrapper.deleteClue(clueID);
+  }
+  getImage(clueID: number): string {
+    return dbWrapper.getImageStringOfClue(clueID);
+  }
+}
+export class ClueControllerImpError implements ClueController {
   addClue(name: string, place: string, crawlID: number): number {
     throw new Error("Method addClue not implemented.");
   }
-  finishClue(imgEncoding: string, id: number): number {
+  completeClue(imgEncoding: string, id: number): number {
     throw new Error("Method finishClue not implemented.");
   }
   getAllClues(): number[] {
     throw new Error("Method getAllClues not implemented.");
   }
-  unfinishedClues(): number[] {
+  getIncompleteClues(): number[] {
     throw new Error("Method unfinishedClues not implemented.");
   }
-  finishedClues(): number[] {
+  getCompleteClues(): number[] {
     throw new Error("Method finishedClues not implemented.");
   }
   deleteClue(id: number): Clue {

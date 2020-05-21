@@ -1,6 +1,5 @@
 import * as express from "express";
-import { ClueControllerImp } from "../controller/ClueController";
-import { Path } from "controller/PathController";
+import { ClueControllerImpError } from "../controller/ClueController";
 
 const cluesRouter: express.Router = express.Router();
 const controller = new ClueControllerImp();

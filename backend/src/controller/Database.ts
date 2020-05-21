@@ -5,7 +5,7 @@ import { isNullOrUndefined } from "util";
 /**
  * Wrapper class for the database to provide various ways to interact with it
  */
-export class DatabaseWrapper {
+class DatabaseWrapper {
   protected db: sqlite3.Database;
 
   /**
@@ -156,7 +156,7 @@ export class DatabaseWrapper {
   /**
    *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
    */
-  getAllUnfinishedClueIDs(): number[] {
+  getAllIncompleteClueIDs(): number[] {
     const allUnfinishedClueIDs: number[] = [];
 
     this.db.each(
@@ -177,7 +177,7 @@ export class DatabaseWrapper {
   /**
    *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
    */
-  getAllFinishedClueIDs(): number[] {
+  getAllCompleteClueIDs(): number[] {
     const AllFinishedClueIDs: number[] = [];
 
     this.db.each(
@@ -220,7 +220,7 @@ export class DatabaseWrapper {
    * @param name
    * returns the id of the created group
    */
-  addGroup(name: string): number {
+  createGroup(name: string): number {
     this.db.run("INSERT INTO groups(name) VALUES(?)", [name], (err) => {
       if (err) throw console.error(err.message);
     });
@@ -341,7 +341,7 @@ export class DatabaseWrapper {
    * @param clueIDs
    * returns the id of the created path
    */
-  createPath(name: string, clueIDs: number[]): number {
+  createPath(name: string): number {
     this.db.run(`INSERT INTO paths(name) VALUES(?)`, [name], (err) => {
       if (err) throw console.error(err.message);
     });
@@ -357,18 +357,6 @@ export class DatabaseWrapper {
         pathID = row.path_id;
       }
     );
-
-    clueIDs.forEach((clueID) => {
-      this.db.run(
-        `INSERT INTO paths_join_clues(path_id, clue_id) VALUES(?)`,
-        [pathID, clueID],
-        (err) => {
-          if (err) {
-            throw console.error(err.message);
-          }
-        }
-      );
-    });
 
     return pathID;
   }
@@ -469,7 +457,7 @@ export class DatabaseWrapper {
   /**
    *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
    */
-  getAllUnfinishedClueIDsOfPath(pathID: number): number[] {
+  getAllIncompleteCluesOfPath(pathID: number): number[] {
     const allClues = this.getCluesofPath(pathID);
     const allUnfinishedClueIDs: number[] = [];
 
@@ -496,7 +484,7 @@ export class DatabaseWrapper {
   /**
    *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
    */
-  getAllFinishedClueIDsOfPath(pathID: number): number[] {
+  getAllCompletedCluesOfPath(pathID: number): number[] {
     const allClues = this.getCluesofPath(pathID);
     const allFinishedClueIDs: number[] = [];
 
@@ -569,12 +557,9 @@ export class DatabaseWrapper {
   // - delete crawl without clues
   // - add clue to crawl
   //
-  // - create path with clue(s)
-  // - create path without clue
-  // - add clue to path
-  // - delete path
-  // -groups
   //
   // other:
   // - add address table that clues reference
 }
+
+export const dbWrapper = new DatabaseWrapper("hh-db");

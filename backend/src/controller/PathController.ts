@@ -1,5 +1,6 @@
 import { isNullOrUndefined } from "util";
 import { Clue } from "./ClueController";
+import { dbWrapper } from "./Database";
 
 /**
  * Abstract representation of a real world location.
@@ -56,7 +57,7 @@ export interface PathController {
    * @param name name of the path
    * @returns the id of the new path
    */
-  newPath(name: string, clues: number[]): number;
+  createPath(name: string): number;
 
   /**
    * Remove the specified path.
@@ -119,8 +120,36 @@ export interface PathController {
   getCompleteClues(pathID: number): number[];
 }
 
-export class PathControllerImp implements PathController {
-  newPath(name: string, clues: number[]): number {
+class PathControllerImp implements PathController {
+  createPath(name: string): number {
+    return dbWrapper.createPath(name);
+  }
+  removePath(pathID: number): number[] {
+    return dbWrapper.removePath(pathID);
+  }
+  getClues(pathID: number): number[] {
+    return dbWrapper.getCluesofPath(pathID);
+  }
+  addClueToPath(pathID: number, clueID: number): void {
+    return dbWrapper.addClueToPath(pathID, clueID);
+  }
+  removeClueFromPath(pathID: number, clueID: number): number {
+    return dbWrapper.removeClueFromPath(pathID, clueID);
+  }
+  orderPath(pathID: number, startingPoint: Place): void;
+  orderPath(pathID: number, startingPoint: Place, endingPoint: Place): void;
+  orderPath(pathID: any, startingPoint: any, endingPoint?: any) {
+    throw new Error("Method not implemented.");
+  }
+  getIncompleteClues(pathID: number): number[] {
+    return dbWrapper.getAllIncompleteCluesOfPath(pathID);
+  }
+  getCompleteClues(pathID: number): number[] {
+    return dbWrapper.getAllCompletedCluesOfPath(pathID);
+  }
+}
+export class PathControllerImpError implements PathController {
+  createPath(name: string): number {
     throw new Error("Method newPath not implemented.");
   }
   removePath(pathID: number): number[] {
