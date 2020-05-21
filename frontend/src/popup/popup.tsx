@@ -32,12 +32,50 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 
         this.props.hidePopup();
     }
+
+    private confirm(): JSX.Element {
+        return <div></div>;
+    }
+
+    private input(): JSX.Element {
+        return <div></div>
+    }
+
+    private notif(): JSX.Element {
+        return <div></div>
+    }
+
+    private notifAck(): JSX.Element {
+        return <div></div>
+    }
+
     render() {
+        let buttons: JSX.Element;
+        switch (this.props.popupType) {
+            case PopupTypes.Confirm:
+                buttons = this.confirm();
+                break;
+
+            case PopupTypes.Input:
+                buttons = this.input();
+                break;
+
+            case PopupTypes.Notif:
+                buttons = this.notif();
+                break;
+
+            case PopupTypes.NotifAck:
+                buttons = this.notifAck();
+                break;
+
+            default:
+                throw Error("Invalid Type")
+        }
 
         return (
-            <div className={this.props.showPopup ? "popup" : "hidden"}
-                onClick={() => this.handleClick()}>
+            <div className={this.props.showPopup ? "popup" : "hidden"}>
                 {this.props.popupMessage}
+
             </div>
         );
     }
