@@ -25,7 +25,7 @@ class DatabaseWrapper {
         `CREATE TABLE IF NOT EXISTS crawls (
           crawl_id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
-          UNIQUE(crawl_id, name) ON CONFLICT ABORT 
+          UNIQUE(name) ON CONFLICT ABORT 
       );`,
         (err) => {
           if (err) {
@@ -48,7 +48,7 @@ class DatabaseWrapper {
               ON DELETE NO ACTION
               ON UPDATE NO ACTION,
       
-          UNIQUE(clue_id, name) ON CONFLICT ABORT 
+          UNIQUE(name) ON CONFLICT ABORT 
       );`,
         (err) => {
           if (err) {
@@ -62,7 +62,7 @@ class DatabaseWrapper {
           path_id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
       
-          UNIQUE(path_id, name) ON CONFLICT ABORT -- paths cannot have duplicate names or ids
+          UNIQUE(name) ON CONFLICT ABORT -- paths cannot have duplicate names or ids
       );`,
         (err) => {
           if (err) {
@@ -82,7 +82,7 @@ class DatabaseWrapper {
               ON DELETE NO ACTION
               ON UPDATE NO ACTION,
           
-          UNIQUE(group_id, name) ON CONFLICT ABORT  
+          UNIQUE(name) ON CONFLICT ABORT  
       );`,
         (err) => {
           if (err) {
@@ -492,10 +492,7 @@ class DatabaseWrapper {
    * @param pathID - the id of the path being added to this group
    * sets the path_id of the specified group to the specified path
    */
-  setPathOfGroupTo(
-    groupID: number,
-    newPathID: number,
-  ): Promise<object> {
+  setPathOfGroupTo(groupID: number, newPathID: number): Promise<object> {
     const db = this.db;
     return new Promise(function (resolve, reject) {
       db.run(
@@ -769,37 +766,160 @@ class DatabaseWrapper {
 
   // CRAWL TABLE METHODS
 
+
+  getAllCrawls(): Promise<number[]>{
+    const db = this.db;
+    const crawlIDs: number[] = [];
+    return new Promise((resolve, reject) => {
+      db.all(
+        `SELECT crawl_id FROM crawls`,
+        (err, rows) => {
+          if (err) {
+            reject(console.error());
+          }
+
+          rows.forEach((row) => {
+            crawlIDs.push(row.crawl_id);
+          });
+          resolve(crawlIDs);
+        }
+      );
+    });
+  }
+  /**
+   *  returns a list of the clues in the specified crawl
+   * @param crawlID - id of crawl being queried
+   */
+  getCluesOfCrawl(crawlID: number): Promise<number[]> {
+    const db = this.db;
+    const clueIDs: number[] = [];
+    return new Promise((resolve, reject) => {
+      db.all(
+        `SELECT clue_id FROM clues WHERE crawl_id = ${crawlID}`,
+        (err, rows) => {
+          if (err) {
+            reject(console.error());
+          }
+
+          rows.forEach((row) => {
+            clueIDs.push(row.clue_id);
+          });
+          resolve(clueIDs);
+        }
+      );
+    });
+  }
+
+  /**
+   *  returns a list of the unfinished clues in the specified crawl
+   * @param crawlID - id of crawl being queried
+   */
+  getAllUnfinishedCluesOfCrawl(crawlID: number): Promise<number[]> {
+    const db = this.db;
+    const clueIDs: number[] = [];
+    return new Promise((resolve, reject) => {
+      db.all(
+        `SELECT clue_id FROM clues WHERE crawl_id = ${crawlID} AND finished = 0`,
+        (err, rows) => {
+          if (err) {
+            reject(console.error());
+          }
+
+          rows.forEach((row) => {
+            clueIDs.push(row.clue_id);
+          });
+          resolve(clueIDs);
+        }
+      );
+    });
+  }
+  /**
+   *  returns a list of the finished clues in the specified crawl
+   * @param crawlID - id of crawl being queried
+   */
+  getAllFinishedCluesOfCrawl(crawlID: number): Promise<number[]> {
+    const db = this.db;
+    const clueIDs: number[] = [];
+    return new Promise((resolve, reject) => {
+      db.all(
+        `SELECT clue_id FROM clues WHERE crawl_id = ${crawlID} AND finished = 1`,
+        (err, rows) => {
+          if (err) {
+            reject(console.error());
+          }
+
+          rows.forEach((row) => {
+            clueIDs.push(row.clue_id);
+          });
+          resolve(clueIDs);
+        }
+      );
+    });
+  }
+
   /**
    * Add a Crawl to the database.
-   * @param crawlName -the crawl to add
+   * @param crawlName -the name of the crawl to add
    * @returns -the id of the crawl in the database
    */
-  addCrawl(crawlName: string): number {
-    this.db.run(
-      `INSERT INTO crawls(name) VALUES(${crawlName})
-          WHERE NOT EXISTS(SELECT 1 FROM crawls WHERE name = ${crawlName})`,
-      (err) => {
+  addCrawl(crawlName: string): Promise<object> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.run(`INSERT INTO crawls (name) VALUES(?)`, [crawlName], (err) => {
         if (err) {
           throw console.error(err.message);
         }
         console.log("Added crawl to database");
-      }
-    );
+      });
 
-    let crawlID: number;
-    this.db.get(
-      `SELECT crawl_id FROM crawls WHERE name = ${crawlName}`,
-      (err, row) => {
-        if (err) {
-          throw console.error(err.message);
-        } else if (isNullOrUndefined(row)) {
-          throw new Error("did not insert desired crawl");
+      let crawlID: number;
+      db.get(
+        `SELECT crawl_id FROM crawls WHERE name = '${crawlName}'`,
+        (err, row) => {
+          if (err) {
+            reject(err.message);
+          } else if (isNullOrUndefined(row)) {
+            reject(new Error("did not insert desired crawl"));
+          }
+          crawlID = row.crawl_id;
+          resolve({ crawlID: crawlID, name: crawlName });
         }
-        crawlID = row.crawl_id;
-      }
-    );
+      );
+    });
+  }
 
-    return crawlID;
+  /**
+   * returns the info of the specified crawl, (crawlID, name)
+   * @param crawlID 
+   */
+
+  getInfoOfCrawl(crawlID: number): Promise<object>{
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.get(`SELECT name FROM crawls WHERE crawl_id = ${crawlID}`, (err, row) => {
+        if(err){
+          reject(err.message)
+        }
+        resolve({crawlID: crawlID, name: row.name});
+      })
+    });
+  }
+
+  /**
+   * deletes the specified crawl and returns its information as an object
+   * @param crawlID 
+   */
+  async removeCrawl(crawlID: number): Promise<object> {
+    const db = this.db;
+    const infoObject = await this.getInfoOfCrawl(crawlID);
+    return new Promise((resolve, reject) => {
+      db.run(`DELETE FROM crawls where crawl_id = ${crawlID}`, (err) =>{
+        if(err){
+          reject(err.message)
+        }
+        resolve(infoObject);
+      })
+    });
   }
 
   // TODO

@@ -39,9 +39,7 @@ pathsRouter.get("/:pathID/incomplete", async (req, res) => {
 pathsRouter.get("/:pathID/complete", async (req, res) => {
   try {
     const pathID = Number(req.params.pathID);
-    const clueIDs: number[] = await dbWrapper.getAllFinishedCluesOfPath(
-      pathID
-    );
+    const clueIDs: number[] = await dbWrapper.getAllFinishedCluesOfPath(pathID);
     res.send({ clues: clueIDs });
   } catch (error) {
     console.log(error);
@@ -78,7 +76,7 @@ pathsRouter.delete("/:pathID", async (req, res) => {
   }
 });
 
-/**  
+/**
  * adds or removes the specified clue to the specified path, sends back information on modified path
  */
 pathsRouter.put("/:pathID", async (req, res) => {
