@@ -5,9 +5,10 @@ import "../css/nav-bar.css"
 import NavBarFrame from "../frames/nav-bar";
 import PathFrame from "../frames/path-frame";
 import GroupFrame from "../frames/group-frame";
+import {PopupCreator} from "../utils/popup";
 
 interface MainPageProps {
-
+    popupFactory: PopupCreator;
 }
 
 interface MainPageState {
@@ -22,7 +23,7 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
                 <NavBarFrame />
                 <ClueFrame />
                 <PathFrame />
-                <GroupFrame />
+                <GroupFrame popupFactory={this.props.popupFactory} />
             </div>
             )
         }

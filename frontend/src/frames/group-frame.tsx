@@ -1,6 +1,7 @@
 import React from "react";
 import '../css/group-frame.css';
 import API from '../utils/API';
+import { PopupTypes, PopupCreator } from '../utils/popup'
 
 interface GroupListProps {
     ids: number[];
@@ -32,7 +33,7 @@ class GroupList extends React.Component<GroupListProps> {
 }
 
 interface GroupFrameProps {
-
+    popupFactory: PopupCreator;
 }
 
 interface GroupFrameState {
@@ -62,13 +63,30 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
         this.setState(ids);
     }
 
+    async addGroup(name: string) {
+        // Implement
+        console.log("added Group: " + name);
+    }
+
+    async deleteGroup(id: number) {
+        // Implement
+        console.log("deleted group: " + id);
+    }
+
 
     render() {
         return (
             <div className="group-frame">
                 <GroupList ids={this.state.ids} clickHandler={(id: number) => this.setState({ selected: id })} selected={this.state.selected} />
-                <button className="add-group group-button">Add Group</button>
-                <button className="remove-group group-button">Remove Group</button>
+                <button className="add-group group-button"
+                    onClick={() => this.props.popupFactory(PopupTypes.Input, "Input name for new Group", (res: string) => this.addGroup(res))}>
+                    Add Group
+                        </button>
+                <button className="remove-group group-button"
+                // Deal with case where no group selected
+                    onClick={() => this.props.popupFactory(PopupTypes.Confirm, "Delete Selected Group?", undefined,() => this.deleteGroup(this.state.selected!))}>
+                    Remove Group
+                    </button>
             </div>
         )
     }

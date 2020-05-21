@@ -7,13 +7,13 @@ export enum PopupTypes {
     Notif = "notif"
 }
 
-export type PopupCreator = (type: PopupTypes, message: String, onInput: (res: String) => void, onConfirm: () => void) => void;
+export type PopupCreator = (type: PopupTypes, message: string, onInput?: (res: string) => void, onConfirm?: () => void) => void;
 
 interface PopupProps {
     showPopup: boolean;
     popupType: PopupTypes;
-    popupMessage: String;
-    popupDoInput?(res: String): void;
+    popupMessage: string;
+    popupDoInput?(res: string): void;
     popupDoConfirm?(): void;
     hidePopup(): void;
 }
@@ -28,21 +28,22 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         this.state = { inputValue: "" };
     }
 
-    private handleClick() {
-        if (this.props.popupType === PopupTypes.Confirm) {
+    private handleClick(confirm: boolean, input: boolean, inputValue?: string) {
+        if (confirm) {
             (this.props.popupDoConfirm)!();
-        } else if (this.props.popupType === PopupTypes.Input) {
-            (this.props.popupDoInput)!("Fill this in");
+        } else if (input) {
+            (this.props.popupDoInput)!(inputValue!);
         }
 
+        this.setState({inputValue: ""});
         this.props.hidePopup();
     }
 
     private confirm(): JSX.Element {
         return (
             <div className="popup-button">
-                <button className="okay">Okay</button>
-                <button className="cancel">Cancel</button>
+                <button className="okay" onClick={() => this.handleClick(true, false)}>Okay</button>
+                <button className="cancel" onClick={() => this.handleClick(false, false)}>Cancel</button>
             </div>);
     }
 
@@ -51,8 +52,8 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
             <div className="popup-button">
                 <input type="text" id="input" value={this.state.inputValue}
                     onChange={(e) => this.setState({ inputValue: e.target.value })}></input>
-                <button className="okay">Okay</button>
-                <button className="cancel">Cancel</button>
+                <button className="okay" onClick={() => this.handleClick(false, true, this.state.inputValue)}>Okay</button>
+                <button className="cancel" onClick={() => this.handleClick(false, false)}>Cancel</button>
             </div>
         );
     }
@@ -60,7 +61,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     private notif(): JSX.Element {
         return (
             <div className="popup-button">
-                <button className="notif">Okay</button>
+                <button className="notif" onClick={() => this.handleClick(false, false)}>Okay</button>
             </div>
         );
     }
