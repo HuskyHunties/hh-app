@@ -1,13 +1,10 @@
 import * as express from "express";
-import { ClueControllerImpError } from "../controller/ClueController";
 import { dbWrapper } from "../controller/Database";
-import { resolve } from "dns";
 
 const cluesRouter: express.Router = express.Router();
-const controller = new ClueControllerImpError();
 
 // gets all the clues in the form of their IDs
-cluesRouter.get("/", async (req, res, next) => {
+cluesRouter.get("/", async (req, res) => {
   try {
     const allClues: number[] = await dbWrapper.getAllClueIDs();
     res.json({ clueIDs: allClues });
@@ -18,13 +15,11 @@ cluesRouter.get("/", async (req, res, next) => {
 });
 
 // deletes the specified clue from the database
-cluesRouter.get("/:clueID", async (req, res, next) => {
+cluesRouter.get("/:clueID", async (req, res) => {
   const clueID = Number(req.params.clueID);
 
   try {
-    const infoObject: Record<string, any> = await dbWrapper.getInfoOfClue(
-      clueID
-    );
+    const infoObject: object = await dbWrapper.getInfoOfClue(clueID);
     res.send(infoObject);
   } catch (error) {
     console.log(error);
@@ -32,7 +27,7 @@ cluesRouter.get("/:clueID", async (req, res, next) => {
 });
 
 // gets all the ids of incomplete clues
-cluesRouter.get("/incomplete", async (req, res, next) => {
+cluesRouter.get("/incomplete", async (req, res) => {
   try {
     const allIncompleteClues: number[] = await dbWrapper.getAllUnfinishedClueIDs();
     res.json({ clueIDs: allIncompleteClues });
@@ -43,7 +38,7 @@ cluesRouter.get("/incomplete", async (req, res, next) => {
 });
 
 // gets all the ids of complete clues
-cluesRouter.get("/complete", async (req, res, next) => {
+cluesRouter.get("/complete", async (req, res) => {
   try {
     const allCompleteClues: number[] = await dbWrapper.getAllFinishedClueIDs();
     res.json({ clueIDs: allCompleteClues });
@@ -54,17 +49,13 @@ cluesRouter.get("/complete", async (req, res, next) => {
 });
 
 // adds a clue described by the request body to the table
-cluesRouter.post("/", async (req, res, next) => {
+cluesRouter.post("/", async (req, res) => {
   const name: string = req.body.name;
   const place: string = req.body.place;
   const crawlID = Number(req.body.crawlID);
 
   try {
-    const infoObject: Record<string, any> = await dbWrapper.addClue(
-      name,
-      place,
-      crawlID
-    );
+    const infoObject: object = await dbWrapper.addClue(name, place, crawlID);
     res.send(infoObject);
   } catch (error) {
     console.log(error);
@@ -72,11 +63,11 @@ cluesRouter.post("/", async (req, res, next) => {
 });
 
 // deletes the specified clue from the database
-cluesRouter.delete("/:clueID", async (req, res, next) => {
+cluesRouter.delete("/:clueID", async (req, res) => {
   const clueID = Number(req.params.clueID);
 
   try {
-    const infoObject: Record<string, any> = await dbWrapper.deleteClue(clueID);
+    const infoObject: object = await dbWrapper.deleteClue(clueID);
     res.send(infoObject);
   } catch (error) {
     console.log(error);
@@ -84,7 +75,7 @@ cluesRouter.delete("/:clueID", async (req, res, next) => {
 });
 
 // modifies the image and finished fields of the specified clue
-cluesRouter.put("/:clueID", async (req, res, next) => {
+cluesRouter.put("/:clueID", async (req, res) => {
   const clueID = Number(req.params.clueID);
   const imageString: string = req.body.image;
 

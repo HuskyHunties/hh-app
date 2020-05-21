@@ -4,7 +4,7 @@ import { dbWrapper } from "../controller/Database";
 const groupsRouter: express.Router = express.Router();
 
 // gets all the groups in the database
-groupsRouter.get("/", async (req, res, next) => {
+groupsRouter.get("/", async (req, res) => {
   try {
     const allGroups = await dbWrapper.getAllGroups();
 
@@ -16,13 +16,11 @@ groupsRouter.get("/", async (req, res, next) => {
 });
 
 // sends the name and the id of the path of a specific group in the database based off the given ID
-groupsRouter.get("/:groupID", async (req, res, next) => {
+groupsRouter.get("/:groupID", async (req, res) => {
   try {
     const groupID = Number(req.params.groupID);
 
-    const infoObject: Record<string, any> = await dbWrapper.getInfofGroup(
-      groupID
-    );
+    const infoObject: object = await dbWrapper.getInfofGroup(groupID);
 
     res.send(infoObject);
   } catch (error) {
@@ -32,12 +30,10 @@ groupsRouter.get("/:groupID", async (req, res, next) => {
 });
 
 // adds a group to the database, JSON with group name in request body
-groupsRouter.post("/", async (req, res, next) => {
+groupsRouter.post("/", async (req, res) => {
   try {
     const groupName = req.body.name;
-    const infoObject: Record<string, any> = await dbWrapper.createGroup(
-      groupName
-    );
+    const infoObject: object = await dbWrapper.createGroup(groupName);
 
     res.send(infoObject);
   } catch (error) {
@@ -47,12 +43,10 @@ groupsRouter.post("/", async (req, res, next) => {
 });
 
 // deletes the group specified by the given ID
-groupsRouter.delete("/:groupID", async (req, res, next) => {
+groupsRouter.delete("/:groupID", async (req, res) => {
   try {
     const groupID = Number(req.params.groupID);
-    const infoObject: Record<string, any> = await dbWrapper.deleteGroup(
-      groupID
-    );
+    const infoObject: object = await dbWrapper.deleteGroup(groupID);
 
     res.send(infoObject);
   } catch (error) {
@@ -64,7 +58,7 @@ groupsRouter.delete("/:groupID", async (req, res, next) => {
 });
 
 // changes either/or of the name/pathID fields of the specified group
-groupsRouter.put("/:groupID", async (req, res, next) => {
+groupsRouter.put("/:groupID", async (req, res) => {
   const groupID = Number(req.params.groupID);
   const newPathID = Number(req.body.pathID);
   const newName: string = req.body.name;
@@ -78,9 +72,7 @@ groupsRouter.put("/:groupID", async (req, res, next) => {
       dbWrapper.changeGroupName(groupID, newName);
     }
 
-    const infoObject: Record<string, any> = await dbWrapper.getInfofGroup(
-      groupID
-    );
+    const infoObject: object = await dbWrapper.getInfofGroup(groupID);
     res.send(infoObject);
   } catch (error) {
     res.status(400).send({ groupID: req.params.groupID });
