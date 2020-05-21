@@ -31,7 +31,7 @@ interface PageLoaderState {
 class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
   constructor(props: PageLoaderProps) {
     super(props);
-    this.state = { showPopup: false, popupType: PopupTypes.Confirm, popupMessage: "Message Not Intialized" };
+    this.state = { showPopup: false, popupType: PopupTypes.Confirm, popupMessage: "Message Not Initialized" };
     this.popupFactory = this.popupFactory.bind(this);
   }
 
