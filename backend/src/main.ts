@@ -2,10 +2,10 @@ import * as express from "express";
 import * as logger from "morgan";
 import * as bodyParser from "body-parser";
 
-import groupsRouter from "../routes/groupsRouter";
-import cluesRouter from "../routes/cluesRouter";
-import pathsRouter from "../routes/pathsRouter";
-import crawlsRouter from "../routes/crawlsRouter";
+import groupsRouter from "./routes/groupsRouter";
+import cluesRouter from "./routes/cluesRouter";
+import pathsRouter from "./routes/pathsRouter";
+import crawlsRouter from "./routes/crawlsRouter";
 
 class Main {
   public express: express.Application;
@@ -24,7 +24,7 @@ class Main {
   private routes(): void {
     const router = express.Router();
 
-    router.get("/", (req, res, next) => {
+    router.get("/", (req, res) => {
       res.send("Whattup you gotta enter a route extension: groups, clues, paths, or crawls");
     });
 

@@ -1,6 +1,6 @@
 /* eslint-disable tsdoc/syntax */
 import * as express from "express";
-import { dbWrapper } from "../controller/Database";
+import { dbWrapper } from "../database/DatabaseWrapper";
 
 const groupsRouter: express.Router = express.Router();
 

@@ -1,6 +1,6 @@
 import { isNullOrUndefined } from "util";
 import { Path, Place } from "./PathController";
-import { dbWrapper } from "./Database";
+import { dbWrapper } from "../database/DatabaseWrapper";
 
 /**
  * List of associated clues making up a crawl.

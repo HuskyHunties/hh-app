@@ -1,6 +1,6 @@
 import { isNullOrUndefined } from "util";
 import { Clue } from "./ClueController";
-import { dbWrapper } from "./Database";
+import { dbWrapper } from "../database/DatabaseWrapper";
 
 /**
  * Abstract representation of a real world location.

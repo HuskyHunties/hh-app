@@ -1,7 +1,7 @@
 import * as http from "http";
 import * as debug from "debug";
 
-import Main from "./controller/main";
+import Main from "./main";
 
 const server = http.createServer(Main);
 
