@@ -3,7 +3,9 @@ import { dbWrapper } from "../controller/Database";
 
 const pathsRouter: express.Router = express.Router();
 
-// gets the list of all the ids of all the clues on the specified path
+/**
+ * sends the list of all the ids of all the clues on the specified path
+ */
 pathsRouter.get("/:pathID", async (req, res) => {
   try {
     const pathID = Number(req.params.pathID);
@@ -11,11 +13,13 @@ pathsRouter.get("/:pathID", async (req, res) => {
     res.send({ clues: clueIDs });
   } catch (error) {
     console.log(error);
-    res.status(400).send({ clueIDs: [1, 2, 3, 4, 5, 6] });
+    res.status(400).send();
   }
 });
 
-// gets the list of all the ids of all the incomplete clues on the specified path
+/**
+ * sends the list of all the ids of all the incomplete clues on the specified path
+ */
 pathsRouter.get("/:pathID/incomplete", async (req, res) => {
   try {
     const pathID = Number(req.params.pathID);
@@ -25,11 +29,13 @@ pathsRouter.get("/:pathID/incomplete", async (req, res) => {
     res.send({ clues: clueIDs });
   } catch (error) {
     console.log(error);
-    res.status(400).send({ clueIDs: [1, 2, 3] });
+    res.status(400).send();
   }
 });
 
-// gets the list of all the ids of all the incomplete clues on the specified path
+/**
+ * sends the list of all the ids of all the incomplete clues on the specified path
+ */
 pathsRouter.get("/:pathID/complete", async (req, res) => {
   try {
     const pathID = Number(req.params.pathID);
@@ -39,12 +45,14 @@ pathsRouter.get("/:pathID/complete", async (req, res) => {
     res.send({ clues: clueIDs });
   } catch (error) {
     console.log(error);
-    res.status(400).send({ clueIDs: [4, 5, 6] });
+    res.status(400).send();
   }
 });
 
-// makes a new path based off the list of clues in the request body,
-// sends back the ID of the new path created
+/**
+ * makes a new path based off the list of clues in the request body,
+ * sends back the information of the path created.
+ */
 pathsRouter.post("/", async (req, res) => {
   try {
     const name: string = req.body.name;
@@ -52,11 +60,13 @@ pathsRouter.post("/", async (req, res) => {
     res.send(infoObject);
   } catch (error) {
     console.log(error);
-    res.status(400).send({ pathID: 1 });
+    res.status(400).send();
   }
 });
 
-// deletes the path specified by the given pathID param
+/**
+ * deletes the path specified by the given pathID param, sends back information on deleted path
+ */
 pathsRouter.delete("/:pathID", async (req, res) => {
   try {
     const pathID = Number(req.params.pathID);
@@ -64,13 +74,13 @@ pathsRouter.delete("/:pathID", async (req, res) => {
     res.send(infoObject);
   } catch (error) {
     console.log(error);
-    res.status(400).send({ clueIDs: [1, 2, 3, 4, 5, 6] });
+    res.status(400).send();
   }
 });
 
-// adds or removes the specified clue to the specified path
-// req.body.clueID is the id of the clue, and req.body.add is
-// boolean
+/**  
+ * adds or removes the specified clue to the specified path, sends back information on modified path
+ */
 pathsRouter.put("/:pathID", async (req, res) => {
   try {
     const pathID = Number(req.params.pathID);

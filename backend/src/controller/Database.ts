@@ -495,7 +495,6 @@ class DatabaseWrapper {
   setPathOfGroupTo(
     groupID: number,
     newPathID: number,
-    override?: boolean
   ): Promise<object> {
     const db = this.db;
     return new Promise(function (resolve, reject) {

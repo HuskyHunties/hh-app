@@ -3,19 +3,23 @@ import { dbWrapper } from "../controller/Database";
 
 const groupsRouter: express.Router = express.Router();
 
-// gets all the groups in the database
+/**
+ * sends a resonse of all the group IDs in the database
+ */
 groupsRouter.get("/", async (req, res) => {
   try {
-    const allGroups = await dbWrapper.getAllGroups();
+    const allGroupIDs = await dbWrapper.getAllGroups();
 
-    res.send({ allGroups: allGroups });
+    res.send({ allGroups: allGroupIDs });
   } catch (error) {
     console.log(error);
-    res.status(400).json({ allGroups: [1, 2, 3] });
+    res.status(400).json();
   }
 });
 
-// sends the name and the id of the path of a specific group in the database based off the given ID
+/**
+ * sends an object with all the fields of the requested group in the database
+ */
 groupsRouter.get("/:groupID", async (req, res) => {
   try {
     const groupID = Number(req.params.groupID);
@@ -25,11 +29,15 @@ groupsRouter.get("/:groupID", async (req, res) => {
     res.send(infoObject);
   } catch (error) {
     console.log(error);
-    res.status(400).send({ pathID: 45 });
+    res.status(400).send();
   }
 });
 
-// adds a group to the database, JSON with group name in request body
+/**
+ * adds a group to the database, JSON with group name in request body,
+ * sends information on the created group
+ */
+
 groupsRouter.post("/", async (req, res) => {
   try {
     const groupName = req.body.name;
@@ -38,11 +46,14 @@ groupsRouter.post("/", async (req, res) => {
     res.send(infoObject);
   } catch (error) {
     console.log(error);
-    res.status(400).send({ groupID: 23 });
+    res.status(400).send();
   }
 });
 
-// deletes the group specified by the given ID
+/**
+ * deletes the group specified by the given ID, sends information on deleted group
+ */
+
 groupsRouter.delete("/:groupID", async (req, res) => {
   try {
     const groupID = Number(req.params.groupID);
@@ -51,13 +62,14 @@ groupsRouter.delete("/:groupID", async (req, res) => {
     res.send(infoObject);
   } catch (error) {
     console.log(error);
-    res.status(400).send({
-      pathID: 4,
-    });
+    res.status(400).send();
   }
 });
 
-// changes either/or of the name/pathID fields of the specified group
+/**
+ * changes either/or of the name/pathID fields of the specified group,
+ * sends information on modified group
+ */
 groupsRouter.put("/:groupID", async (req, res) => {
   const groupID = Number(req.params.groupID);
   const newPathID = Number(req.body.pathID);
@@ -75,7 +87,7 @@ groupsRouter.put("/:groupID", async (req, res) => {
     const infoObject: object = await dbWrapper.getInfofGroup(groupID);
     res.send(infoObject);
   } catch (error) {
-    res.status(400).send({ groupID: req.params.groupID });
+    res.status(400).send();
     console.log(error);
   }
 });
