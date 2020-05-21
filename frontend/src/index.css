@@ -7,3 +7,27 @@ body {
   text-align: center;
   font-size: 24pt;
 }
+
+button {
+    background: var(--secondary-color);
+    border-radius: 15px;
+    font-size: 1em;
+    font-family: inherit;
+    color: var(--font-color);
+    padding: none;
+    border: none;
+}
+
+button:focus {
+  outline: 0;
+}
+
+button:active {
+  transform: scale(0.97);
+  filter: brightness(50%);
+}
+
+input:focus {
+  outline: 0;
+}
+

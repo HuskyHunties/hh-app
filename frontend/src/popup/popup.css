@@ -18,3 +18,60 @@
 .hidden {
     display: none;
 }
+
+.okay {
+    position: absolute;
+    width: 45.5%;
+    left: 3%;
+    bottom: 25px;
+    height: 50px;
+    line-height: 50px;
+}
+
+.cancel {
+    position: absolute;
+    width: 45.5%;
+    left: 51.5%;
+    bottom: 25px;
+    height: 50px;
+    line-height: 50px;
+}
+
+.notif {
+    position: absolute;
+    width: 50%;
+    left: 25%;
+    bottom: 25px;
+    height: 50px;
+    line-height: 50px;
+}
+
+#input {
+    width: 94%;
+    bottom: 100px;
+    height: 50px;
+    left: 3%;
+    background-color: var(--bg-color);
+    color: var(--font-color);
+    border-color: var(--accent-color);
+    font: inherit;
+    padding-left: 10px;
+}
+
+.popup-button {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    left: 0;
+    top: 50%;
+}
+
+.popup-text {
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    left: 0;
+    top: 0;
+    padding: 25px;
+    box-sizing: border-box;
+}

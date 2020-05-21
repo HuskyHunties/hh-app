@@ -67,8 +67,8 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
         return (
             <div className="group-frame">
                 <GroupList ids={this.state.ids} clickHandler={(id: number) => this.setState({ selected: id })} selected={this.state.selected} />
-                <button className="add-group">Add Group</button>
-                <button className="remove-group">Remove Group</button>
+                <button className="add-group group-button">Add Group</button>
+                <button className="remove-group group-button">Remove Group</button>
             </div>
         )
     }

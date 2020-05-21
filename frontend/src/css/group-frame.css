@@ -54,28 +54,12 @@ td {
     color: var(--bg-color);
 }
 
-button {
+.group-button {
     position: absolute;
     width: 45.5%;
     top: 530px;
     height: 50px;
     line-height: 50px;
-    background: var(--secondary-color);
-    border-radius: 15px;
-    font-size: 1em;
-    font-family: inherit;
-    color: var(--font-color);
-    padding: none;
-    border: none;
-}
-
-button:focus {
-    outline: 0;
-}
-
-button:active {
-    transform: scale(0.97);
-    filter: brightness(50%);
 }
 
 .add-group {

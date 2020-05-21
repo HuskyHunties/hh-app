@@ -33,7 +33,7 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
 }
 
   render() {
-    return (<div onDoubleClick={() => this.popupFactory(PopupTypes.Confirm, "It works!", undefined, () => this.hidePopup())}>
+    return (<div onDoubleClick={() => this.popupFactory(PopupTypes.Input, "It works!", undefined, () => this.hidePopup())}>
       <MainPage />
       <Popup showPopup={this.state.showPopup} popupType={this.state.popupType} popupMessage={this.state.popupMessage}
         popupDoInput={this.state.popupDoInput} popupDoConfirm={this.state.popupDoConfirm} hidePopup={() => this.hidePopup()} />

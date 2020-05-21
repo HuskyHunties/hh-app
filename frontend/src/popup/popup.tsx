@@ -4,8 +4,7 @@ import './popup.css';
 export enum PopupTypes {
     Confirm = "confirm",
     Input = "input",
-    Notif = "notif",
-    NotifAck = "notifAck"
+    Notif = "notif"
 }
 
 export type PopupCreator = (type: PopupTypes, message: String, onInput: (res: String) => void, onConfirm: () => void) => void;
@@ -20,9 +19,15 @@ interface PopupProps {
 }
 
 interface PopupState {
+    inputValue: string;
 }
 
 export default class Popup extends React.Component<PopupProps, PopupState> {
+    constructor(props: PopupProps) {
+        super(props);
+        this.state = { inputValue: "" };
+    }
+
     private handleClick() {
         if (this.props.popupType === PopupTypes.Confirm) {
             (this.props.popupDoConfirm)!();
@@ -34,19 +39,30 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     }
 
     private confirm(): JSX.Element {
-        return <div></div>;
+        return (
+            <div className="popup-button">
+                <button className="okay">Okay</button>
+                <button className="cancel">Cancel</button>
+            </div>);
     }
 
     private input(): JSX.Element {
-        return <div></div>
+        return (
+            <div className="popup-button">
+                <input type="text" id="input" value={this.state.inputValue}
+                    onChange={(e) => this.setState({ inputValue: e.target.value })}></input>
+                <button className="okay">Okay</button>
+                <button className="cancel">Cancel</button>
+            </div>
+        );
     }
 
     private notif(): JSX.Element {
-        return <div></div>
-    }
-
-    private notifAck(): JSX.Element {
-        return <div></div>
+        return (
+            <div className="popup-button">
+                <button className="notif">Okay</button>
+            </div>
+        );
     }
 
     render() {
@@ -64,18 +80,17 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
                 buttons = this.notif();
                 break;
 
-            case PopupTypes.NotifAck:
-                buttons = this.notifAck();
-                break;
-
             default:
                 throw Error("Invalid Type")
         }
 
         return (
             <div className={this.props.showPopup ? "popup" : "hidden"}>
-                {this.props.popupMessage}
+                <div className="popup-text">
+                    {this.props.popupMessage}
+                </div>
 
+                {buttons}
             </div>
         );
     }
