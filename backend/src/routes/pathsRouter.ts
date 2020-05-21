@@ -1,16 +1,14 @@
 import * as express from "express";
-import { PathControllerImpError } from "../controller/PathController";
 import { dbWrapper } from "../controller/Database";
 
 const pathsRouter: express.Router = express.Router();
-const controller = new PathControllerImpError();
 
 // gets the list of all the ids of all the clues on the specified path
-pathsRouter.get("/:pathID", (req, res, next) => {
+pathsRouter.get("/:pathID", async (req, res, next) => {
   try {
     const pathID = Number(req.params.pathID);
-    const clueIDs: number[] = controller.getClues(pathID);
-    res.json(JSON.stringify({ clues: clueIDs }));
+    const clueIDs: number[] = await dbWrapper.getCluesofPath(pathID);
+    res.send({ clues: clueIDs });
   } catch (error) {
     console.log(error);
     res.status(400).send({ clueIDs: [1, 2, 3, 4, 5, 6] });
@@ -18,11 +16,13 @@ pathsRouter.get("/:pathID", (req, res, next) => {
 });
 
 // gets the list of all the ids of all the incomplete clues on the specified path
-pathsRouter.get("/:pathID/incomplete", (req, res, next) => {
+pathsRouter.get("/:pathID/incomplete", async (req, res, next) => {
   try {
     const pathID = Number(req.params.pathID);
-    const clueIDs: number[] = controller.getIncompleteClues(pathID);
-    res.json(JSON.stringify({ clues: clueIDs }));
+    const clueIDs: number[] = await dbWrapper.getAllIncompleteCluesOfPath(
+      pathID
+    );
+    res.send({ clues: clueIDs });
   } catch (error) {
     console.log(error);
     res.status(400).send({ clueIDs: [1, 2, 3] });
@@ -30,11 +30,13 @@ pathsRouter.get("/:pathID/incomplete", (req, res, next) => {
 });
 
 // gets the list of all the ids of all the incomplete clues on the specified path
-pathsRouter.get("/:pathID/complete", (req, res, next) => {
+pathsRouter.get("/:pathID/complete", async (req, res, next) => {
   try {
     const pathID = Number(req.params.pathID);
-    const clueIDs: number[] = controller.getCompleteClues(pathID);
-    res.json({ clues: clueIDs });
+    const clueIDs: number[] = await dbWrapper.getAllCompletedCluesOfPath(
+      pathID
+    );
+    res.send({ clues: clueIDs });
   } catch (error) {
     console.log(error);
     res.status(400).send({ clueIDs: [4, 5, 6] });
@@ -43,11 +45,11 @@ pathsRouter.get("/:pathID/complete", (req, res, next) => {
 
 // makes a new path based off the list of clues in the request body,
 // sends back the ID of the new path created
-pathsRouter.post("/", (req, res, next) => {
+pathsRouter.post("/", async (req, res, next) => {
   try {
     const name: string = req.body.name;
-    const pathID = controller.createPath(name);
-    res.json({ pathID: pathID });
+    const infoObject: Record<string, any> = await dbWrapper.createPath(name);
+    res.send(infoObject);
   } catch (error) {
     console.log(error);
     res.status(400).send({ pathID: 1 });
@@ -55,11 +57,11 @@ pathsRouter.post("/", (req, res, next) => {
 });
 
 // deletes the path specified by the given pathID param
-pathsRouter.delete("/:pathID", (req, res, next) => {
+pathsRouter.delete("/:pathID", async (req, res, next) => {
   try {
     const pathID = Number(req.params.pathID);
-    const removedClues: number[] = controller.removePath(pathID);
-    res.json({ clueIDs: removedClues });
+    const infoObject: Record<string, any> = await dbWrapper.removePath(pathID);
+    res.send(infoObject);
   } catch (error) {
     console.log(error);
     res.status(400).send({ clueIDs: [1, 2, 3, 4, 5, 6] });
@@ -69,16 +71,22 @@ pathsRouter.delete("/:pathID", (req, res, next) => {
 // adds or removes the specified clue to the specified path
 // req.body.clueID is the id of the clue, and req.body.add is
 // boolean
-pathsRouter.put("/:pathID", (req, res, next) => {
+pathsRouter.put("/:pathID", async (req, res, next) => {
   try {
     const pathID = Number(req.params.pathID);
-    const clueID = req.body.clueID;
-    if (Boolean(req.body.add)) {
-      controller.addClueToPath(pathID, clueID);
-      res.send(`Added clue: ${clueID} to path: ${pathID}`);
+    const clueID = Number(req.body.clueID);
+    if (Boolean(req.body.addClue)) {
+      const infoObject: Record<string, any> = await dbWrapper.addClueToPath(
+        pathID,
+        clueID
+      );
+      res.send(infoObject);
     } else {
-      controller.removeClueFromPath(pathID, clueID);
-      res.send(`Removed clue: ${clueID} from path: ${pathID}`);
+      const infoObject: Record<
+        string,
+        any
+      > = await dbWrapper.removeClueFromPath(pathID, clueID);
+      res.send(infoObject);
     }
   } catch (error) {
     console.log(error);

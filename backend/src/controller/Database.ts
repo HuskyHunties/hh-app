@@ -141,173 +141,255 @@ class DatabaseWrapper {
   // CLUE TABLE METHODS
 
   /**
+   * @returns an array of all the clue_ids in the clues table of the database
+   */
+  getAllClueIDs(): Promise<number[]> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      const clueIDs: number[] = [];
+
+      // collecting the clue ids from the join table
+      db.all(`SELECT clue_id FROM clues`, (err, rows) => {
+        if (err) {
+          reject(err.message);
+        }
+        rows.forEach((row) => {
+          clueIDs.push(row.clue_id);
+        });
+
+        resolve(clueIDs);
+      });
+    });
+  }
+
+  /**
+   * return an object containing the information on this clue
+   * @param clueID
+   */
+  getInfoOfClue(clueID: number): Promise<object> {
+    const db = this.db;
+    let crawlID: number;
+    let name: string;
+    let place: string;
+    let image: string;
+    let finished: number;
+
+    return new Promise((resolve, reject) => {
+      db.get(
+        `SELECT crawl_id, name, place, image, finished FROM clues WHERE clue_id = ${clueID}`,
+        (err, row) => {
+          if (err) {
+            reject(err);
+          }
+          crawlID = row.crawl_id;
+          name = row.name;
+          place = row.place;
+          image = row.image;
+          finished = row.finished;
+
+          resolve({
+            crawlID: crawlID,
+            name: name,
+            place: place,
+            image: image,
+            finished: finished,
+          });
+        }
+      );
+    });
+  }
+
+  /**
+   *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
+   */
+  async getAllUnfinishedClueIDs(): Promise<number[]> {
+    const db = this.db;
+
+    return new Promise(async (resolve, reject) => {
+      const allUnfinishedClueIDs: number[] = [];
+
+      db.all(
+        `SELECT clue_id, finished FROM clues WHERE finished = 0`,
+        [],
+        (err, rows) => {
+          if (err) {
+            reject(err.message);
+          }
+          console.log(rows);
+          rows.forEach((row) => {
+            if (row.finished === 0) {
+              allUnfinishedClueIDs.push(row.clue_id);
+            }
+          });
+
+          resolve(allUnfinishedClueIDs);
+        }
+      );
+    });
+  }
+
+  /**
+   *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
+   */
+  async getAllFinishedClueIDs(): Promise<number[]> {
+    const db = this.db;
+
+    return new Promise(async (resolve, reject) => {
+      const allFinishedClueIDs: number[] = [];
+
+      db.all(
+        `SELECT clue_id, finished FROM clues WHERE finished = 1`,
+        [],
+        (err, rows) => {
+          if (err) {
+            reject(err.message);
+          }
+          console.log(rows);
+          rows.forEach((row) => {
+            if (row.finished === 1) {
+              allFinishedClueIDs.push(row.clue_id);
+            }
+          });
+
+          resolve(allFinishedClueIDs);
+        }
+      );
+    });
+  }
+
+  /**
    *
    * @param name
    * @param place
    * @param crawlId
    */
-  addClue(name: string, place: string, crawlId?: number): number {
-    // if the clue has a crawl, add its crawl to the database; else, only add the clue
-    if (!isNullOrUndefined(crawlId)) {
-      this.db.run(
-        "INSERT INTO clues(crawl_id, name, address, finished) VALUES(?)",
-        [crawlId, name, place, 0],
-        (err) => {
-          if (err) throw console.error(err.message);
-        }
-      );
-    } else {
-      this.db.run(
-        "INSERT INTO clues(name, address, finished) VALUES(?)",
-        [name, place, 0],
-        (err) => {
-          if (err) throw console.error(err.message);
-        }
-      );
-    }
+  addClue(
+    name: string,
+    place: string,
+    crawlId: number
+  ): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      // if the clue has a crawl, add its crawl to the database; else, only add the clue
+      if (!isNullOrUndefined(crawlId)) {
+        db.run(
+          "INSERT INTO clues(crawl_id, name, place, finished) VALUES(?, ?, ?, ?)",
+          [crawlId, name, place, 0],
+          (err) => {
+            if (err) throw console.error(err.message);
+          }
+        );
+      } else {
+        db.run(
+          "INSERT INTO clues(name, place, finished) VALUES(?, ?, ?)",
+          [name, place, 0],
+          (err) => {
+            if (err) throw console.error(err.message);
+          }
+        );
+      }
 
-    // retrieve the clue ID registered from the database
-    let clueId: number;
-    this.db.get(
-      `SELECT clue_id FROM clues WHERE name = ${name}`,
-      (err, row) => {
+      // retrieve the clue ID registered from the database
+      let clueId: number;
+      db.get(`SELECT clue_id FROM clues WHERE name = '${name}'`, (err, row) => {
         if (err) {
           throw console.error(err.message);
         } else if (isNullOrUndefined(row)) {
           throw new Error("did not insert desired clue");
         }
         clueId = row.clue_id;
-      }
-    );
-
-    return clueId;
-  }
-
-  /**
-   *
-   * @param clueID
-   * @param pictureEncoding
-   */
-  addPictureToClue(clueID: number, pictureEncoding: string): number {
-    // can we assume that this method will only be called with the names
-    // of clues which we know to have beena added, and don't have to check for a clue?
-
-    this.db.run(
-      `UPDATE clues SET image = ${pictureEncoding} WHERE clue_id = ${clueID}`,
-      (err) => {
-        if (err) throw console.error(err.message);
-      }
-    );
-
-    return clueID;
-  }
-
-  /**
-   *
-   * @param clueID
-   */
-  completeClue(clueID: number): number {
-    this.db.run(
-      `UPDATE clues SET finished = 1 WHERE clue_id = ${clueID}`,
-      (err) => {
-        if (err) {
-          throw console.error(err.message);
-        }
-      }
-    );
-
-    return clueID;
-  }
-
-  /**
-   *
-   * @param clueID
-   */
-  deleteClue(clueID: number): void {
-    this.db.run(`DELETE FROM clues WHERE clue_id = ${clueID}`, (err) => {
-      if (err) {
-        throw console.error(err.message);
-      }
-    });
-  }
-
-  /**
-   * @returns an array of all the clue_ids in the clues table of the database
-   */
-  getAllClueIDs(): number[] {
-    const allClueIDs: number[] = [];
-
-    this.db.all(`SELECT clue_id FROM clues`, [], (err, rows) => {
-      if (err) {
-        throw console.error(err.message);
-      }
-      rows.forEach((row) => {
-        allClueIDs.push(row.clue_id);
+        resolve({
+          clueID: clueId,
+          crawlID: crawlId,
+          name: name,
+          place: place,
+          finished: 0,
+        });
       });
     });
-    return allClueIDs;
-  }
-  /**
-   *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
-   */
-  getAllIncompleteClueIDs(): number[] {
-    const allUnfinishedClueIDs: number[] = [];
-
-    this.db.each(
-      `SELECT clue_id FROM clues WHERE finished = 0`,
-      [],
-      (err, rows) => {
-        if (err) {
-          throw console.error(err.message);
-        }
-        rows.forEach((row) => {
-          allUnfinishedClueIDs.push(row.clue_id);
-        });
-      }
-    );
-    return allUnfinishedClueIDs;
   }
 
   /**
-   *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
+   *
+   * @param clueID
    */
-  getAllCompleteClueIDs(): number[] {
-    const AllFinishedClueIDs: number[] = [];
+  deleteClue(clueID: number): Promise<Record<string, any>> {
+    const db = this.db;
+    let crawlID: number;
+    let name: string;
+    let place: string;
+    let image: string;
+    let finished: number;
 
-    this.db.each(
-      `SELECT clue_id FROM clues WHERE finished = 0`,
-      [],
-      (err, rows) => {
-        if (err) {
-          throw console.error(err.message);
+    return new Promise((resolve, reject) => {
+      db.get(
+        `SELECT crawl_id, name, place, image, finished FROM clues WHERE clue_id = ${clueID}`,
+        (err, row) => {
+          if (err) {
+            reject(err);
+          }
+          crawlID = row.crawl_id;
+          name = row.name;
+          place = row.place;
+          image = row.image;
+          finished = row.finished;
         }
-        rows.forEach((row) => {
-          AllFinishedClueIDs.push(row.clue_id);
+      );
+      db.run(`DELETE FROM clues WHERE clue_id = ${clueID}`, (err) => {
+        if (err) {
+          reject(err.message);
+        }
+        resolve({
+          crawlID: crawlID,
+          name: name,
+          place: place,
+          image: image,
+          finished: finished,
         });
-      }
-    );
-    return AllFinishedClueIDs;
+      });
+    });
   }
 
-  getImageStringOfClue(clueID: number): string {
-    let imageString: string;
-
-    this.db.get(
-      `SELECT image FROM clues WHERE clue_id = ${clueID}`,
-      (err, row) => {
-        if (err) {
-          throw console.error(err.message);
-        } else if (isNullOrUndefined(row)) {
-          throw new Error("desired clue was not selected");
+  /**
+   *
+   * @param clueID
+   * @param imageEncoding
+   */
+  addPictureToClue(clueID: number, imageEncoding: string): Promise<string> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE clues SET image = '${imageEncoding}' WHERE clue_id = ${clueID}`,
+        (err) => {
+          if (err) {
+            reject(err.message);
+          }
+          resolve(imageEncoding);
         }
-        imageString = row.image;
-      }
-    );
-
-    return imageString;
+      );
+    });
   }
 
-  // Group Controller Methods
+  /**
+   *
+   * @param clueID
+   */
+  finishClue(clueID: number): Promise<number> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE clues SET finished = 1 WHERE clue_id = ${clueID}`,
+        (err) => {
+          if (err) {
+            reject(err.message);
+          }
+          resolve(1);
+        }
+      );
+    });
+  }
+
+  // Group TABLE Methods
 
   /**
    * returns an array of all the group ids in the groups table
@@ -402,7 +484,7 @@ class DatabaseWrapper {
         `SELECT name, path_id from groups WHERE group_id = ${groupID}`,
         (err, row) => {
           if (err) {
-            throw console.error(err.message);
+            reject(err.message);
           }
           name = row.name;
           pathID = row.path_id;
@@ -411,7 +493,7 @@ class DatabaseWrapper {
 
       db.run(`DELETE FROM groups WHERE group_id = ${groupID}`, (err, row) => {
         if (err) {
-          throw console.error(err.message);
+          reject(err.message);
         } else {
           resolve({ name: name, pathID: pathID });
         }
@@ -425,15 +507,37 @@ class DatabaseWrapper {
    * @param pathID
    * sets the path_id of the specified group to the specified path
    */
-  setPathOfGroupTo(groupID: number, pathID: number, override?: boolean): void {
-    this.db.run(
-      `UPDATE groups SET path_id = ${pathID} WHERE group_id = ${groupID}`,
-      (err) => {
-        if (err) {
-          throw console.error(err.message);
+  setPathOfGroupTo(
+    groupID: number,
+    newPathID: number,
+    override?: boolean
+  ): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      db.run(
+        `UPDATE groups SET path_id = ${newPathID} WHERE group_id = ${groupID}`,
+        (err) => {
+          if (err) {
+            reject(err.message);
+          }
         }
-      }
-    );
+      );
+
+      let name: string;
+      let pathID: number;
+
+      db.get(
+        `SELECT name, path_id from groups WHERE group_id = ${groupID}`,
+        (err, row) => {
+          if (err) {
+            reject(err.message);
+          }
+          name = row.name;
+          pathID = row.path_id;
+          resolve({ name: name, pathID: pathID });
+        }
+      );
+    });
   }
 
   /**
@@ -442,43 +546,159 @@ class DatabaseWrapper {
    * @param newName
    * returns the given group id that is being modified
    */
-  changeGroupName(groupID: number, newName: string): number {
-    this.db.run(
-      `UPDATE groups SET name = '${newName}' WHERE group_id = ${groupID}`,
-      (err) => {
-        if (err) {
-          throw console.error(err.message);
+
+  changeGroupName(
+    groupID: number,
+    newName: string
+  ): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      db.run(
+        `UPDATE groups SET name = '${newName}' WHERE group_id = ${groupID}`,
+        (err) => {
+          if (err) {
+            reject(err.message);
+          }
         }
-      }
-    );
-    return groupID;
+      );
+
+      let name: string;
+      let pathID: number;
+
+      db.get(
+        `SELECT name, path_id from groups WHERE group_id = ${groupID}`,
+        (err, row) => {
+          if (err) {
+            reject(err.message);
+          }
+          name = row.name;
+          pathID = row.path_id;
+          resolve({ name: name, pathID: pathID });
+        }
+      );
+    });
   }
 
-  // PATH CONTROLLER METHODS - path and join tables
+  // PATH TABLE METHODS - path and join tables
+
+  /**
+   *
+   * @param pathID
+   * returns all the clue IDs associated with the specific clue
+   */
+  getCluesofPath(pathID: number): Promise<number[]> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      const clueIDs: number[] = [];
+
+      // collecting the clue ids from the join table
+      db.all(
+        `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID}`,
+        (err, rows) => {
+          if (err) {
+            reject(err.message);
+          }
+          rows.forEach((row) => {
+            clueIDs.push(row.clue_id);
+          });
+
+          resolve(clueIDs);
+        }
+      );
+    });
+  }
+
+  /**
+   *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
+   */
+  async getAllIncompleteCluesOfPath(pathID: number): Promise<number[]> {
+    const allClues = await this.getCluesofPath(pathID);
+    const db = this.db;
+
+    return new Promise(async (resolve, reject) => {
+      const allUnfinishedClueIDs: number[] = [];
+
+      let clueIDSQL = `SELECT clue_id, finished FROM clues WHERE finished = 0 AND`;
+
+      allClues.forEach((clueID) => {
+        clueIDSQL += ` clue_id = ${clueID} OR`;
+      });
+
+      clueIDSQL = clueIDSQL.slice(0, clueIDSQL.length - 3);
+
+      db.all(clueIDSQL, [], (err, rows) => {
+        if (err) {
+          reject(err.message);
+        }
+        console.log(rows);
+        rows.forEach((row) => {
+          if (row.finished === 0) {
+            allUnfinishedClueIDs.push(row.clue_id);
+          }
+        });
+
+        resolve(allUnfinishedClueIDs);
+      });
+    });
+  }
+
+  /**
+   *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
+   */
+  async getAllCompletedCluesOfPath(pathID: number): Promise<number[]> {
+    const allClues = await this.getCluesofPath(pathID);
+    const db = this.db;
+
+    return new Promise(async (resolve, reject) => {
+      const allFinishedClueIDs: number[] = [];
+
+      let clueIDSQL = `SELECT clue_id, finished FROM clues WHERE finished = 1 AND`;
+
+      allClues.forEach((clueID) => {
+        clueIDSQL += ` clue_id = ${clueID} OR`;
+      });
+
+      clueIDSQL = clueIDSQL.slice(0, clueIDSQL.length - 3);
+      console.log(clueIDSQL);
+
+      db.all(clueIDSQL, [], (err, rows) => {
+        if (err) {
+          reject(err.message);
+        }
+        console.log(rows);
+        rows.forEach((row) => {
+          if (row.finished === 1) {
+            allFinishedClueIDs.push(row.clue_id);
+          }
+        });
+
+        resolve(allFinishedClueIDs);
+      });
+    });
+  }
 
   /**
    *
    * @param clueIDs
    * returns the id of the created path
    */
-  createPath(name: string): number {
-    this.db.run(`INSERT INTO paths (name) VALUES(?)`, [name], (err) => {
-      if (err) throw console.error(err.message);
-    });
+  createPath(name: string): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.run(`INSERT INTO paths (name) VALUES(?)`, [name], (err) => {
+        if (err) throw console.error(err.message);
+      });
 
-    let pathID: number;
+      let pathID: number;
 
-    this.db.get(
-      `SELECT path_id from paths WHERE name = ${name}`,
-      (err, row) => {
+      db.get(`SELECT path_id from paths WHERE name = '${name}'`, (err, row) => {
         if (err) {
-          throw console.error(err.message);
+          reject(err);
         }
         pathID = row.path_id;
-      }
-    );
-
-    return pathID;
+        resolve({ pathID: pathID, name: name });
+      });
+    });
   }
 
   /**
@@ -486,56 +706,40 @@ class DatabaseWrapper {
    * @param pathID
    * returns an array of the clueIDs which were on this path
    */
-  removePath(pathID: number): number[] {
-    const clueIDs: number[] = [];
-
-    // collecting the clue ids from the join table
-    this.db.each(
-      `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID}`,
-      (err, rows) => {
+  removePath(pathID: number): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      let name: string;
+      const clueIDs: number[] = [];
+      db.get(`SELECT name FROM paths WHERE path_id = ${pathID}`, (err, row) => {
         if (err) {
-          throw console.error(err.message);
+          reject(err.message);
         }
+        name = row.name;
+      });
 
-        rows.forEach((row) => {
-          clueIDs.push(row.clue_id);
-        });
-      }
-    );
+      // collecting the clue ids from the join table
+      db.each(
+        `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID}`,
+        (err, rows) => {
+          if (err) {
+            reject(err.message);
+          }
 
-    //deleting the path from the path table
-    this.db.run(`DELETE FROM paths WHERE path_id = ${pathID}`, (err) => {
-      if (err) {
-        throw console.error(err.message);
-      }
+          rows.forEach((row) => {
+            clueIDs.push(row.clue_id);
+          });
+        }
+      );
+
+      //deleting the path from the path table
+      db.run(`DELETE FROM paths WHERE path_id = ${pathID}`, (err) => {
+        if (err) {
+          reject(err.message);
+        }
+        resolve({ name: name, clueIDs: clueIDs });
+      });
     });
-
-    return clueIDs;
-  }
-
-  /**
-   *
-   * @param pathID
-   * returns all the clue IDs associated with the specific clue
-   */
-  getCluesofPath(pathID: number): number[] {
-    const clueIDs: number[] = [];
-
-    // collecting the clue ids from the join table
-    this.db.each(
-      `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID}`,
-      (err, rows) => {
-        if (err) {
-          throw console.error(err.message);
-        }
-
-        rows.forEach((row) => {
-          clueIDs.push(row.clue_id);
-        });
-      }
-    );
-
-    return clueIDs;
   }
 
   /**
@@ -543,16 +747,20 @@ class DatabaseWrapper {
    * @param pathID
    * @param clueID
    */
-  addClueToPath(pathID: number, clueID: number): void {
-    this.db.run(
-      `INSERT INTO paths_join_clues(path_id, clue_id) VALUES(?)`,
-      [pathID, clueID],
-      (err) => {
-        if (err) {
-          throw console.error(err.message);
+  addClueToPath(pathID: number, clueID: number): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.run(
+        `INSERT INTO paths_join_clues (path_id, clue_id) VALUES(?, ?)`,
+        [pathID, clueID],
+        (err) => {
+          if (err) {
+            reject(err.message);
+          }
+          resolve({ pathID: pathID, clueID: clueID });
         }
-      }
-    );
+      );
+    });
   }
 
   /**
@@ -561,80 +769,25 @@ class DatabaseWrapper {
    * @param clueID
    * returns the clueID removed
    */
-  removeClueFromPath(pathID: number, clueID: number): number {
-    this.db.run(
-      `DELETE FROM paths_join_clues WHERE path_id = ${pathID} AND clue_id = ${clueID}`,
-      (err) => {
-        if (err) {
-          throw console.error(err.message);
-        }
-      }
-    );
-
-    return clueID;
-  }
-
-  /**
-   *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
-   */
-  getAllIncompleteCluesOfPath(pathID: number): number[] {
-    const allClues = this.getCluesofPath(pathID);
-    const allUnfinishedClueIDs: number[] = [];
-
-    allClues.forEach((clueID) => {
-      this.db.each(
-        `SELECT finished FROM clues WHERE clue_id = ${clueID}`,
-        [],
-        (err, rows) => {
+  removeClueFromPath(
+    pathID: number,
+    clueID: number
+  ): Promise<Record<string, any>> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.run(
+        `DELETE FROM paths_join_clues WHERE path_id = ${pathID} AND clue_id = ${clueID}`,
+        (err) => {
           if (err) {
             throw console.error(err.message);
           }
-          rows.forEach((row) => {
-            if (row.finished === 0) {
-              allUnfinishedClueIDs.push(row.clue_id);
-            }
-          });
+          resolve({ pathID: pathID, clueID: clueID });
         }
       );
     });
-
-    return allUnfinishedClueIDs;
   }
 
-  /**
-   *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
-   */
-  getAllCompletedCluesOfPath(pathID: number): number[] {
-    const allClues = this.getCluesofPath(pathID);
-    const allFinishedClueIDs: number[] = [];
-
-    allClues.forEach((clueID) => {
-      this.db.each(
-        `SELECT finished FROM clues WHERE clue_id = ${clueID}`,
-        [],
-        (err, rows) => {
-          if (err) {
-            throw console.error(err.message);
-          }
-          rows.forEach((row) => {
-            if (row.finished === 1) {
-              allFinishedClueIDs.push(row.clue_id);
-            }
-          });
-        }
-      );
-    });
-
-    return allFinishedClueIDs;
-  }
-
-  /*
-
-
-
-
-
-*/
+  // CRAWL TABLE METHODS
 
   /**
    * Add a Crawl to the database.
@@ -679,7 +832,7 @@ class DatabaseWrapper {
   //
   //
   // other:
-  // - add address table that clues reference
+  // - add place table that clues reference
 }
 
 export const dbWrapper = new DatabaseWrapper("hh-db");
