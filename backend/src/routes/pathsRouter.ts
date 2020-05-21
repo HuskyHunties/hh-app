@@ -1,5 +1,8 @@
 import * as express from "express";
-import { PathControllerImpError, PathControllerImp } from "../controller/PathController";
+import {
+  PathControllerImpError,
+  PathControllerImp,
+} from "../controller/PathController";
 
 const pathsRouter: express.Router = express.Router();
 const controller = new PathControllerImp();

@@ -1,5 +1,4 @@
 import { Path } from "./PathController";
-import { dbWrapper } from "./Database";
 
 /**
  * A class to represent a group of people.
@@ -82,29 +81,6 @@ export interface GroupController {
   changeGroupName(id: number, newName: string): number;
 }
 
-export class GroupControllerImp implements GroupController {
-  getGroups(): number[] {
-    return dbWrapper.getAllGroups();
-  }
-  setPath(pathID: number, groupID: number): void;
-  setPath(pathID: number, groupID: number, override: boolean): void;
-  setPath(pathID: any, groupID: any, override?: any) {
-    return dbWrapper.setPathOfGroupTo(groupID, pathID);
-    // need to implement overriding
-  }
-  getGroupPath(groupID: number): number {
-    return dbWrapper.getPathOfGroup(groupID);
-  }
-  createGroup(name: string): number {
-    return dbWrapper.createGroup(name);
-  }
-  deleteGroup(groupID: number): number {
-    return dbWrapper.deleteGroup(groupID);
-  }
-  changeGroupName(groupID: number, newName: string): number {
-    return dbWrapper.changeGroupName(groupID, newName);
-  }
-}
 export class GroupControllerImpError implements GroupController {
   getGroups(): number[] {
     throw new Error("Method getGroups not implemented.");

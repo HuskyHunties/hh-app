@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as sqlite3 from "sqlite3";
 import { isNullOrUndefined } from "util";
+import { response } from "express";
 
 /**
  * Wrapper class for the database to provide various ways to interact with it
@@ -29,8 +30,6 @@ class DatabaseWrapper {
         }
         console.log("Successfully initialized the database.");
       }); */
-
-      
 
       this.db.run(
         `CREATE TABLE IF NOT EXISTS crawls (
@@ -315,24 +314,28 @@ class DatabaseWrapper {
    * @param name
    * returns the id of the created group
    */
-  createGroup(groupName: string): number {
-    let groupID: number;
+  createGroup(groupName: string): Promise<number> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      let groupID: number;
 
-    this.db.run(`INSERT INTO groups (name) VALUES(?)`, [groupName], (err) => {
-      if (err) throw console.error(err.message);
-      this.db.get(
+      db.run(`INSERT INTO groups (name) VALUES(?)`, [groupName], (err) => {
+        if (err) reject(err);
+      });
+
+      db.get(
         `SELECT group_id from groups WHERE name = '${groupName}'`,
         (err, row) => {
           if (err) {
-            throw console.error(err.message);
+            reject(err);
+          } else {
+            resolve(row.group_id);
           }
-          console.log(row.group_id);
-          groupID = row.group_id;
+          /* console.log(row.group_id);
+          groupID = row.group_id; */
         }
       );
     });
-    console.log(groupID);
-    return groupID;
   }
 
   /**
@@ -340,38 +343,51 @@ class DatabaseWrapper {
    * @param groupID
    * returns the ID of the path this group had
    */
-  deleteGroup(groupID: number): number {
-    let pathID: number;
+  deleteGroup(groupID: number): Promise<number> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      let pathID: number;
 
-    this.db.run(
-      `DELETE FROM groups WHERE group_id = ${groupID}`,
-      (err, row) => {
+      db.get(
+        `SELECT path_id from groups WHERE group_id = ${groupID}`,
+        (err, row) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+          pathID = row.path_id;
+        }
+      );
+
+      db.run(`DELETE FROM groups WHERE group_id = ${groupID}`, (err, row) => {
         if (err) {
           throw console.error(err.message);
+        } else {
+          resolve(pathID);
         }
-
-        pathID = row.path_id;
-      }
-    );
-
-    return pathID;
+      });
+    });
   }
 
   /**
    * returns an array of all the group ids in the groups table
    */
-  getAllGroups(): number[] {
-    const allGroupIDs: number[] = [];
+  getAllGroups(): Promise<number[]> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      const allGroupIDs: number[] = [];
 
-    this.db.all(`SELECT group_id FROM groups`, [], (err, rows) => {
-      if (err) {
-        throw console.error(err.message);
-      }
-      rows.forEach((row) => {
-        allGroupIDs.push(row.group_id);
+      db.all(`SELECT group_id FROM groups`, [], (err, rows) => {
+        if (err) {
+          //throw console.error(err.message)
+          reject(err);
+        } else {
+          rows.forEach((row) => {
+            allGroupIDs.push(row.group_id);
+          });
+          resolve(allGroupIDs);
+        }
       });
     });
-    return allGroupIDs;
   }
 
   /**
@@ -380,7 +396,7 @@ class DatabaseWrapper {
    * @param pathID
    * sets the path_id of the specified group to the specified path
    */
-  setPathOfGroupTo(groupID: number, pathID: number): void {
+  setPathOfGroupTo(groupID: number, pathID: number, override?: boolean): void {
     this.db.run(
       `UPDATE groups SET path_id = ${pathID} WHERE group_id = ${groupID}`,
       (err) => {
@@ -396,19 +412,23 @@ class DatabaseWrapper {
    * @param groupID
    * returns the id of the path of the specified group
    */
-  getPathOfGroup(groupID: number): number {
-    let pathID: number;
-    this.db.get(
-      `SELECT path_id from groups WHERE group_id = ${groupID}`,
-      (err, row) => {
-        if (err) {
-          throw console.error(err.message);
-        }
-        pathID = row.path_id;
-      }
-    );
+  getPathOfGroup(groupID: number): Promise<number> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      let pathID: number;
 
-    return pathID;
+      db.get(
+        `SELECT path_id from groups WHERE group_id = ${groupID}`,
+        (err, row) => {
+          if (err) {
+            reject(err);
+          } else {
+            pathID = row.path_id;
+            resolve(pathID);
+          }
+        }
+      );
+    });
   }
 
   /**
@@ -419,7 +439,7 @@ class DatabaseWrapper {
    */
   changeGroupName(groupID: number, newName: string): number {
     this.db.run(
-      `UPDATE groups SET name = ${newName} WHERE group_id = ${groupID}`,
+      `UPDATE groups SET name = '${newName}' WHERE group_id = ${groupID}`,
       (err) => {
         if (err) {
           throw console.error(err.message);
@@ -444,7 +464,7 @@ class DatabaseWrapper {
     let pathID: number;
 
     this.db.get(
-      `SELECT path_id from paths WHERE name = '${name}'`,
+      `SELECT path_id from paths WHERE name = ${name}`,
       (err, row) => {
         if (err) {
           throw console.error(err.message);
