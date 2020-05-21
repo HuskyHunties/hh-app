@@ -88,8 +88,16 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
      * @param name The name of a new group.
      */
     async addGroup(name: string) {
-        // Implement
-        console.log("added Group: " + name);
+        API.post("/groups", {name: name}).then(this.setIDs, (res) => this.handleAddError(res))
+        console.log("Tried to add group: " + name);
+    }
+
+    /**
+     * Handles errors in the add group function
+     * @param res the error for the add request
+     */
+    handleAddError(res: JSON) {
+        // TODO Implement
     }
 
     /**
@@ -97,7 +105,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
      * @param id The id of the group to be deleted
      */
     async deleteGroup(id: number) {
-        // Implement
+        API.delete("/groups/" + id, {}).then(this.setIDs, (res) => {throw Error(res)});
         console.log("deleted group: " + id);
     }
 
