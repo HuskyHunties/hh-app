@@ -156,7 +156,7 @@ class DatabaseWrapper {
   /**
    * 
    * @param clueID - the id of the clue being queried
-   * @return an object containing the information on this clue
+   * @returns an object containing the information on this clue
    */
   getInfoOfClue(clueID: number): Promise<object> {
     const db = this.db;
@@ -265,7 +265,9 @@ class DatabaseWrapper {
           `INSERT INTO clues(crawl_id, name, place, finished) VALUES(?, ?, ?, ?)`,
           [crawlID, name, place, 0],
           (err) => {
-            if (err) reject(err.message);
+            if (err) {
+              reject(err.message);
+            }
           }
         );
       } else {
@@ -273,7 +275,9 @@ class DatabaseWrapper {
           "INSERT INTO clues(name, place, finished) VALUES(?, ?, ?)",
           [name, place, 0],
           (err) => {
-            if (err) reject(err.message);
+            if (err) {
+              reject(err.message);
+            }
           }
         );
       }
@@ -441,7 +445,9 @@ class DatabaseWrapper {
     const db = this.db;
     return new Promise(function (resolve, reject) {
       db.run(`INSERT INTO groups (name) VALUES(?)`, [groupName], (err) => {
-        if (err) reject(err);
+        if (err) {
+          reject(err);
+        }
       });
 
       db.get(
