@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test": "gulp scripts && mocha --reporter spec --require ts-node/register 'test/**/*.test.ts'",
-    "build": "gulp scripts",
-    "start": "gulp scripts && node build/src/server.js",
+    "build": "gulp scripts && node build/src/server.js",
+    "start": "ts-node src/server.ts",
     "debug": "gulp scripts && node --inspect-brk build/src/server.js",
     "lint": "eslint -f unix \"src/**/*.{ts,tsx}\""
   },
@@ -39,10 +39,11 @@
   "dependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "cross-env": "5.0.5",
     "debug": "^4.1.1",
     "express": "^4.17.1",
     "mocha": "^6.2.2",
     "sqlite3": "^4.2.0",
-    "cross-env": "5.0.5"
+    "tsc": "^1.20150623.0"
   }
 }

@@ -1,13 +1,13 @@
 import * as http from "http";
 import * as debug from "debug";
 
-import Main from "./controller/main";
+import Main from "./main";
 
 const server = http.createServer(Main);
 
 /**
  * Coerce a port number into its integer representation
- * @param val a number or string representing port number
+ * @param val - a number or string representing port number
  */
 function normalizePort(val: number | string): number | string | boolean {
   const port: number = typeof val === "string" ? parseInt(val, 10) : val;
@@ -21,7 +21,7 @@ debug("ts-express:server");
 
 /**
  * Event handler for error events in the ExpressJS server.
- * @param error NodeJS error, typically thrown by Express middleware
+ * @param error - NodeJS error, typically thrown by Express middleware
  */
 function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== "listen") throw error;

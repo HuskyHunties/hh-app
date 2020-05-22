@@ -1,7 +1,11 @@
 import * as express from "express";
 import * as logger from "morgan";
 import * as bodyParser from "body-parser";
-import sr from "./subrouter"; // note, the name sr is arbitrary and doesn't correspond to any literals in subRouter.ts
+
+import groupsRouter from "./routes/groupsRouter";
+import cluesRouter from "./routes/cluesRouter";
+import pathsRouter from "./routes/pathsRouter";
+import crawlsRouter from "./routes/crawlsRouter";
 
 class Main {
   public express: express.Application;
@@ -20,15 +24,16 @@ class Main {
   private routes(): void {
     const router = express.Router();
 
-    router.get("/", (req, res, next) => {
-      res.json({
-        dan: "dumb",
-      }); // this ends the req res cycle and sends a json response
+    router.get("/", (req, res) => {
+      res.send("Whattup you gotta enter a route extension: groups, clues, paths, or crawls");
     });
 
     this.express.use("/", router);
 
-    this.express.use("/subrouter", sr); // register the subrouter
+    this.express.use("/groups", groupsRouter);
+    this.express.use("/clues", cluesRouter);
+    this.express.use("/paths", pathsRouter);
+    this.express.use("/crawls", crawlsRouter);
   }
 }
 

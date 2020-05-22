@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS clues (
     crawl_id INTEGER,
     name TEXT NOT NULL,
     place TEXT NOT NULL,
-    image BLOB,
-    finished INTEGER, -- 0 for unfinished, 1 for finished
+    image TEXT,
+    finished INTEGER NOT NULL, -- 0 for unfinished, 1 for finished
 
     FOREIGN KEY (crawl_id)
         REFERENCES crawls (crawl_id)
@@ -29,6 +29,18 @@ CREATE TABLE IF NOT EXISTS paths (
     UNIQUE(path_id, name) ON CONFLICT ABORT -- paths cannot have duplicate names or ids
 );
 
+CREATE TABLE IF NOT EXISTS groups (
+    group_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    path_id INTEGER,
+
+    FOREIGN KEY (path_id)
+        REFERENCES paths (path_id)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    
+    UNIQUE(group_id, name) ON CONFLICT ABORT  -- groups cannot have dulpicate names or ids
+);
 -- represents a many to many relationship between paths and clues,
 -- allowing us to store a list of paths associated with a clue or a list 
 -- of clues associated with a path
