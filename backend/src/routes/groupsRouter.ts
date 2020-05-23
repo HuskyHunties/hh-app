@@ -14,12 +14,7 @@ groupsRouter.get("/", async (req, res) => {
     res.send({ allGroups: allGroupIDs });
   } catch (error) {
     console.log(error);
-<<<<<<< HEAD
-    //res.status(400)
-    res.json({ids: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]});
-=======
     res.status(400).json();
->>>>>>> master
   }
 });
 

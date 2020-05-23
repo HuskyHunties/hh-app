@@ -39,19 +39,11 @@
   "dependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
-<<<<<<< HEAD
-    "cors": "^2.8.5",
-=======
->>>>>>> master
     "cross-env": "5.0.5",
     "debug": "^4.1.1",
     "express": "^4.17.1",
     "mocha": "^6.2.2",
-<<<<<<< HEAD
-    "sqlite3": "^4.2.0"
-=======
     "sqlite3": "^4.2.0",
     "tsc": "^1.20150623.0"
->>>>>>> master
   }
 }
