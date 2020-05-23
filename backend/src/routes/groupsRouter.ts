@@ -5,7 +5,7 @@ import { dbWrapper } from "../database/DatabaseWrapper";
 const groupsRouter: express.Router = express.Router();
 
 /**
- * sends a resonse of all the group IDs in the database
+ * sends a response of all the group IDs in the database
  */
 groupsRouter.get("/", async (req, res) => {
   try {

@@ -66,6 +66,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
             ids: [],
             selected: undefined
         }
+        this.setIDs = this.setIDs.bind(this);
     }
 
     /**
@@ -79,8 +80,9 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
      * Sets the state to a list of group ids, fetched from the backend.
      */
     async setIDs() {
+        console.log("Getting ids");
         const ids = (await API.get("/groups", {})).data;
-        this.setState(ids);
+        this.setState({ids: ids.allGroups});
     }
 
     /**
