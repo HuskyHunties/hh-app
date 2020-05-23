@@ -1,104 +1,104 @@
+/* eslint-disable tsdoc/syntax */
 import * as express from "express";
-import { GroupControllerImp } from "../controller/GroupController";
-import { Path } from "controller/PathController";
+import { dbWrapper } from "../database/DatabaseWrapper";
 
 const groupsRouter: express.Router = express.Router();
-const controller = new GroupControllerImp();
 
-// gets all the groups in the database
-groupsRouter.get("/", (req, res, next) => {
+/**
+ * sends a resonse of all the group IDs in the database
+ */
+groupsRouter.get("/", async (req, res) => {
   try {
-    const allGroups = controller.getGroups();
+    const allGroupIDs = await dbWrapper.getAllGroups();
 
-    const responseObj = JSON.stringify({ groups: allGroups });
-    res.json(responseObj);
+    res.send({ allGroups: allGroupIDs });
   } catch (error) {
     console.log(error);
+<<<<<<< HEAD
     //res.status(400)
     res.json({ids: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]});
+=======
+    res.status(400).json();
+>>>>>>> master
   }
 });
 
-// sets the path of the specific group to the pathID given in the body,
-// also in the request body is whether or not to override the path assignment
-groupsRouter.put("/:groupID", (req, res, next) => {
-  try {
-    const groupID = Number(req.params.id);
-    const pathID = Number(req.body.pathID);
-
-    if (req.body.override) {
-      controller.setPath(pathID, groupID, true);
-    } else {
-      try {
-        controller.setPath(pathID, groupID);
-      } catch (error) {
-        res.status(400).send(error);
-      }
-    }
-
-    const responseObj = JSON.stringify({ pathID: pathID, groupID: groupID });
-    res.json(responseObj);
-  } catch (error) {
-    console.log(error);
-    res.status(400);
-  }
-});
-
-// sends the id of the path of a specific group in the database based off the given ID
-groupsRouter.get("/:groupID", (req, res, next) => {
+/**
+ * sends an object with all the fields of the requested group in the database
+ * { groupID: groupID, name: name, pathID: pathID }
+ */
+groupsRouter.get("/:groupID", async (req, res) => {
   try {
     const groupID = Number(req.params.groupID);
 
-    const pathID: number = controller.getGroupPath(groupID);
+    const infoObject: object = await dbWrapper.getInfofGroup(groupID);
 
-    res.json(JSON.stringify({ pathID: pathID }));
+    res.send(infoObject);
   } catch (error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send();
   }
 });
 
-// adds a group to the database, JSON with group name in request body
-groupsRouter.post("/", (req, res, next) => {
+/**
+ * adds a group to the database, JSON with group name in request body,
+ * sends information on the created group
+ * { groupID: row.group_id, name: row.name }
+ */
+
+groupsRouter.post("/", async (req, res) => {
   try {
     const groupName = req.body.name;
-    const groupID = controller.createGroup(groupName);
-    res.json(JSON.stringify({ groupID: groupID }));
+    const infoObject: object = await dbWrapper.addGroup(groupName);
+
+    res.send(infoObject);
   } catch (error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send();
   }
 });
 
-// deletes the group specified by the given ID
-groupsRouter.delete("/:groupID", (req, res, next) => {
+/**
+ * deletes the group specified by the given ID, sends information on deleted group
+ * { name: name, pathID: pathID }
+ */
+
+groupsRouter.delete("/:groupID", async (req, res) => {
   try {
     const groupID = Number(req.params.groupID);
-    const deletedGroup = controller.deleteGroup(groupID);
+    const infoObject: object = await dbWrapper.deleteGroup(groupID);
 
-    res.json(
-      JSON.stringify({
-        name: deletedGroup.getName(),
-        path: deletedGroup.getPath(),
-      })
-    );
+    res.send(infoObject);
   } catch (error) {
     console.log(error);
-    res.status(400);
+    res.status(400).send();
   }
 });
 
-// changes the group name of the group specified by the ID, name in request body
-groupsRouter.put("/:groupID", (req, res, next) => {
+/**
+ * changes either/or of the name/pathID fields of the specified group,
+ * sends information on modified group
+ * { groupID: groupID, name: name, pathID: pathID }
+ */
+groupsRouter.put("/:groupID", async (req, res) => {
   const groupID = Number(req.params.groupID);
-  const newName = req.body.name;
+  const newPathID = Number(req.body.pathID);
+  const newName: string = req.body.name;
+
   try {
-    controller.changeGroupName(groupID, newName);
-    res.json(JSON.stringify({ groupID: groupID }));
+    if (newPathID) {
+      dbWrapper.setPathOfGroupTo(groupID, newPathID);
+    }
+
+    if (newName) {
+      dbWrapper.changeGroupName(groupID, newName);
+    }
+
+    const infoObject: object = await dbWrapper.getInfofGroup(groupID);
+    res.send(infoObject);
   } catch (error) {
-    res.status(400).send("broken");
+    res.status(400).send();
     console.log(error);
   }
 });
-
 export default groupsRouter;

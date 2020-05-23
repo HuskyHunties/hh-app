@@ -1,5 +1,6 @@
 import { isNullOrUndefined } from "util";
 import { Clue } from "./ClueController";
+import { dbWrapper } from "../database/DatabaseWrapper";
 
 /**
  * Abstract representation of a real world location.
@@ -52,24 +53,25 @@ export class Path {
 export interface PathController {
   /**
    * Makes a new path from the list of clues, does not guarantee any specific order.
-   * @param clues the clues that will make up the path
-   * @returns the new path
+   * @param clues the clues IDs that will make up the path
+   * @param name name of the path
+   * @returns the id of the new path
    */
-  newPath(clues: Clue[]): Path;
+  createPath(name: string): number;
 
   /**
    * Remove the specified path.
-   * @param id the path to remove
-   * @returns the removed path
+   * @param pathID the path to remove
+   * @returns the ids of the clues that were in the deleted path
    */
-  removePath(id: number): Path;
+  removePath(pathID: number): number[];
 
   /**
    * Gets the list of clues from the specified path
-   * @param id the path to get clues from
-   * @returns the list of clues on the path
+   * @param pathID the path to get clues from
+   * @returns the list of ids of the clues on the path
    */
-  getClues(id: number): Clue[];
+  getClues(pathID: number): number[];
 
   /**
    * Adds an exisitng clue to an an exisiting path.
@@ -86,34 +88,63 @@ export interface PathController {
    * @throws if the clue is not a part of the path
    * @returns the removed clue
    */
-  removeClueFromPath(pathID: number, clueID: number): Clue;
+  removeClueFromPath(pathID: number, clueID: number): number;
 
   /**
    * Orders the path, from the starting point to take the least total amount of distance.  Note: this should only reorder incomplete clues.
-   * @param id the path id
+   * @param pathID the path id
    * @param startingPoint the starting point
    */
-  orderPath(id: number, startingPoint: Place): void;
+  orderPath(pathID: number, startingPoint: Place): void;
 
   /**
    * Orders the path, from the starting point to the ending point to take the least total amount of distance. Note: this should only reorder incomplete clues.
-   * @param id the path id
+   * @param pathID the path id
    * @param startingPoint the starting point
    * @param endingPoint the ending point
    */
-  orderPath(id: number, startingPoint: Place, endingPoint: Place): void;
+  orderPath(pathID: number, startingPoint: Place, endingPoint: Place): void;
 
   /**
    * Gets a list of the clues along the path that have not yet been completed.
-   * @param id the path id
-   * @returns the list of incomplete clues
+   * @param pathID the path id
+   * @returns the list of incomplete clues ids
    */
-  getIncompleteClues(id: number): Clue[];
+  getIncompleteClues(pathID: number): number[];
 
   /**
    * Gets a list of the clues along the path that have been completed.
-   * @param id the path id
-   * @returns the list of complete clues
+   * @param pathID the path id
+   * @returns the list of complete clues ids
    */
-  getCompleteClues(id: number): Clue[];
+  getCompleteClues(pathID: number): number[];
+}
+
+export class PathControllerImpError implements PathController {
+  createPath(name: string): number {
+    throw new Error("Method newPath not implemented.");
+  }
+  removePath(pathID: number): number[] {
+    throw new Error("Method removePath not implemented.");
+  }
+  getClues(pathID: number): number[] {
+    throw new Error("Method getClues not implemented.");
+  }
+  addClueToPath(pathID: number, clueID: number): void {
+    throw new Error("Method addClueToPath not implemented.");
+  }
+  removeClueFromPath(pathID: number, clueID: number): number {
+    throw new Error("Method removeClueFromPath not implemented.");
+  }
+  orderPath(pathID: number, startingPoint: Place): void;
+  orderPath(pathID: number, startingPoint: Place, endingPoint: Place): void;
+  orderPath(pathID: number, startingPoint: Place, endingPoint?: Place): void {
+    throw new Error("Method orderPath not implemented.");
+  }
+  getIncompleteClues(pathID: number): number[] {
+    throw new Error("Method getIncompleteClues not implemented.");
+  }
+  getCompleteClues(pathID: number): number[] {
+    throw new Error("Method getCompleteClues not implemented.");
+  }
 }

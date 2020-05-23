@@ -70,7 +70,7 @@ export interface GroupController {
    * @throws if the group with the id does not exist
    * @returns the id group that was deleted
    */
-  deleteGroup(id: number): Group;
+  deleteGroup(id: number): number;
 
   /**
    * Changes the group name to be the given name.
@@ -81,7 +81,7 @@ export interface GroupController {
   changeGroupName(id: number, newName: string): number;
 }
 
-export class GroupControllerImp implements GroupController {
+export class GroupControllerImpError implements GroupController {
   getGroups(): number[] {
     throw new Error("Method getGroups not implemented.");
   }
@@ -101,7 +101,7 @@ export class GroupControllerImp implements GroupController {
     throw new Error("Method createGroup not implemented.");
   }
 
-  deleteGroup(id: number): Group {
+  deleteGroup(id: number): number {
     throw new Error("Method deleteGroup not implemented.");
   }
 

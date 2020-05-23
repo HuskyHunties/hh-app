@@ -3,7 +3,10 @@ import * as logger from "morgan";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
 
-import groupsRouter from "../routes/groupsRouter";
+import groupsRouter from "./routes/groupsRouter";
+import cluesRouter from "./routes/cluesRouter";
+import pathsRouter from "./routes/pathsRouter";
+import crawlsRouter from "./routes/crawlsRouter";
 
 class Main {
   public express: express.Application;
@@ -23,15 +26,16 @@ class Main {
   private routes(): void {
     const router = express.Router();
 
-    router.get("/", (req, res, next) => {
-      res.json({
-        dan: "dumb",
-      }); // this ends the req res cycle and sends a json response
+    router.get("/", (req, res) => {
+      res.send("Whattup you gotta enter a route extension: groups, clues, paths, or crawls");
     });
 
     this.express.use("/", router);
 
     this.express.use("/groups", groupsRouter);
+    this.express.use("/clues", cluesRouter);
+    this.express.use("/paths", pathsRouter);
+    this.express.use("/crawls", crawlsRouter);
   }
 }
 
