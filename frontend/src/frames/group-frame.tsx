@@ -12,21 +12,48 @@ interface GroupListProps {
     selected: number | undefined;
 }
 
+interface GroupListState {
+    desc: string[];
+}
+
 /**
  * A component that displays all of the currently created groups as a selectable list.
  */
-class GroupList extends React.Component<GroupListProps> {
+class GroupList extends React.Component<GroupListProps, GroupListState> {
+    constructor(props: GroupListProps) {
+        super(props);
+        this.state = {desc: []};
+    }
+
+    componentWillMount() {
+        this.setDesc();
+    }
+
+    /**
+     * Sets the state to have proper descriptions for each id.
+     */
+    async setDesc() {
+        // TODO this doesn't work
+        const descs: string[] = [];
+        for (var id of this.props.ids) {
+            const group = (await API.get("/groups/" + id, {})).data;
+            const name: string = group.name;
+            const assocPath: string = "No Associated Path"; //TODO  Change to database logic
+            descs.push(name + assocPath);
+        }
+
+        this.setState({desc: descs});
+    }
+    
     /**
      * Renders the component
      */
     render() {
         // Map all groups ids to table cells with appropriate information.
-        const groups = this.props.ids.map((id) => {
-            const name = String(id); // TODO Change to database logic
-            const assocPath = "No Associated Path"; //TODO  Change to database logic
+        const groups = this.props.ids.map((id, count) => {
             return (
                 <tr key={id} onClick={() => this.props.clickHandler(id)}><td className={id === this.props.selected ? "selected" : ""}>
-                    {name} -- {assocPath}
+                    {id + " -- No Associated Path"}
                 </td></tr>
             );
         })
@@ -60,6 +87,8 @@ interface GroupFrameState {
  * A component to display group information and allow operations on the groups.
  */
 export default class GroupFrame extends React.Component<GroupFrameProps, GroupFrameState> {
+    intervalID?: NodeJS.Timeout;
+
     constructor(props: GroupFrameProps) {
         super(props);
         this.state = {
@@ -74,6 +103,15 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
      */
     componentDidMount() {
         this.setIDs();
+
+        this.intervalID = setInterval(this.setIDs, 5000);
+    }
+
+    /**
+     * Stop refreshing the data when the component is unloaded.
+     */
+    componentWillUnmount() {
+        clearInterval(this.intervalID!);
     }
 
     /**
