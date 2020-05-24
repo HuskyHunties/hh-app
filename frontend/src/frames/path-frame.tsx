@@ -96,10 +96,10 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
      * Sets the state to a list of path ids, fetched from the backend.
      */
     async setIDs() {
-        //console.log("Getting ids");
-        //const ids = (await API.get("/groups", {})).data;
+        console.log("Getting ids");
+        const ids = (await API.get("/paths", {})).data;
         //TODO: make this actually check the database!!
-        this.setState({ids: [1, 2, 3, 4]});
+        this.setState({ids: ids.allPaths});
     }
 
     /**
