@@ -5,6 +5,20 @@ import { dbWrapper } from "../database/DatabaseWrapper";
 const pathsRouter: express.Router = express.Router();
 
 /**
+ * sends a list of all the pathIDS
+ */
+
+pathsRouter.get("/", async (req, res) => {
+  try {
+    const allPathIDS = await dbWrapper.getAllPaths();
+
+    res.send({ allPaths: allPathIDS });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json();
+  }
+});
+/**
  * sends the list of all the ids of all the clues on the specified path
  */
 pathsRouter.get("/:pathID", async (req, res) => {

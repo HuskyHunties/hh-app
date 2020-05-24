@@ -569,6 +569,28 @@ class DatabaseWrapper {
 
   // PATH TABLE METHODS - path and join tables
 
+    /**
+   * @returns an array of all the group ids in the paths table
+   */
+  getAllPaths(): Promise<number[]> {
+    const db = this.db;
+    return new Promise(function (resolve, reject) {
+      const allPathIDs: number[] = [];
+
+      db.all(`SELECT path_id FROM paths`, [], (err, rows) => {
+        if (err) {
+          //throw console.error(err.message)
+          reject(err);
+        } else {
+          rows.forEach((row) => {
+            allPathIDs.push(row.path_id);
+          });
+          resolve(allPathIDs);
+        }
+      });
+    });
+  }
+
   /**
    *
    * @param pathID - id of the path being queried
