@@ -31,7 +31,7 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
             <div className="main-page">
                 <NavBarFrame />
                 <ClueFrame />
-                <PathFrame />
+                <PathFrame popupFactory={this.props.popupFactory} />
                 <GroupFrame popupFactory={this.props.popupFactory} />
             </div>
         )
