@@ -3,6 +3,7 @@
         "Notif",
         "Unmount",
         "descs",
+        "reqs",
         "tsdoc"
     ]
 }
