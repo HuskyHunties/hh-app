@@ -154,7 +154,7 @@ class DatabaseWrapper {
   }
 
   /**
-   * 
+   *
    * @param clueID - the id of the clue being queried
    * @returns an object containing the information on this clue
    */
@@ -569,7 +569,7 @@ class DatabaseWrapper {
 
   // PATH TABLE METHODS - path and join tables
 
-    /**
+  /**
    * @returns an array of all the group ids in the paths table
    */
   getAllPaths(): Promise<number[]> {

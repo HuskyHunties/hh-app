@@ -7,32 +7,19 @@ const groupsRouter: express.Router = express.Router();
 /**
  * sends a response of all the group IDs in the database
  */
-groupsRouter.get("/", async (req, res) => {
-  try {
-    const allGroupIDs = await dbWrapper.getAllGroups();
-
-    res.send({ allGroups: allGroupIDs });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json();
-  }
+groupsRouter.get("/", (req, res) => {
+  dbWrapper
+    .getAllGroups()
+    .then((allGroupIDs) => res.send({ allGroups: allGroupIDs }));
 });
 
 /**
  * sends an object with all the fields of the requested group in the database
  * { groupID: groupID, name: name, pathID: pathID }
  */
-groupsRouter.get("/:groupID", async (req, res) => {
-  try {
-    const groupID = Number(req.params.groupID);
-
-    const infoObject: object = await dbWrapper.getInfofGroup(groupID);
-
-    res.send(infoObject);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+groupsRouter.get("/:groupID", (req, res) => {
+  const groupID = Number(req.params.groupID);
+  dbWrapper.getInfofGroup(groupID).then((infoObject) => res.send(infoObject));
 });
 
 /**
@@ -41,16 +28,9 @@ groupsRouter.get("/:groupID", async (req, res) => {
  * { groupID: row.group_id, name: row.name }
  */
 
-groupsRouter.post("/", async (req, res) => {
-  try {
-    const groupName = req.body.name;
-    const infoObject: object = await dbWrapper.addGroup(groupName);
-
-    res.send(infoObject);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+groupsRouter.post("/", (req, res) => {
+  const groupName = req.body.name;
+  dbWrapper.addGroup(groupName).then((infoObject) => res.send(infoObject));
 });
 
 /**
@@ -58,16 +38,9 @@ groupsRouter.post("/", async (req, res) => {
  * { name: name, pathID: pathID }
  */
 
-groupsRouter.delete("/:groupID", async (req, res) => {
-  try {
-    const groupID = Number(req.params.groupID);
-    const infoObject: object = await dbWrapper.deleteGroup(groupID);
-
-    res.send(infoObject);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+groupsRouter.delete("/:groupID", (req, res) => {
+  const groupID = Number(req.params.groupID);
+  dbWrapper.deleteGroup(groupID).then((infoObject) => res.send(infoObject));
 });
 
 /**
@@ -75,25 +48,19 @@ groupsRouter.delete("/:groupID", async (req, res) => {
  * sends information on modified group
  * { groupID: groupID, name: name, pathID: pathID }
  */
-groupsRouter.put("/:groupID", async (req, res) => {
+groupsRouter.put("/:groupID", (req, res) => {
   const groupID = Number(req.params.groupID);
   const newPathID = Number(req.body.pathID);
   const newName: string = req.body.name;
 
-  try {
-    if (newPathID) {
-      dbWrapper.setPathOfGroupTo(groupID, newPathID);
-    }
-
-    if (newName) {
-      dbWrapper.changeGroupName(groupID, newName);
-    }
-
-    const infoObject: object = await dbWrapper.getInfofGroup(groupID);
-    res.send(infoObject);
-  } catch (error) {
-    res.status(400).send();
-    console.log(error);
+  if (newPathID) {
+    dbWrapper.setPathOfGroupTo(groupID, newPathID);
   }
+
+  if (newName) {
+    dbWrapper.changeGroupName(groupID, newName);
+  }
+
+  dbWrapper.getInfofGroup(groupID).then((infoObject) => res.send(infoObject));
 });
 export default groupsRouter;

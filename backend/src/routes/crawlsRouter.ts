@@ -7,59 +7,37 @@ const crawlsRouter: express.Router = express.Router();
 /**
  * sends the list of all the crawl ids
  */
-crawlsRouter.get("/", async (req, res) => {
-  try {
-    const crawlIDs = await dbWrapper.getAllCrawls();
-    res.send({ crawlIDs: crawlIDs });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+crawlsRouter.get("/", (req, res) => {
+  dbWrapper.getAllCrawls().then((crawlIDs) => res.send({ crawlIDs: crawlIDs }));
 });
 /**
  * sends the list of all the ids of all the clues on the specified crawl
  */
-crawlsRouter.get("/:crawlID", async (req, res) => {
-  try {
-    const crawlID = Number(req.params.crawlID);
-    const clueIDs: number[] = await dbWrapper.getCluesOfCrawl(crawlID);
-    res.send({ clues: clueIDs });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+crawlsRouter.get("/:crawlID", (req, res) => {
+  const crawlID = Number(req.params.crawlID);
+  dbWrapper
+    .getCluesOfCrawl(crawlID)
+    .then((clueIDs) => res.send({ clues: clueIDs }));
 });
 
 /**
  * sends the list of all the ids of all the incomplete clues on the specified crawl
  */
-crawlsRouter.get("/:crawlID/incomplete", async (req, res) => {
-  try {
-    const crawlID = Number(req.params.crawlID);
-    const clueIDs: number[] = await dbWrapper.getAllUnfinishedCluesOfCrawl(
-      crawlID
-    );
-    res.send({ clues: clueIDs });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+crawlsRouter.get("/:crawlID/incomplete", (req, res) => {
+  const crawlID = Number(req.params.crawlID);
+  dbWrapper
+    .getAllUnfinishedCluesOfCrawl(crawlID)
+    .then((clueIDs) => res.send({ clues: clueIDs }));
 });
 
 /**
  * sends the list of all the ids of all the incomplete clues on the specified crawl
  */
-crawlsRouter.get("/:crawlID/complete", async (req, res) => {
-  try {
-    const crawlID = Number(req.params.crawlID);
-    const clueIDs: number[] = await dbWrapper.getAllFinishedCluesOfCrawl(
-      crawlID
-    );
-    res.send({ clues: clueIDs });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+crawlsRouter.get("/:crawlID/complete", (req, res) => {
+  const crawlID = Number(req.params.crawlID);
+  dbWrapper
+    .getAllFinishedCluesOfCrawl(crawlID)
+    .then((clueIDs) => res.send({ clues: clueIDs }));
 });
 
 /**
@@ -67,30 +45,18 @@ crawlsRouter.get("/:crawlID/complete", async (req, res) => {
  * sends back the information of the crawl created.
  * { crawlID: crawlID, name: crawlName }
  */
-crawlsRouter.post("/", async (req, res) => {
-  try {
-    const name: string = req.body.name;
-    const infoObject: object = await dbWrapper.addCrawl(name);
-    res.send(infoObject);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+crawlsRouter.post("/", (req, res) => {
+  const name: string = req.body.name;
+  dbWrapper.addCrawl(name).then((infoObject) => res.send(infoObject));
 });
 
 /**
  * deletes the crawl specified by the given crawlID param, sends back information on deleted crawl
  * { crawlID: crawlID, name: crawlName }
  */
-crawlsRouter.delete("/:crawlID", async (req, res) => {
-  try {
-    const crawlID = Number(req.params.crawlID);
-    const infoObject: object = await dbWrapper.removeCrawl(crawlID);
-    res.send(infoObject);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+crawlsRouter.delete("/:crawlID", (req, res) => {
+  const crawlID = Number(req.params.crawlID);
+  dbWrapper.removeCrawl(crawlID).then((infoObject) => res.send(infoObject));
 });
 
 export default crawlsRouter;

@@ -7,14 +7,8 @@ const cluesRouter: express.Router = express.Router();
 /**
  * sends all of the clue IDs in the database
  */
-cluesRouter.get("/", async (req, res) => {
-  try {
-    const allClues: number[] = await dbWrapper.getAllClueIDs();
-    res.json({ clueIDs: allClues });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+cluesRouter.get("/", (req, res) => {
+  dbWrapper.getAllClueIDs().then((allClues) => res.json({ clueIDs: allClues }));
 });
 
 /**
@@ -27,42 +21,28 @@ cluesRouter.get("/", async (req, res) => {
             finished: finished,
     }
  */
-cluesRouter.get("/:clueID", async (req, res) => {
+cluesRouter.get("/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
 
-  try {
-    const infoObject: object = await dbWrapper.getInfoOfClue(clueID);
-    res.send(infoObject);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+  dbWrapper.getInfoOfClue(clueID).then((infoObject) => res.send(infoObject));
 });
 
 /**
  * sends all the ids of incomplete clues
  */
-cluesRouter.get("/incomplete", async (req, res) => {
-  try {
-    const allIncompleteClues: number[] = await dbWrapper.getAllUnfinishedClueIDs();
-    res.json({ clueIDs: allIncompleteClues });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+cluesRouter.get("/incomplete", (req, res) => {
+  dbWrapper
+    .getAllUnfinishedClueIDs()
+    .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues }));
 });
 
 /**
  * sends all the ids of complete clues
  */
-cluesRouter.get("/complete", async (req, res) => {
-  try {
-    const allCompleteClues: number[] = await dbWrapper.getAllFinishedClueIDs();
-    res.json({ clueIDs: allCompleteClues });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+cluesRouter.get("/complete", (req, res) => {
+  dbWrapper
+    .getAllFinishedClueIDs()
+    .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues }));
 });
 
 /**
@@ -75,18 +55,14 @@ cluesRouter.get("/complete", async (req, res) => {
           finished: 0,
         }
  */
-cluesRouter.post("/", async (req, res) => {
+cluesRouter.post("/", (req, res) => {
   const name: string = req.body.name;
   const place: string = req.body.place;
   const crawlID = Number(req.body.crawlID);
 
-  try {
-    const infoObject: object = await dbWrapper.addClue(name, place, crawlID);
-    res.send(infoObject);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+  dbWrapper
+    .addClue(name, place, crawlID)
+    .then((infoObject) => res.send(infoObject));
 });
 
 /**
@@ -99,35 +75,21 @@ cluesRouter.post("/", async (req, res) => {
           finished: finished,
         }
  */
-cluesRouter.delete("/:clueID", async (req, res) => {
+cluesRouter.delete("/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
-
-  try {
-    const infoObject: object = await dbWrapper.deleteClue(clueID);
-    res.send(infoObject);
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+  dbWrapper.deleteClue(clueID).then((infoObject) => res.send(infoObject));
 });
 
 /**
  * modifies the image and finished fields of the specified clue, returns information of modified clue
  */
-cluesRouter.put("/:clueID", async (req, res) => {
+cluesRouter.put("/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
   const imageString: string = req.body.image;
 
-  try {
-    let image: string;
-    if (imageString) {
-      image = await dbWrapper.addPictureToClue(clueID, imageString);
-    }
-    const finished: number = await dbWrapper.finishClue(clueID);
-    res.send({ image: image, finished: finished });
-  } catch (error) {
-    console.log(error);
-    res.status(400).send();
-  }
+  dbWrapper.addPictureToClue(clueID, imageString).then((image) => {
+    dbWrapper.finishClue(clueID);
+    res.send({ image: image, finished: 1 });
+  });
 });
 export default cluesRouter;
