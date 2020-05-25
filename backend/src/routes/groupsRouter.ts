@@ -10,7 +10,8 @@ const groupsRouter: express.Router = express.Router();
 groupsRouter.get("/", (req, res) => {
   dbWrapper
     .getAllGroups()
-    .then((allGroupIDs) => res.send({ allGroups: allGroupIDs })).catch(error => res.status(400).send(error));
+    .then((allGroupIDs) => res.send({ allGroups: allGroupIDs }))
+    .catch((error) => res.status(400).send(error));
 });
 
 /**
@@ -19,7 +20,10 @@ groupsRouter.get("/", (req, res) => {
  */
 groupsRouter.get("/:groupID", (req, res) => {
   const groupID = Number(req.params.groupID);
-  dbWrapper.getInfofGroup(groupID).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
+  dbWrapper
+    .getInfofGroup(groupID)
+    .then((infoObject) => res.send(infoObject))
+    .catch((error) => res.status(400).send(error));
 });
 
 /**
@@ -30,7 +34,10 @@ groupsRouter.get("/:groupID", (req, res) => {
 
 groupsRouter.post("/", (req, res) => {
   const groupName = req.body.name;
-  dbWrapper.addGroup(groupName).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
+  dbWrapper
+    .addGroup(groupName)
+    .then((infoObject) => res.send(infoObject))
+    .catch((error) => res.status(400).send(error));
 });
 
 /**
@@ -40,7 +47,10 @@ groupsRouter.post("/", (req, res) => {
 
 groupsRouter.delete("/:groupID", (req, res) => {
   const groupID = Number(req.params.groupID);
-  dbWrapper.deleteGroup(groupID).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
+  dbWrapper
+    .deleteGroup(groupID)
+    .then((infoObject) => res.send(infoObject))
+    .catch((error) => res.status(400).send(error));
 });
 
 /**
@@ -61,6 +71,9 @@ groupsRouter.put("/:groupID", (req, res) => {
     dbWrapper.changeGroupName(groupID, newName);
   }
 
-  dbWrapper.getInfofGroup(groupID).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
+  dbWrapper
+    .getInfofGroup(groupID)
+    .then((infoObject) => res.send(infoObject))
+    .catch((error) => res.status(400).send(error));
 });
 export default groupsRouter;
