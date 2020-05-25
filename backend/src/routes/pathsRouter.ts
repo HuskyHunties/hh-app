@@ -11,7 +11,7 @@ const pathsRouter: express.Router = express.Router();
 pathsRouter.get("/", (req, res) => {
   dbWrapper
     .getAllPaths()
-    .then((allPathIDs) => res.send({ allPaths: allPathIDs }));
+    .then((allPathIDs) => res.send({ allPaths: allPathIDs })).catch(error => res.status(400).send(error));
 });
 /**
  * sends the list of all the ids of all the clues on the specified path
@@ -20,7 +20,7 @@ pathsRouter.get("/:pathID", (req, res) => {
   const pathID = Number(req.params.pathID);
   dbWrapper
     .getCluesofPath(pathID)
-    .then((clueIDs) => res.send({ clues: clueIDs }));
+    .then((clueIDs) => res.send({ clues: clueIDs })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -30,7 +30,7 @@ pathsRouter.get("/:pathID/incomplete", (req, res) => {
   const pathID = Number(req.params.pathID);
   dbWrapper
     .getAllUnfinishedCluesOfPath(pathID)
-    .then((clueIDs) => res.send({ clues: clueIDs }));
+    .then((clueIDs) => res.send({ clues: clueIDs })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -40,7 +40,7 @@ pathsRouter.get("/:pathID/complete", (req, res) => {
   const pathID = Number(req.params.pathID);
   dbWrapper
     .getAllFinishedCluesOfPath(pathID)
-    .then((clueIDs) => res.send({ clues: clueIDs }));
+    .then((clueIDs) => res.send({ clues: clueIDs })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -50,7 +50,7 @@ pathsRouter.get("/:pathID/complete", (req, res) => {
  */
 pathsRouter.post("/", (req, res) => {
   const name: string = req.body.name;
-  dbWrapper.addPath(name).then((infoObject) => res.send(infoObject));
+  dbWrapper.addPath(name).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -59,7 +59,7 @@ pathsRouter.post("/", (req, res) => {
  */
 pathsRouter.delete("/:pathID", (req, res) => {
   const pathID = Number(req.params.pathID);
-  dbWrapper.removePath(pathID).then((infoObject) => res.send(infoObject));
+  dbWrapper.removePath(pathID).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -72,11 +72,11 @@ pathsRouter.put("/:pathID", (req, res) => {
   if (Boolean(req.body.addClue)) {
     dbWrapper
       .addClueToPath(pathID, clueID)
-      .then((infoObject) => res.send(infoObject));
+      .then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
   } else {
     dbWrapper
       .removeClueFromPath(pathID, clueID)
-      .then((infoObject) => res.send(infoObject));
+      .then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
   }
 });
 

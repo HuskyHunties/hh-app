@@ -8,7 +8,7 @@ const cluesRouter: express.Router = express.Router();
  * sends all of the clue IDs in the database
  */
 cluesRouter.get("/", (req, res) => {
-  dbWrapper.getAllClueIDs().then((allClues) => res.json({ clueIDs: allClues }));
+  dbWrapper.getAllClueIDs().then((allClues) => res.json({ clueIDs: allClues })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -24,7 +24,7 @@ cluesRouter.get("/", (req, res) => {
 cluesRouter.get("/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
 
-  dbWrapper.getInfoOfClue(clueID).then((infoObject) => res.send(infoObject));
+  dbWrapper.getInfoOfClue(clueID).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -33,7 +33,7 @@ cluesRouter.get("/:clueID", (req, res) => {
 cluesRouter.get("/incomplete", (req, res) => {
   dbWrapper
     .getAllUnfinishedClueIDs()
-    .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues }));
+    .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -42,7 +42,7 @@ cluesRouter.get("/incomplete", (req, res) => {
 cluesRouter.get("/complete", (req, res) => {
   dbWrapper
     .getAllFinishedClueIDs()
-    .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues }));
+    .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -62,7 +62,7 @@ cluesRouter.post("/", (req, res) => {
 
   dbWrapper
     .addClue(name, place, crawlID)
-    .then((infoObject) => res.send(infoObject));
+    .then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -77,7 +77,7 @@ cluesRouter.post("/", (req, res) => {
  */
 cluesRouter.delete("/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
-  dbWrapper.deleteClue(clueID).then((infoObject) => res.send(infoObject));
+  dbWrapper.deleteClue(clueID).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -90,6 +90,6 @@ cluesRouter.put("/:clueID", (req, res) => {
   dbWrapper.addPictureToClue(clueID, imageString).then((image) => {
     dbWrapper.finishClue(clueID);
     res.send({ image: image, finished: 1 });
-  });
+  }).catch(error => res.status(400).send(error));
 });
 export default cluesRouter;

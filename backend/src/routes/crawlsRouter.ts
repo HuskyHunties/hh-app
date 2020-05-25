@@ -8,7 +8,7 @@ const crawlsRouter: express.Router = express.Router();
  * sends the list of all the crawl ids
  */
 crawlsRouter.get("/", (req, res) => {
-  dbWrapper.getAllCrawls().then((crawlIDs) => res.send({ crawlIDs: crawlIDs }));
+  dbWrapper.getAllCrawls().then((crawlIDs) => res.send({ crawlIDs: crawlIDs })).catch(error => res.status(400).send(error));
 });
 /**
  * sends the list of all the ids of all the clues on the specified crawl
@@ -17,7 +17,7 @@ crawlsRouter.get("/:crawlID", (req, res) => {
   const crawlID = Number(req.params.crawlID);
   dbWrapper
     .getCluesOfCrawl(crawlID)
-    .then((clueIDs) => res.send({ clues: clueIDs }));
+    .then((clueIDs) => res.send({ clues: clueIDs })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -27,7 +27,7 @@ crawlsRouter.get("/:crawlID/incomplete", (req, res) => {
   const crawlID = Number(req.params.crawlID);
   dbWrapper
     .getAllUnfinishedCluesOfCrawl(crawlID)
-    .then((clueIDs) => res.send({ clues: clueIDs }));
+    .then((clueIDs) => res.send({ clues: clueIDs })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -37,7 +37,7 @@ crawlsRouter.get("/:crawlID/complete", (req, res) => {
   const crawlID = Number(req.params.crawlID);
   dbWrapper
     .getAllFinishedCluesOfCrawl(crawlID)
-    .then((clueIDs) => res.send({ clues: clueIDs }));
+    .then((clueIDs) => res.send({ clues: clueIDs })).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -47,7 +47,7 @@ crawlsRouter.get("/:crawlID/complete", (req, res) => {
  */
 crawlsRouter.post("/", (req, res) => {
   const name: string = req.body.name;
-  dbWrapper.addCrawl(name).then((infoObject) => res.send(infoObject));
+  dbWrapper.addCrawl(name).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
 });
 
 /**
@@ -56,7 +56,7 @@ crawlsRouter.post("/", (req, res) => {
  */
 crawlsRouter.delete("/:crawlID", (req, res) => {
   const crawlID = Number(req.params.crawlID);
-  dbWrapper.removeCrawl(crawlID).then((infoObject) => res.send(infoObject));
+  dbWrapper.removeCrawl(crawlID).then((infoObject) => res.send(infoObject)).catch(error => res.status(400).send(error));
 });
 
 export default crawlsRouter;
