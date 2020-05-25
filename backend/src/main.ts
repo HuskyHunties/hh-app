@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as logger from "morgan";
 import * as bodyParser from "body-parser";
+import * as cors from "cors";
 
 import groupsRouter from "./routes/groupsRouter";
 import cluesRouter from "./routes/cluesRouter";
@@ -19,13 +20,16 @@ class Main {
     this.express.use(logger("dev"));
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
+    this.express.use(cors());
   }
 
   private routes(): void {
     const router = express.Router();
 
     router.get("/", (req, res) => {
-      res.send("Whattup you gotta enter a route extension: groups, clues, paths, or crawls");
+      res.send(
+        "Whattup you gotta enter a route extension: groups, clues, paths, or crawls"
+      );
     });
 
     this.express.use("/", router);

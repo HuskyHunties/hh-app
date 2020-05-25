@@ -1,0 +1,19 @@
+/* Dark Theme Colors */
+
+:root {
+  --bg-color: #121212;
+  --primary-color: #232323;
+  --secondary-color: #A85858;
+  --font-color: #F9F9F9;
+  --accent-color: #A85858;
+}
+
+/* Light Theme Colors */
+
+[data-theme="light"] {
+  --bg-color: #ededed;
+  --primary-color: #aaaaaa;
+  --secondary-color: #A85858;
+  --font-color: #070707;
+  --accent-color: #F36464;
+}

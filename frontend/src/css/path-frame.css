@@ -1,0 +1,31 @@
+@import "./colors.css";
+
+/* Styles the ClueFrame container component. */
+.path-frame {
+    position: absolute;
+    height: 600px;
+    left: 3%;
+    right: 51.5%;
+    top: 825px;
+
+    background: var(--primary-color);
+    border-radius: 25px;
+}
+
+.path-table {
+    position: absolute;
+    margin: 25px;
+    margin-left: 6%;
+    margin-top: 0px;
+    width: calc(50% - 50px);
+}
+
+.path-button {
+    position: relative;
+    width: 30%;
+    top: 0px;
+    margin-top: 45px;
+    margin-left: 50%;
+    height: 65px;
+    line-height: 65px;
+}
