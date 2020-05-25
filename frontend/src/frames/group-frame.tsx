@@ -1,7 +1,8 @@
 import React from "react";
 import '../css/group-frame.css';
 import API from '../utils/API';
-import { PopupTypes, PopupCreator } from '../utils/popup'
+import { PopupTypes, PopupCreator } from '../utils/popup';
+import Axios from 'axios';
 
 /**
  * Properties type for the GroupList Component
@@ -20,29 +21,36 @@ interface GroupListState {
  * A component that displays all of the currently created groups as a selectable list.
  */
 class GroupList extends React.Component<GroupListProps, GroupListState> {
+    intervalID?: NodeJS.Timeout;
+
     constructor(props: GroupListProps) {
         super(props);
         this.state = {desc: []};
+        this.setDesc = this.setDesc.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.setDesc();
+
+        this.intervalID = setInterval(this.setDesc, 5000);
+    }
+
+    /**
+     * Stop refreshing the data when the component is unloaded.
+     */
+    componentWillUnmount() {
+        clearInterval(this.intervalID!);
     }
 
     /**
      * Sets the state to have proper descriptions for each id.
      */
-    async setDesc() {
-        // TODO this doesn't work
-        const descs: string[] = [];
-        for (var id of this.props.ids) {
-            const group = (await API.get("/groups/" + id, {})).data;
-            const name: string = group.name;
-            const assocPath: string = "No Associated Path"; //TODO  Change to database logic
-            descs.push(name + assocPath);
-        }
-
-        this.setState({desc: descs});
+    setDesc() {
+        // TODO Make Path Name instead of ID
+        const reqs = this.props.ids.map((id) => API.get("/groups/" + id, {}));
+        Axios.all(reqs).then((groups) => {
+            return groups.map((group) => group.data.name + " -- " + (group.data.pathID ? "Path: " + group.data.pathID : "No Associated path"));
+        }).then((descs) => this.setState({desc: descs}));
     }
     
     /**
@@ -53,7 +61,7 @@ class GroupList extends React.Component<GroupListProps, GroupListState> {
         const groups = this.props.ids.map((id, count) => {
             return (
                 <tr key={id} onClick={() => this.props.clickHandler(id)}><td className={id === this.props.selected ? "selected" : ""}>
-                    {id + " -- No Associated Path"}
+                    {this.state.desc[count]}
                 </td></tr>
             );
         })
