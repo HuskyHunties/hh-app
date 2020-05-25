@@ -144,9 +144,14 @@ class DatabaseWrapper {
         if (err) {
           reject(err.message);
         }
-        rows.forEach((row) => {
-          clueIDs.push(row.clue_id);
-        });
+        try {
+          rows.forEach((row) => {
+            clueIDs.push(row.clue_id);
+          });
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
 
         resolve(clueIDs);
       });
@@ -173,12 +178,16 @@ class DatabaseWrapper {
           if (err) {
             reject(err);
           }
-          crawlID = row.crawl_id;
-          name = row.name;
-          place = row.place;
-          image = row.image;
-          finished = row.finished;
-
+          try {
+            crawlID = row.crawl_id;
+            name = row.name;
+            place = row.place;
+            image = row.image;
+            finished = row.finished;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
           resolve({
             crawlID: crawlID,
             name: name,
@@ -207,12 +216,16 @@ class DatabaseWrapper {
           if (err) {
             reject(err.message);
           }
-          console.log(rows);
-          rows.forEach((row) => {
-            if (row.finished === 0) {
-              allUnfinishedClueIDs.push(row.clue_id);
-            }
-          });
+          try {
+            rows.forEach((row) => {
+              if (row.finished === 0) {
+                allUnfinishedClueIDs.push(row.clue_id);
+              }
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
 
           resolve(allUnfinishedClueIDs);
         }
@@ -236,12 +249,16 @@ class DatabaseWrapper {
           if (err) {
             reject(err.message);
           }
-          console.log(rows);
-          rows.forEach((row) => {
-            if (row.finished === 1) {
-              allFinishedClueIDs.push(row.clue_id);
-            }
-          });
+          try {
+            rows.forEach((row) => {
+              if (row.finished === 1) {
+                allFinishedClueIDs.push(row.clue_id);
+              }
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
 
           resolve(allFinishedClueIDs);
         }
@@ -251,19 +268,19 @@ class DatabaseWrapper {
 
   /**
    *
-   * @param name - the name of the clue being created
+   * @param clueName - the name of the clue being created
    * @param place - the place where the clue is found
    * @param crawlID - the id of the crawl the clue is part of, could be null
    * @returns - information on the created clue
    */
-  addClue(name: string, place: string, crawlID: number): Promise<object> {
+  addClue(clueName: string, place: string, crawlID: number): Promise<object> {
     const db = this.db;
     return new Promise((resolve, reject) => {
       // if the clue has a crawl, add its crawl to the database; else, only add the clue
       if (!isNullOrUndefined(crawlID)) {
         db.run(
           `INSERT INTO clues(crawl_id, name, place, finished) VALUES(?, ?, ?, ?)`,
-          [crawlID, name, place, 0],
+          [crawlID, clueName, place, 0],
           (err) => {
             if (err) {
               reject(err.message);
@@ -273,7 +290,7 @@ class DatabaseWrapper {
       } else {
         db.run(
           "INSERT INTO clues(name, place, finished) VALUES(?, ?, ?)",
-          [name, place, 0],
+          [clueName, place, 0],
           (err) => {
             if (err) {
               reject(err.message);
@@ -284,21 +301,27 @@ class DatabaseWrapper {
 
       // retrieve the clue ID registered from the database
       let clueID: number;
-      db.get(`SELECT clue_id FROM clues WHERE name = '${name}'`, (err, row) => {
-        if (err) {
-          throw console.error(err.message);
-        } else if (isNullOrUndefined(row)) {
-          throw new Error("did not insert desired clue");
+      db.get(
+        `SELECT clue_id FROM clues WHERE name = '${clueName}'`,
+        (err, row) => {
+          if (err) {
+            throw console.error(err.message);
+          }
+          try {
+            clueID = row.clue_id;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
+          resolve({
+            clueID: clueID,
+            crawlID: crawlID,
+            name: clueName,
+            place: place,
+            finished: 0,
+          });
         }
-        clueID = row.clue_id;
-        resolve({
-          clueID: clueID,
-          crawlID: crawlID,
-          name: name,
-          place: place,
-          finished: 0,
-        });
-      });
+      );
     });
   }
 
@@ -322,11 +345,16 @@ class DatabaseWrapper {
           if (err) {
             reject(err);
           }
-          crawlID = row.crawl_id;
-          name = row.name;
-          place = row.place;
-          image = row.image;
-          finished = row.finished;
+          try {
+            crawlID = row.crawl_id;
+            name = row.name;
+            place = row.place;
+            image = row.image;
+            finished = row.finished;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
         }
       );
       db.run(`DELETE FROM clues WHERE clue_id = ${clueID}`, (err) => {
@@ -399,12 +427,16 @@ class DatabaseWrapper {
         if (err) {
           //throw console.error(err.message)
           reject(err);
-        } else {
+        }
+        try {
           rows.forEach((row) => {
             allGroupIDs.push(row.group_id);
           });
-          resolve(allGroupIDs);
+        } catch (error) {
+          console.log(error);
+          reject(error);
         }
+        resolve(allGroupIDs);
       });
     });
   }
@@ -426,11 +458,16 @@ class DatabaseWrapper {
         (err, row) => {
           if (err) {
             reject(err);
-          } else {
+          }
+
+          try {
             name = row.name;
             pathID = row.path_id;
-            resolve({ groupID: groupID, name: name, pathID: pathID });
+          } catch (error) {
+            console.log(error);
+            reject(error);
           }
+          resolve({ groupID: groupID, name: name, pathID: pathID });
         }
       );
     });
@@ -450,14 +487,22 @@ class DatabaseWrapper {
         }
       });
 
+      let groupID: number;
+      let name: string;
       db.get(
         `SELECT group_id, name from groups WHERE name = '${groupName}'`,
         (err, row) => {
           if (err) {
             reject(err);
-          } else {
-            resolve({ groupID: row.group_id, name: row.name });
           }
+          try {
+            groupID = row.group_id;
+            name = row.name;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
+          resolve({ groupID: groupID, name: name });
         }
       );
     });
@@ -480,8 +525,13 @@ class DatabaseWrapper {
           if (err) {
             reject(err.message);
           }
-          name = row.name;
-          pathID = row.path_id;
+          try {
+            name = row.name;
+            pathID = row.path_id;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
         }
       );
 
@@ -523,8 +573,13 @@ class DatabaseWrapper {
           if (err) {
             reject(err.message);
           }
-          name = row.name;
-          pathID = row.path_id;
+          try {
+            name = row.name;
+            pathID = row.path_id;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
           resolve({ name: name, pathID: pathID });
         }
       );
@@ -559,8 +614,13 @@ class DatabaseWrapper {
           if (err) {
             reject(err.message);
           }
-          name = row.name;
-          pathID = row.path_id;
+          try {
+            name = row.name;
+            pathID = row.path_id;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
           resolve({ name: name, pathID: pathID });
         }
       );
@@ -581,12 +641,16 @@ class DatabaseWrapper {
         if (err) {
           //throw console.error(err.message)
           reject(err);
-        } else {
+        }
+        try {
           rows.forEach((row) => {
             allPathIDs.push(row.path_id);
           });
-          resolve(allPathIDs);
+        } catch (error) {
+          console.log(error);
+          reject(error);
         }
+        resolve(allPathIDs);
       });
     });
   }
@@ -608,9 +672,14 @@ class DatabaseWrapper {
           if (err) {
             reject(err.message);
           }
-          rows.forEach((row) => {
-            clueIDs.push(row.clue_id);
-          });
+          try {
+            rows.forEach((row) => {
+              clueIDs.push(row.clue_id);
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
 
           resolve(clueIDs);
         }
@@ -641,12 +710,16 @@ class DatabaseWrapper {
         if (err) {
           reject(err.message);
         }
-        console.log(rows);
-        rows.forEach((row) => {
-          if (row.finished === 0) {
-            allUnfinishedClueIDs.push(row.clue_id);
-          }
-        });
+        try {
+          rows.forEach((row) => {
+            if (row.finished === 0) {
+              allUnfinishedClueIDs.push(row.clue_id);
+            }
+          });
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
 
         resolve(allUnfinishedClueIDs);
       });
@@ -677,12 +750,16 @@ class DatabaseWrapper {
         if (err) {
           reject(err.message);
         }
-        console.log(rows);
-        rows.forEach((row) => {
-          if (row.finished === 1) {
-            allFinishedClueIDs.push(row.clue_id);
-          }
-        });
+        try {
+          rows.forEach((row) => {
+            if (row.finished === 1) {
+              allFinishedClueIDs.push(row.clue_id);
+            }
+          });
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
 
         resolve(allFinishedClueIDs);
       });
@@ -698,7 +775,9 @@ class DatabaseWrapper {
     const db = this.db;
     return new Promise((resolve, reject) => {
       db.run(`INSERT INTO paths (name) VALUES(?)`, [name], (err) => {
-        if (err) throw console.error(err.message);
+        if (err) {
+          reject(err);
+        }
       });
 
       let pathID: number;
@@ -707,7 +786,12 @@ class DatabaseWrapper {
         if (err) {
           reject(err);
         }
-        pathID = row.path_id;
+        try {
+          pathID = row.path_id;
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
         resolve({ pathID: pathID, name: name });
       });
     });
@@ -727,8 +811,11 @@ class DatabaseWrapper {
         if (err) {
           reject(err.message);
         }
-        if (row) {
+        try {
           name = row.name;
+        } catch (error) {
+          console.log(error);
+          reject(error);
         }
       });
 
@@ -739,10 +826,14 @@ class DatabaseWrapper {
           if (err) {
             reject(err.message);
           }
-
-          rows.forEach((row) => {
-            clueIDs.push(row.clue_id);
-          });
+          try {
+            rows.forEach((row) => {
+              clueIDs.push(row.clue_id);
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
         }
       );
 
@@ -813,9 +904,14 @@ class DatabaseWrapper {
           reject(console.error());
         }
 
-        rows.forEach((row) => {
-          crawlIDs.push(row.crawl_id);
-        });
+        try {
+          rows.forEach((row) => {
+            crawlIDs.push(row.crawl_id);
+          });
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
         resolve(crawlIDs);
       });
     });
@@ -835,10 +931,14 @@ class DatabaseWrapper {
           if (err) {
             reject(console.error());
           }
-
-          rows.forEach((row) => {
-            clueIDs.push(row.clue_id);
-          });
+          try {
+            rows.forEach((row) => {
+              clueIDs.push(row.clue_id);
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
           resolve(clueIDs);
         }
       );
@@ -860,10 +960,14 @@ class DatabaseWrapper {
           if (err) {
             reject(console.error());
           }
-
-          rows.forEach((row) => {
-            clueIDs.push(row.clue_id);
-          });
+          try {
+            rows.forEach((row) => {
+              clueIDs.push(row.clue_id);
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
           resolve(clueIDs);
         }
       );
@@ -884,10 +988,14 @@ class DatabaseWrapper {
           if (err) {
             reject(console.error());
           }
-
-          rows.forEach((row) => {
-            clueIDs.push(row.clue_id);
-          });
+          try {
+            rows.forEach((row) => {
+              clueIDs.push(row.clue_id);
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
           resolve(clueIDs);
         }
       );
@@ -904,7 +1012,9 @@ class DatabaseWrapper {
     return new Promise((resolve, reject) => {
       db.run(`INSERT INTO crawls (name) VALUES(?)`, [crawlName], (err) => {
         if (err) {
-          throw console.error(err.message);
+          if (err) {
+            reject(err);
+          }
         }
         console.log("Added crawl to database");
       });
@@ -915,10 +1025,13 @@ class DatabaseWrapper {
         (err, row) => {
           if (err) {
             reject(err.message);
-          } else if (isNullOrUndefined(row)) {
-            reject(new Error("did not insert desired crawl"));
           }
-          crawlID = row.crawl_id;
+          try {
+            crawlID = row.crawl_id;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
           resolve({ crawlID: crawlID, name: crawlName });
         }
       );
@@ -934,13 +1047,20 @@ class DatabaseWrapper {
   getInfoOfCrawl(crawlID: number): Promise<object> {
     const db = this.db;
     return new Promise((resolve, reject) => {
+      let name: string;
       db.get(
         `SELECT name FROM crawls WHERE crawl_id = ${crawlID}`,
         (err, row) => {
           if (err) {
             reject(err.message);
           }
-          resolve({ crawlID: crawlID, name: row.name });
+          try {
+            name = row.name;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
+          resolve({ crawlID: crawlID, name: name });
         }
       );
     });
