@@ -5,13 +5,11 @@ import "../css/nav-bar.css"
 import NavBarFrame from "../utils/nav-bar";
 import PathFrame from "../frames/path-frame";
 import GroupFrame from "../frames/group-frame";
-import { PopupCreator } from "../utils/popup";
 
 /**
  * Properties type for the MainPage Component.
  */
 interface MainPageProps {
-    popupFactory: PopupCreator;
 }
 
 /**
@@ -31,8 +29,8 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
             <div className="main-page">
                 <NavBarFrame />
                 <ClueFrame />
-                <PathFrame popupFactory={this.props.popupFactory} />
-                <GroupFrame popupFactory={this.props.popupFactory} />
+                <PathFrame />
+                <GroupFrame />
             </div>
         )
     }
