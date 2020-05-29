@@ -1,7 +1,7 @@
-import React from "react";
+import React, { RefObject } from "react";
 import '../css/path-frame.css';
 import API from '../utils/API';
-import { PopupCreator, PopupTypes } from "../utils/popup";
+import Popup, { PopupTypes } from "../utils/popup";
 
 /**
  * Properties type for the PathList Component
@@ -50,7 +50,6 @@ class PathList extends React.Component<PathListProps, PathListState> {
  * Properties type for the PathFrame Component
  */
 interface PathFrameProps {
-    popupFactory: PopupCreator;
 }
 
 /**
@@ -65,7 +64,8 @@ interface PathFrameState {
  * A component to display a list of paths and allow operations on those paths.
  */
 export default class PathFrame extends React.Component<PathFrameProps, PathFrameState> {
-    intervalID?: NodeJS.Timeout;
+    private intervalID?: NodeJS.Timeout;
+    private popupRef: RefObject<Popup>;
 
     constructor(props: PathFrameProps) {
         super(props);
@@ -74,6 +74,7 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
             selected: undefined
         }
         this.setIDs = this.setIDs.bind(this);
+        this.popupRef = React.createRef();
     }
 
     /**
@@ -99,15 +100,15 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
         console.log("Getting ids");
         const ids = (await API.get("/paths", {})).data;
         //TODO: make this actually check the database!!
-        this.setState({ids: ids.allPaths});
+        this.setState({ ids: ids.allPaths });
     }
 
     /**
      * Send a new path to the backend to be added and update the component's state.
      * @param name The name of a new path.
      */
-    async addPath(name: string) {
-        API.post("/paths", {name: name}).then(this.setIDs, (res) => this.handleAddError(res))
+    addPath(name: string) {
+        API.post("/paths", { name: name }).then(this.setIDs, (res) => this.handleAddError(res))
         console.log("Tried to add path: " + name);
     }
 
@@ -123,8 +124,8 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
      * Tell the backend to delete a path and update the component's state
      * @param id The id of the path to be deleted
      */
-    async deletePath(id: number) {
-        API.delete("/paths/" + id, {}).then(this.setIDs, (res) => {throw Error(res)});
+    deletePath(id: number) {
+        API.delete("/paths/" + id, {}).then(this.setIDs, (res) => { throw Error(res) });
         console.log("deleted group: " + id);
     }
 
@@ -135,14 +136,15 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
         return (
             <div className="path-frame">
                 <PathList ids={this.state.ids} clickHandler={(id: number) => this.setState({ selected: id })} selected={this.state.selected} />
-                <button className="path-button" onClick={() => this.props.popupFactory(PopupTypes.Input, "Input name for new Path", (res: string) => this.addPath(res))}>Add Path</button>
+                <button className="path-button" onClick={() => this.popupRef.current?.popupFactory(PopupTypes.Input, "Input name for new Path").then((res: string) => this.addPath(res))}>Add Path</button>
                 {/*TODO: Case where there is nothing selected needs to be handled*/}
-                <button className="path-button" onClick={() => this.props.popupFactory(PopupTypes.Confirm, "Delete Selected Path?", undefined,() => this.deletePath(this.state.selected!))}>Delete Path</button>
+                <button className="path-button" onClick={() => this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Selected Path?").then(() => this.deletePath(this.state.selected!))}>Delete Path</button>
                 {/*TODO: this*/}
                 <button className="path-button">Modify Path</button>
                 {/*TODO: this*/}
                 <button className="path-button">Order Path</button>
                 <button className="path-button">Assign Path to Group</button>
+                <Popup ref={this.popupRef} />
             </div>
         )
     }

@@ -11,28 +11,30 @@ export enum PopupTypes {
 }
 
 /**
- * A function type that is used to create a popup.
- * This is only implemented by the popupFactory, but this type makes passing the function in props easier.
- */
-export type PopupCreator = (type: PopupTypes, message: string, onInput?: (res: string) => void, onConfirm?: () => void) => void;
-
-/**
  * Properties type for the Popup Component
  */
 interface PopupProps {
-    showPopup: boolean;
-    popupType: PopupTypes;
-    popupMessage: string;
-    popupDoInput?(res: string): void;
-    popupDoConfirm?(): void;
-    hidePopup(): void;
 }
 
 /**
  * State type for the Popup Component
  */
 interface PopupState {
+    showPopup: boolean;
+    popupType?: PopupTypes;
+    popupMessage?: string;
+    options?: Map<number, string>;
     inputValue: string;
+    clickTypePromise: Promise<boolean>;
+    clickTypeDefer?: DeferredPromise;
+}
+
+/**
+ * Types for the object representing a deferred promise.
+ */
+interface DeferredPromise {
+    resolve(value?: unknown): void;
+    reject(value?: unknown): void;
 }
 
 /**
@@ -41,24 +43,56 @@ interface PopupState {
 export default class Popup extends React.Component<PopupProps, PopupState> {
     constructor(props: PopupProps) {
         super(props);
-        this.state = { inputValue: "" };
+        let deferred = undefined;
+        var p = new Promise<boolean>(function (resolve, reject) {
+            deferred = { resolve: resolve, reject: reject };
+        });
+        this.state = { showPopup: false, inputValue: "", clickTypePromise: p, clickTypeDefer: deferred};
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    /**
+     * Creates a new, unresolved promise to wait for the user to click on a button.
+     */
+    private resetDeferred() {
+        let deferred = undefined;
+        var p = new Promise<boolean>(function (resolve, reject) {
+            deferred = { resolve: resolve, reject: reject };
+        });
+        this.setState({ clickTypePromise: p, clickTypeDefer: deferred})
+    }
+
+    /**
+    * Creates a pop up window.
+    * @param type - the type of popup
+    * @param message - the message to be displayed in the popup
+    * @param onInput - the function to be executed when a user inputs a value to the popup
+    * @param onConfirm - the function to be executed when a user confirms the question asked by the popup
+    */
+    public async popupFactory<T>(type: PopupTypes, message: string, options?: Map<number, string>): Promise<string> {
+        this.setState({ showPopup: true, popupType: type, popupMessage: message, options: options });
+        const confirm: boolean = await this.state.clickTypePromise;
+        this.setState({ showPopup: false });
+        this.resetDeferred();
+
+        return new Promise<string>((resolve, reject) => {
+            if (confirm) {
+                if (this.state.popupType === PopupTypes.Input) {
+                    resolve(this.state.inputValue);
+                } else {
+                    resolve();
+                }
+            } else {
+                reject();
+            }
+        })
     }
 
     /**
      * Handles the clicking on the popup buttons.
-     * @param confirm Was the okay button clicked on a confirm popup?
-     * @param input Was the okay button clicked on a input popup?
-     * @param inputValue The input value on the input popup
      */
-    private handleClick(confirm: boolean, input: boolean, inputValue?: string) {
-        if (confirm) {
-            (this.props.popupDoConfirm)!();
-        } else if (input) {
-            (this.props.popupDoInput)!(inputValue!);
-        }
-
-        this.setState({ inputValue: "" });
-        this.props.hidePopup();
+    private handleClick(confirm: boolean) {
+        this.state.clickTypeDefer!.resolve(confirm);
     }
 
     /**
@@ -68,8 +102,8 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     private confirm(): JSX.Element {
         return (
             <div className="popup-button">
-                <button className="okay" onClick={() => this.handleClick(true, false)}>Okay</button>
-                <button className="cancel" onClick={() => this.handleClick(false, false)}>Cancel</button>
+                <button className="okay" onClick={() => this.handleClick(true)}>Okay</button>
+                <button className="cancel" onClick={() => this.handleClick(false)}>Cancel</button>
             </div>);
     }
 
@@ -82,8 +116,8 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
             <div className="popup-button">
                 <input type="text" id="input" value={this.state.inputValue}
                     onChange={(e) => this.setState({ inputValue: e.target.value })}></input>
-                <button className="okay" onClick={() => this.handleClick(false, true, this.state.inputValue)}>Okay</button>
-                <button className="cancel" onClick={() => this.handleClick(false, false)}>Cancel</button>
+                <button className="okay" onClick={() => this.handleClick(true)}>Okay</button>
+                <button className="cancel" onClick={() => this.handleClick(false)}>Cancel</button>
             </div>
         );
     }
@@ -95,7 +129,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     private notif(): JSX.Element {
         return (
             <div className="popup-button">
-                <button className="notif" onClick={() => this.handleClick(false, false)}>Okay</button>
+                <button className="notif" onClick={() => this.handleClick(true)}>Okay</button>
             </div>
         );
     }
@@ -106,7 +140,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     render() {
         let buttons: JSX.Element;
         // Creates the buttons depending on the popup type.
-        switch (this.props.popupType) {
+        switch (this.state.popupType) {
             case PopupTypes.Confirm:
                 buttons = this.confirm();
                 break;
@@ -120,14 +154,14 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
                 break;
 
             default:
-                throw Error("Invalid Type")
+                buttons = (<div className="popup-button"></div>);
         }
 
         // Combines the buttons with the message.
         return (
-            <div className={this.props.showPopup ? "popup" : "hidden"}>
+            <div className={this.state.showPopup ? "popup" : "hidden"}>
                 <div className="popup-text">
-                    {this.props.popupMessage}
+                    {this.state.popupMessage}
                 </div>
 
                 {buttons}

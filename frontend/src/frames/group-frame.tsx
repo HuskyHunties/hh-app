@@ -1,7 +1,7 @@
-import React from "react";
+import React, { RefObject } from "react";
 import '../css/group-frame.css';
 import API from '../utils/API';
-import { PopupTypes, PopupCreator } from '../utils/popup';
+import Popup, { PopupTypes } from '../utils/popup';
 import Axios from 'axios';
 
 /**
@@ -25,7 +25,7 @@ class GroupList extends React.Component<GroupListProps, GroupListState> {
 
     constructor(props: GroupListProps) {
         super(props);
-        this.state = {desc: []};
+        this.state = { desc: [] };
         this.setDesc = this.setDesc.bind(this);
     }
 
@@ -50,9 +50,9 @@ class GroupList extends React.Component<GroupListProps, GroupListState> {
         const reqs = this.props.ids.map((id) => API.get("/groups/" + id, {}));
         Axios.all(reqs).then((groups) => {
             return groups.map((group) => group.data.name + " -- " + (group.data.pathID ? "Path: " + group.data.pathID : "No Associated path"));
-        }).then((descs) => this.setState({desc: descs}));
+        }).then((descs) => this.setState({ desc: descs }));
     }
-    
+
     /**
      * Renders the component
      */
@@ -80,7 +80,6 @@ class GroupList extends React.Component<GroupListProps, GroupListState> {
  * Properties type for the GroupFrame Component
  */
 interface GroupFrameProps {
-    popupFactory: PopupCreator;
 }
 
 /**
@@ -96,6 +95,7 @@ interface GroupFrameState {
  */
 export default class GroupFrame extends React.Component<GroupFrameProps, GroupFrameState> {
     intervalID?: NodeJS.Timeout;
+    popupRef: RefObject<Popup>;
 
     constructor(props: GroupFrameProps) {
         super(props);
@@ -104,6 +104,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
             selected: undefined
         }
         this.setIDs = this.setIDs.bind(this);
+        this.popupRef = React.createRef();
     }
 
     /**
@@ -128,7 +129,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
     async setIDs() {
         console.log("Getting ids");
         const ids = (await API.get("/groups", {})).data;
-        this.setState({ids: ids.allGroups});
+        this.setState({ ids: ids.allGroups });
     }
 
     /**
@@ -136,7 +137,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
      * @param name The name of a new group.
      */
     async addGroup(name: string) {
-        API.post("/groups", {name: name}).then(this.setIDs, (res) => this.handleAddError(res))
+        API.post("/groups", { name: name }).then(this.setIDs, (res) => this.handleAddError(res))
         console.log("Tried to add group: " + name);
     }
 
@@ -153,7 +154,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
      * @param id The id of the group to be deleted
      */
     async deleteGroup(id: number) {
-        API.delete("/groups/" + id, {}).then(this.setIDs, (res) => {throw Error(res)});
+        API.delete("/groups/" + id, {}).then(this.setIDs, (res) => { throw Error(res) });
         console.log("deleted group: " + id);
     }
 
@@ -166,14 +167,15 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
             <div className="group-frame">
                 <GroupList ids={this.state.ids} clickHandler={(id: number) => this.setState({ selected: id })} selected={this.state.selected} />
                 <button className="add-group group-button"
-                    onClick={() => this.props.popupFactory(PopupTypes.Input, "Input name for new Group", (res: string) => this.addGroup(res))}>
+                    onClick={() => this.popupRef.current?.popupFactory(PopupTypes.Input, "Input name for new Group").then((res: string) => this.addGroup(res))}>
                     Add Group
-                        </button>
+                    </button>
                 <button className="remove-group group-button"
-                // Deal with case where no group selected
-                    onClick={() => this.props.popupFactory(PopupTypes.Confirm, "Delete Selected Group?", undefined,() => this.deleteGroup(this.state.selected!))}>
+                    // Deal with case where no group selected
+                    onClick={() => this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Selected Group?").then(() => this.deleteGroup(this.state.selected!))}>
                     Remove Group
                     </button>
+                <Popup ref={this.popupRef} />
             </div>
         )
     }
