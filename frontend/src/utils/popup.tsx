@@ -78,11 +78,15 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         return new Promise<string>((resolve, reject) => {
             if (confirm) {
                 if (this.state.popupType === PopupTypes.Input) {
+                    this.setState({inputValue: ""});
                     resolve(this.state.inputValue);
                 } else {
                     resolve();
                 }
             } else {
+                if (this.state.popupType === PopupTypes.Input) {
+                    this.setState({inputValue: ""});
+                }
                 reject();
             }
         })

@@ -39,7 +39,7 @@
 /* Positioning for the add and remove group buttons */
 .group-button {
     position: absolute;
-    width: 45.5%;
+    width: 30%;
     top: 530px;
     height: 50px;
     line-height: 50px;
@@ -47,10 +47,14 @@
 
 /* Positioning for the add group button */
 .add-group {
-    left: 3%;
+    left: 1.5%;
 }
 
 /* Positioning for the remove group button */
 .remove-group {
-    right: 3%;
+    left: 34.5%;
+}
+
+.assign-path {
+    left: 67.5%;
 }
