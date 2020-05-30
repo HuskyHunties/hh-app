@@ -660,9 +660,23 @@ class DatabaseWrapper {
    * @param pathID - id of the path being queried
    * @returns all the clue IDs associated with the specific clue
    */
-  getCluesofPath(pathID: number): Promise<number[]> {
+  getCluesofPath(pathID: number): Promise<object> {
     const db = this.db;
     return new Promise((resolve, reject) => {
+      let name: string;
+
+      db.get(`SELECT name FROM paths WHERE path_id = ${pathID}`, (err, row) => {
+        if (err) {
+          reject(err.message);
+        }
+        try {
+          name = row.name;
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
+      });
+
       const clueIDs: number[] = [];
 
       // collecting the clue ids from the join table
@@ -681,7 +695,7 @@ class DatabaseWrapper {
             reject(error);
           }
 
-          resolve(clueIDs);
+          resolve({name: name, clueIDs: clueIDs});
         }
       );
     });
@@ -691,11 +705,26 @@ class DatabaseWrapper {
    * @param pathID - ID of path being queried
    *  @returns an array of all the clue_ids of the unfinished clues in the clues table of the database
    */
-  async getAllUnfinishedCluesOfPath(pathID: number): Promise<number[]> {
-    const allClues = await this.getCluesofPath(pathID);
+  async getAllUnfinishedCluesOfPath(pathID: number): Promise<object> {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    //@ts-ignore
+    const allClues = (await this.getCluesofPath(pathID)).clueIDs;
     const db = this.db;
 
     return new Promise(async (resolve, reject) => {
+      let name: string;
+      db.get(`SELECT name FROM paths WHERE path_id = ${pathID}`, (err, row) => {
+        if (err) {
+          reject(err.message);
+        }
+        try {
+          name = row.name;
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
+      });
+
       const allUnfinishedClueIDs: number[] = [];
 
       let clueIDSQL = `SELECT clue_id, finished FROM clues WHERE finished = 0 AND`;
@@ -721,7 +750,7 @@ class DatabaseWrapper {
           reject(error);
         }
 
-        resolve(allUnfinishedClueIDs);
+        resolve({name: name, clueIDs: allUnfinishedClueIDs});
       });
     });
   }
@@ -730,11 +759,26 @@ class DatabaseWrapper {
    * @param pathID - ID of path being queried
    *  @returns an array of all the clue_ids of the finished clues in the clues table of the database
    */
-  async getAllFinishedCluesOfPath(pathID: number): Promise<number[]> {
-    const allClues = await this.getCluesofPath(pathID);
+  async getAllFinishedCluesOfPath(pathID: number): Promise<object> {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    //@ts-ignore
+    const allClues = (await this.getCluesofPath(pathID)).clueIDs;
     const db = this.db;
 
     return new Promise(async (resolve, reject) => {
+      let name: string;
+      db.get(`SELECT name FROM paths WHERE path_id = ${pathID}`, (err, row) => {
+        if (err) {
+          reject(err.message);
+        }
+        try {
+          name = row.name;
+        } catch (error) {
+          console.log(error);
+          reject(error);
+        }
+      });
+
       const allFinishedClueIDs: number[] = [];
 
       let clueIDSQL = `SELECT clue_id, finished FROM clues WHERE finished = 1 AND`;
@@ -761,7 +805,7 @@ class DatabaseWrapper {
           reject(error);
         }
 
-        resolve(allFinishedClueIDs);
+        resolve({name: name, clueIDs: allFinishedClueIDs});
       });
     });
   }

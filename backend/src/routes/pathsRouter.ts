@@ -15,35 +15,38 @@ pathsRouter.get("/", (req, res) => {
     .catch((error) => res.status(400).send(error));
 });
 /**
- * sends the list of all the ids of all the clues on the specified path
+ * sends the name and the list of all the ids of all the clues on the specified path
+ * { name: name, clueIDs: clueIDs }
  */
 pathsRouter.get("/:pathID", (req, res) => {
   const pathID = Number(req.params.pathID);
   dbWrapper
     .getCluesofPath(pathID)
-    .then((clueIDs) => res.send({ clues: clueIDs }))
+    .then((infoObject) => res.send(infoObject))
     .catch((error) => res.status(400).send(error));
 });
 
 /**
- * sends the list of all the ids of all the incomplete clues on the specified path
+ * sends the name and the list of all the ids of all the incomplete clues on the specified path
+ * { name: name, clueIDs: clueIDs }
  */
 pathsRouter.get("/:pathID/incomplete", (req, res) => {
   const pathID = Number(req.params.pathID);
   dbWrapper
     .getAllUnfinishedCluesOfPath(pathID)
-    .then((clueIDs) => res.send({ clues: clueIDs }))
+    .then((infoObject) => res.send(infoObject))
     .catch((error) => res.status(400).send(error));
 });
 
 /**
- * sends the list of all the ids of all the incomplete clues on the specified path
+ * sends the name and the list of all the ids of all the incomplete clues on the specified path
+ * { name: name, clueIDs: clueIDs }
  */
 pathsRouter.get("/:pathID/complete", (req, res) => {
   const pathID = Number(req.params.pathID);
   dbWrapper
     .getAllFinishedCluesOfPath(pathID)
-    .then((clueIDs) => res.send({ clues: clueIDs }))
+    .then((infoObject) => res.send(infoObject))
     .catch((error) => res.status(400).send(error));
 });
 
