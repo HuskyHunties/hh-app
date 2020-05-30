@@ -30,7 +30,7 @@ class PathList extends React.Component<PathListProps, PathListState> {
         // Map all path ids to table cells with appropriate information.
         const paths: JSX.Element[] = [];
         this.props.paths.forEach((name, id) => {
-            paths.push (
+            paths.push(
                 <tr key={id} onClick={() => this.props.clickHandler(id)}><td className={id === this.props.selected ? "selected" : ""}>
                     {name}
                 </td></tr>
@@ -77,29 +77,125 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
     }
 
     /**
+    * Clears the selected value if the selected value has been deleted
+    */
+    componentDidUpdate() {
+        if (this.state.selected && !this.props.paths.has(this.state.selected!)) {
+            this.setState({ selected: undefined });
+        }
+    }
+
+    /**
      * Send a new path to the backend to be added and update the component's state.
      * @param name The name of a new path.
      */
-    addPath(name: string) {
-        API.post("paths", { name: name }).then(this.props.updateInfo, (res) => this.handleAddError(res))
-        console.log("Tried to add path: " + name);
+    addPath() {
+        this.popupRef.current?.popupFactory(PopupTypes.Input, "Input name for new Path").then((res: string) => {
+            API.post("paths", { name: res }).then(this.props.updateInfo, (res) => this.handleAddError(res.response.status))
+            console.log("Tried to add path: " + res);
+        }, () => {});
     }
 
     /**
      * Handles errors in the add path function
-     * @param res the error for the add request
+     * @param status error code for the add request
      */
-    handleAddError(res: JSON) {
-        // TODO Implement
+    handleAddError(status: number) {
+        // TODO Actual error code for name already in use
+        if (status === 400) {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "Name already in use").then(() => this.addPath());
+
+            // Unknown error
+        } else {
+            console.log(status);
+            throw new Error("Unknown error code");
+        }
     }
 
     /**
      * Tell the backend to delete a path and update the component's state
-     * @param id The id of the path to be deleted
      */
-    deletePath(id: number) {
-        API.delete("paths/" + id, {}).then(this.props.updateInfo, (res) => { throw Error(res) });
-        console.log("deleted path: " + id);
+    deletePath() {
+        if (this.state.selected) {
+            this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Selected Path?").then(() => {
+                API.delete("paths/" + this.state.selected, {}).then(this.props.updateInfo, (res) => this.handleDeleteError(res.response.status));
+                console.log("deleted path: " + this.state.selected);
+            }, () => {});
+        } else {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "No Path Selected")
+        }
+    }
+
+    /**
+    * Handles errors in the delete path function
+    * @param status error code for the delete request
+    */
+    handleDeleteError(status: number) {
+        // Item already deleted TODO Actual Error code
+        if (status === 400) {
+            this.props.updateInfo();
+
+            // Unknown error
+        } else {
+            console.log(status);
+            throw new Error("Unknown error code");
+        }
+    }
+
+    /**
+     * Tell the backend to delete a path and update the component's state
+     * TODO implement
+     */
+    modifyPath() {
+        if (this.state.selected) {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "Operation Not Implemented")
+        } else {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "No Path Selected")
+        }
+    }
+
+    /**
+    * Handles errors in the modify path function
+    * @param status error code for the modify request
+    */
+    handleModifyError(status: number) {
+        // TODO Actual Error code
+        if (status === 400) {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "Implement me");
+
+            // Unknown error
+        } else {
+            console.log(status);
+            throw new Error("Unknown error code");
+        }
+    }
+
+    /**
+     * Tell the backend to order the selected path and update the component's state
+     * TODO Implement
+     */
+    orderPath() {
+        if (this.state.selected) {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "Operation Not Implemented")
+        } else {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "No Path Selected")
+        }
+    }
+
+    /**
+    * Handles errors in the order path function
+    * @param status error code for the order request
+    */
+    handleOrderError(status: number) {
+        // TODO Actual Error codes
+        if (status === 400) {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "Implement me")
+
+            // Unknown error
+        } else {
+            console.log(status);
+            throw new Error("Unknown error code");
+        }
     }
 
     /**
@@ -110,13 +206,10 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
         return (
             <div className="path-frame">
                 <PathList paths={this.props.paths} clickHandler={(id: number) => this.setState({ selected: id })} selected={this.state.selected} />
-                <button className="path-button" onClick={() => this.popupRef.current?.popupFactory(PopupTypes.Input, "Input name for new Path").then((res: string) => this.addPath(res))}>Add Path</button>
-                {/*TODO: Case where there is nothing selected needs to be handled*/}
-                <button className="path-button" onClick={() => this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Selected Path?").then(() => this.deletePath(this.state.selected!))}>Delete Path</button>
-                {/*TODO: this*/}
-                <button className="path-button">Modify Path</button>
-                {/*TODO: this*/}
-                <button className="path-button">Order Path</button>
+                <button className="path-button" onClick={() => this.addPath()}>Add Path</button>
+                <button className="path-button" onClick={() => this.deletePath()}>Delete Path</button>
+                <button className="path-button" onClick={() => this.modifyPath()}>Modify Path</button>
+                <button className="path-button" onClick={() => this.orderPath()}>Order Path</button>
                 <Popup ref={this.popupRef} />
             </div>
         )

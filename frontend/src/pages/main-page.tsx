@@ -77,7 +77,7 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
                 });
             }
             return paths;
-        }).then((paths) => this.setState({ paths })).then(() => console.log(this.state.paths))
+        }).then((paths) => this.setState({ paths }));
     }
 
     render() {
