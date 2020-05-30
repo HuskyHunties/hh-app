@@ -68,7 +68,13 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
         API.get("paths", {}).then(async (res) => {
             const paths = new Map<number, string>();
             for (let pathID of res.data.allPaths) {
-                await API.get("paths/" + pathID, {}).then((path) => paths.set(pathID, path.data.name));
+                await API.get("paths/" + pathID, {}).then((path) => {
+                    if (path.data.name) {
+                        paths.set(pathID, path.data.name)
+                    } else {
+                        paths.set(pathID, this.state.paths.get(pathID)!);
+                    }
+                });
             }
             return paths;
         }).then((paths) => this.setState({ paths })).then(() => console.log(this.state.paths))
