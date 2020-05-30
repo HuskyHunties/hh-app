@@ -29,7 +29,7 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
     private intervalID?: NodeJS.Timeout;
     constructor(props: MainPageProps) {
         super(props);
-        this.state = {groups: new Map(), paths: new Map()};
+        this.state = { groups: new Map(), paths: new Map() };
         this.updateInfo = this.updateInfo.bind(this);
     }
 
@@ -38,12 +38,8 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
      */
     componentDidMount() {
         this.updateInfo();
-        const map = new Map<number, string>();
-        map.set(1, "one");
-        map.set(2, "two");
-        console.log(map);
 
-        //this.intervalID = setInterval(this.updateInfo, 5000);
+        this.intervalID = setInterval(this.updateInfo, 5000);
     }
 
     /**
@@ -58,27 +54,32 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
      * Update the state by making api calls
      */
     private updateInfo() {
-        const paths = new Map();
-        const groups = new Map();
-
         // Group API calls
-        API.get("groups", {}).then((res) => res.data.allGroups.forEach((groupID: number) => {
-            API.get("groups/" + groupID, {}).then((res) => groups.set(groupID, {name: res.data.name, pathID: res.data.pathID}));
-        })).then(() => this.setState({groups: groups}));
+        API.get("groups", {}).then(async (res) => {
+            const groups = new Map<number, Group>();
+            for (let groupID of res.data.allGroups) {
+                await API.get("groups/" + groupID, {}).then((group) => groups.set(groupID, { name: group.data.name, pathID: group.data.pathID }));
+            }
+            return groups;
+        }).then((groups) => this.setState({ groups }));
 
 
         // Path API calls
-        API.get("paths", {}).then((res) => res.data.allPaths.forEach((pathID: number) => {
-            API.get("paths/" + pathID, {}).then((res) => paths.set(pathID, res.data.name));
-        })).then(() => this.setState({paths: paths})).then( () => console.log(this.state.paths));
+        API.get("paths", {}).then(async (res) => {
+            const paths = new Map<number, string>();
+            for (let pathID of res.data.allPaths) {
+                await API.get("paths/" + pathID, {}).then((path) => paths.set(pathID, path.data.name));
+            }
+            return paths;
+        }).then((paths) => this.setState({ paths })).then(() => console.log(this.state.paths))
     }
-    
+
     render() {
         return (
             <div className="main-page">
                 <NavBarFrame />
                 <ClueFrame />
-                <PathFrame paths={this.state.paths} updateInfo={this.updateInfo}/>
+                <PathFrame paths={this.state.paths} updateInfo={this.updateInfo} />
                 <GroupFrame groups={this.state.groups} paths={this.state.paths} updateInfo={this.updateInfo} />
             </div>
         )

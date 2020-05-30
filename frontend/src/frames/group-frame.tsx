@@ -34,11 +34,8 @@ class GroupList extends React.Component<GroupListProps, GroupListState> {
   render() {
     // Map all groups ids to table cells with appropriate information.
     const groups : JSX.Element[] = [];
-    console.log("----- GROUP LIST -----");
-    console.log(this.props.groups);
     this.props.groups.forEach((group, id) => {
       const path = group.pathID && this.props.paths.has(group.pathID) ?  this.props.paths.get(group.pathID!) : "No assigned path";
-      console.log(group.name + " -- " + path);
       groups.push(
         <tr key={id} onClick={() => this.props.clickHandler(id)}>
           <td className={id === this.props.selected ? "selected" : ""}>

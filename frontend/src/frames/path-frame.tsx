@@ -30,7 +30,7 @@ class PathList extends React.Component<PathListProps, PathListState> {
         // Map all path ids to table cells with appropriate information.
         const paths: JSX.Element[] = [];
         this.props.paths.forEach((name, id) => {
-            return (
+            paths.push (
                 <tr key={id} onClick={() => this.props.clickHandler(id)}><td className={id === this.props.selected ? "selected" : ""}>
                     {name}
                 </td></tr>
