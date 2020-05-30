@@ -2,79 +2,47 @@ import React, { RefObject } from "react";
 import "../css/group-frame.css";
 import API from "../utils/API";
 import Popup, { PopupTypes } from "../utils/popup";
-import Axios from "axios";
+
+/**
+ * Holds a name and pathID of a group
+ */
+export interface Group {
+  name: String;
+  pathID?: number;
+}
 
 /**
  * Properties type for the GroupList Component
  */
 interface GroupListProps {
-  ids: number[];
+  groups: Map<number, Group>;
+  paths: Map<number, string>;
   clickHandler(selection: number): void;
   selected: number | undefined;
 }
 
 interface GroupListState {
-  desc: string[];
 }
 
 /**
  * A component that displays all of the currently created groups as a selectable list.
  */
 class GroupList extends React.Component<GroupListProps, GroupListState> {
-  intervalID?: NodeJS.Timeout;
-
-  constructor(props: GroupListProps) {
-    super(props);
-    this.state = { desc: [] };
-    this.setDesc = this.setDesc.bind(this);
-  }
-
-  /**
-   * Starts loading descriptions once the component is mounted.
-   */
-  componentDidMount() {
-    this.setDesc();
-
-    this.intervalID = setInterval(this.setDesc, 5000);
-  }
-
-  /**
-   * Stop refreshing the data when the component is unloaded.
-   */
-  componentWillUnmount() {
-    clearInterval(this.intervalID!);
-  }
-
-  /**
-   * Sets the state to have proper descriptions for each id.
-   */
-  setDesc() {
-    // TODO Make Path Name instead of ID
-    const reqs = this.props.ids.map((id) => API.get("/groups/" + id, {}));
-    Axios.all(reqs)
-      .then((groups) => {
-        return groups.map(
-          (group) =>
-            group.data.name +
-            " -- " +
-            (group.data.pathID
-              ? "Path: " + group.data.pathID
-              : "No Associated path")
-        );
-      })
-      .then((descs) => this.setState({ desc: descs }));
-  }
-
   /**
    * Renders the component
    */
   render() {
     // Map all groups ids to table cells with appropriate information.
-    const groups = this.props.ids.map((id, count) => {
-      return (
+    const groups : JSX.Element[] = [];
+    console.log("----- GROUP LIST -----");
+    console.log(this.props.groups);
+    this.props.groups.forEach((group, id) => {
+      const path = group.pathID && this.props.paths.has(group.pathID) ?  this.props.paths.get(group.pathID!) : "No assigned path";
+      console.log(group.name + " -- " + path);
+      groups.push(
         <tr key={id} onClick={() => this.props.clickHandler(id)}>
           <td className={id === this.props.selected ? "selected" : ""}>
-            {this.state.desc[count]}
+            {group.name + " -- " + path}
           </td>
         </tr>
       );
@@ -93,13 +61,16 @@ class GroupList extends React.Component<GroupListProps, GroupListState> {
 /**
  * Properties type for the GroupFrame Component
  */
-interface GroupFrameProps { }
+interface GroupFrameProps {
+  groups: Map<number, Group>;
+  paths: Map<number, string>;
+  updateInfo(): void;
+}
 
 /**
  * Properties type for the Group Frame Component
  */
 interface GroupFrameState {
-  ids: number[];
   selected: number | undefined;
 }
 
@@ -107,41 +78,14 @@ interface GroupFrameState {
  * A component to display group information and allow operations on the groups.
  */
 export default class GroupFrame extends React.Component<GroupFrameProps, GroupFrameState> {
-  intervalID?: NodeJS.Timeout;
   popupRef: RefObject<Popup>;
 
   constructor(props: GroupFrameProps) {
     super(props);
     this.state = {
-      ids: [],
       selected: undefined,
     };
-    this.setIDs = this.setIDs.bind(this);
     this.popupRef = React.createRef();
-  }
-
-  /**
-   * Get the list of group ids from the database when the component is loaded.
-   */
-  componentDidMount() {
-    this.setIDs();
-
-    this.intervalID = setInterval(this.setIDs, 5000);
-  }
-
-  /**
-   * Stop refreshing the data when the component is unloaded.
-   */
-  componentWillUnmount() {
-    clearInterval(this.intervalID!);
-  }
-
-  /**
-   * Sets the state to a list of group ids, fetched from the backend.
-   */
-  async setIDs() {
-    const ids = (await API.get("/groups", {})).data;
-    this.setState({ ids: ids.allGroups });
   }
 
   /**
@@ -152,7 +96,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
     this.popupRef.current
       ?.popupFactory(PopupTypes.Input, "Input name for new Group")
       .then((res: string) => {
-        API.post("/groups", { name: res }).then(this.setIDs, (res) =>
+        API.post("/groups", { name: res }).then(this.props.updateInfo, (res) =>
           this.handleAddError(res.response.status)
         );
         console.log("Tried to add group: " + res);
@@ -181,18 +125,18 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
    * @param id The id of the group to be deleted
    */
   async deleteGroup(id: number) {
-    API.delete("/groups/" + id, {}).then(this.setIDs, (res) => {
+    API.delete("/groups/" + id, {}).then(this.props.updateInfo, (res) => {
       throw Error(res);
     });
     console.log("deleted group: " + id);
   }
 
   assignPath() {
-    const map = new Map();
-    map.set(1, "one");
-    map.set(2, "two");
-    map.set(3, "three");
-    this.popupRef.current?.popupFactory(PopupTypes.DropDown, "Choose a path to assign to the selected group:", map).then((res) => console.log(res));
+    this.popupRef.current?.popupFactory(PopupTypes.DropDown, "Choose a path to assign to the selected group:", this.props.paths)
+    .then((res) => {
+      API.put("groups/" + this.state.selected, {pathID: Number(res)});
+      console.log("Group: " + this.state.selected + " assigned path: " + res);
+    });
   }
 
   /**
@@ -201,7 +145,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
   render() {
     return (
       <div className="group-frame">
-        <GroupList ids={this.state.ids}
+        <GroupList paths={this.props.paths} groups={this.props.groups}
           clickHandler={(id: number) => this.setState({ selected: id })}
           selected={this.state.selected}
         />
