@@ -187,21 +187,25 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
     console.log("deleted group: " + id);
   }
 
+  assignPath() {
+    const map = new Map();
+    map.set(1, "one");
+    map.set(2, "two");
+    map.set(3, "three");
+    this.popupRef.current?.popupFactory(PopupTypes.DropDown, "Choose a path to assign to the selected group:", map).then((res) => console.log(res));
+  }
+
   /**
    * Render the component
    */
   render() {
     return (
       <div className="group-frame">
-        <GroupList
-          ids={this.state.ids}
+        <GroupList ids={this.state.ids}
           clickHandler={(id: number) => this.setState({ selected: id })}
           selected={this.state.selected}
         />
-        <button
-          className="add-group group-button"
-          onClick={() => this.addGroup()}
-        >
+        <button className="add-group group-button" onClick={() => this.addGroup()}>
           Add Group
         </button>
         <button
@@ -215,7 +219,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
         >
           Remove Group
         </button>
-        <button className="assign-path group-button">Assign Path</button>
+        <button className="assign-path group-button" onClick={() => this.assignPath()}>Assign Path</button>
         <Popup ref={this.popupRef} />
       </div>
     );
