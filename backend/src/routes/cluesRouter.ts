@@ -15,7 +15,7 @@ cluesRouter.get("/", (req, res) => {
 });
 
 /**
- * deletes the specified clue from the database, sends information of that clue
+ * Query for information about a clue
  * {
             crawlID: crawlID,
             name: name,
