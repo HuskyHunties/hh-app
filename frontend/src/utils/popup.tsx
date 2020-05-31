@@ -7,7 +7,8 @@ import './popup.css';
 export enum PopupTypes {
     Confirm = "confirm",
     Input = "input",
-    Notif = "notif"
+    Notif = "notif",
+    DropDown = "dropdown"
 }
 
 /**
@@ -47,7 +48,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         var p = new Promise<boolean>(function (resolve, reject) {
             deferred = { resolve: resolve, reject: reject };
         });
-        this.state = { showPopup: false, inputValue: "", clickTypePromise: p, clickTypeDefer: deferred};
+        this.state = { showPopup: false, inputValue: "", clickTypePromise: p, clickTypeDefer: deferred };
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -59,7 +60,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         var p = new Promise<boolean>(function (resolve, reject) {
             deferred = { resolve: resolve, reject: reject };
         });
-        this.setState({ clickTypePromise: p, clickTypeDefer: deferred})
+        this.setState({ clickTypePromise: p, clickTypeDefer: deferred })
     }
 
     /**
@@ -79,10 +80,17 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
             if (confirm) {
                 if (this.state.popupType === PopupTypes.Input) {
                     resolve(this.state.inputValue);
+                    this.setState({ inputValue: "" });
+                } else if (this.state.popupType === PopupTypes.DropDown) {
+                    resolve(this.state.inputValue);
+                    this.setState({inputValue: ""});
                 } else {
                     resolve();
                 }
             } else {
+                if (this.state.popupType === PopupTypes.Input) {
+                    this.setState({ inputValue: "" });
+                }
                 reject();
             }
         })
@@ -135,6 +143,26 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     }
 
     /**
+     * Creates the buttons and selection box for the dropdown popup
+     * @returns a div containing those elements
+     */
+    private dropdown(): JSX.Element {
+        const dropdown: JSX.Element[] = [];
+        this.state.options!.forEach((name: string, id: number) => {
+            dropdown.push(<option value={String(id)} key={id}>{name}</option>);
+        })
+
+        return (
+            <div className="popup-button">
+                <select id="input" value={this.state.inputValue}
+                    onChange={(e) => this.setState({ inputValue: e.target.value })}>{dropdown}</select>
+                <button className="okay" onClick={() => this.handleClick(true)}>Select</button>
+                <button className="cancel" onClick={() => this.handleClick(false)}>Cancel</button>
+            </div>
+        )
+    }
+
+    /**
      * Renders the popup box
      */
     render() {
@@ -151,6 +179,10 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 
             case PopupTypes.Notif:
                 buttons = this.notif();
+                break;
+
+            case PopupTypes.DropDown:
+                buttons = this.dropdown();
                 break;
 
             default:
