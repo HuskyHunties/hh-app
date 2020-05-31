@@ -1,4 +1,5 @@
 import React from "react";
+import ClueMap from "./maps";
 import '../css/clue-frame.css';
 
 /**
@@ -26,7 +27,10 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
      */
     render() {
         return (
-            <div className="clue-frame">Clue Frame</div>
+            <div className={"clue-frame"}>
+                <ClueMap />
+            </div>
+
         )
     }
 }
