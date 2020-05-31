@@ -21,6 +21,19 @@
     top: 0%;
     width: 40%;
     height: 100%;
+    overflow-y: scroll;
+}
+
+/* Positioning for the table itself */
+.clue-table {
+    position: absolute;
+    width: calc(100% - 50px);
+}
+
+/* Indicates that a table cell is currently selected */
+.selected {
+    background: var(--accent-color);
+    color: var(--bg-color);
 }
 
 /* Container for the clue map */

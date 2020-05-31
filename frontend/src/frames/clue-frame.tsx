@@ -28,7 +28,7 @@ export interface Clue {
  */
 interface ClueListProps {
     clues: Map<number, Clue>;
-    clickHandler(selection: number): void;
+    select(selection: number): void;
     selected?: number;
 }
 
@@ -50,14 +50,18 @@ class ClueList extends React.Component<ClueListProps, ClueListState> {
     render() {
         const listItems = Array.from(this.props.clues, ([id, clue]) => {
             return (
-                <tr key={id}><td>{clue.list + clue.num}</td><td>{clue.name}</td></tr>
+                <tr key={id} onClick={() => this.props.select(id)}>
+                    <td className={id === this.props.selected ? "selected" : ""}>
+                        {clue.list + clue.num + ": " + clue.name}
+                    </td>
+                </tr>
             )
         })
 
 
         //TODO this
         return (
-            <table className="group-table">
+            <table className="clue-table">
                 <thead><tr><th>List of Clues</th></tr></thead>
                 <tbody>{listItems}</tbody>
             </table>
@@ -77,6 +81,7 @@ interface ClueFrameProps {
  * State type for the ClueFrame Component
  */
 interface ClueFrameState {
+    clues: Map<number, Clue>;
     selected?: number;
 }
 
@@ -89,8 +94,13 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
 
     constructor(props: ClueFrameProps) {
         super(props);
+        const clues = new Map<number, Clue>();
+        clues.set(1, { name: "Amelia's", list: "A", num: 69, finished: false, desc: "", place: { lat: 42.34117, lng: -71.0874334 } });
+        clues.set(2, { name: "Speare Hall", list: "B", num: 420, finished: false, desc: "In front of res-mail", place: { lat: 42.3406995, lng: -71.0897018 } });
+        clues.set(3, { name: "Castle Island", list: "C", num: 3, finished: false, desc: "", place: { lat: 42.3378643, lng: -71.0125351 } });
         this.state = {
-            selected: undefined
+            selected: undefined,
+            clues
         };
         this.popupRef = React.createRef();
     }
@@ -102,11 +112,11 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
         return (
             <div className={"clue-frame"}>
                 <div className="clue-list">
-                    <ClueList selected={this.state.selected} clickHandler={(id: number) => this.setState({ selected: id })}
-                    clues={new Map()} />
+                    <ClueList selected={this.state.selected} select={(id: number) => this.setState({ selected: id })}
+                        clues={this.state.clues} />
                 </div>
                 <div className="clue-map">
-                    <ClueMap />
+                    <ClueMap clues={this.state.clues} selected={this.state.selected} select={(id: number) => this.setState({selected: id})} />
                 </div>
                 <Popup ref={this.popupRef} />
             </div>
