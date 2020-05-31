@@ -4,17 +4,30 @@ import '../css/clue-frame.css';
 import Popup from "../utils/popup";
 
 /**
- * Holds a name and pathID of a group
+ * Holds a lat and a lng
+ */
+export interface Place {
+    lat: number;
+    lng: number;
+}
+
+/**
+ * Holds information about a clue
  */
 export interface Clue {
-    // TODO Implement
+    list: string;
+    num: number;
+    name: string;
+    desc: string;
+    place: Place;
+    finished: boolean;
 }
 
 /**
  * Properties type for the ClueList Component
  */
 interface ClueListProps {
-    // TODO clues
+    clues: Map<number, Clue>;
     clickHandler(selection: number): void;
     selected?: number;
 }

@@ -71,7 +71,7 @@ interface GroupFrameProps {
  * Properties type for the Group Frame Component
  */
 interface GroupFrameState {
-  selected: number | undefined;
+  selected?: number;
 }
 
 /**
