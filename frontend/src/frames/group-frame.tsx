@@ -21,6 +21,9 @@ interface GroupListProps {
   selected: number | undefined;
 }
 
+/**
+ * State type for the GroupList Component
+ */
 interface GroupListState {
 }
 

@@ -31,17 +31,17 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
     render() {
         return (
             <LoadScript
-            googleMapsApiKey={GLOBALSECRETS.mapsKey}
+                googleMapsApiKey={GLOBALSECRETS.mapsKey}
             >
                 <GoogleMap
-                mapContainerStyle={{width: "100%", height: "100%"}}
-                center={{ lat: 42.3406995, lng: -71.0897018 }}
-                zoom={16}
+                    mapContainerStyle={{ width: "100%", height: "100%" }}
+                    center={{ lat: 42.3406995, lng: -71.0897018 }}
+                    zoom={16}
                 >
-                <Marker
-                    position={{lat: 42.34117, lng: -71.0874334}} />
+                    <Marker
+                        position={{ lat: 42.34117, lng: -71.0874334 }} />
                 </GoogleMap>
-          </LoadScript>
+            </LoadScript>
         )
     }
 }

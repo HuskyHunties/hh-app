@@ -11,3 +11,25 @@
     background: var(--primary-color);
     border-radius: 25px;
 }
+
+/* Container for the clue list */
+.clue-list {
+    position: absolute;
+    box-sizing: border-box;
+    padding: 25px;
+    left: 0%;
+    top: 0%;
+    width: 40%;
+    height: 100%;
+}
+
+/* Container for the clue map */
+.clue-map {
+    position: absolute;
+    box-sizing: border-box;
+    padding: 25px;
+    left: 40%;
+    top: 0%;
+    right: 0%;
+    height: 100%;
+}
