@@ -42,12 +42,26 @@ interface ClueListState {
  * A component that displays all of the currently created groups as a selectable list.
  */
 class ClueList extends React.Component<ClueListProps, ClueListState> {
+
+
     /**
      * Renders the component
      */
     render() {
+        const listItems = Array.from(this.props.clues, ([id, clue]) => {
+            return (
+                <tr key={id}><td>{clue.list + clue.num}</td><td>{clue.name}</td></tr>
+            )
+        })
+
+
         //TODO this
-        return <div></div>;
+        return (
+            <table className="group-table">
+                <thead><tr><th>List of Clues</th></tr></thead>
+                <tbody>{listItems}</tbody>
+            </table>
+        );
     }
 }
 
@@ -75,9 +89,9 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
 
     constructor(props: ClueFrameProps) {
         super(props);
-        this.setState({
+        this.state = {
             selected: undefined
-        })
+        };
         this.popupRef = React.createRef();
     }
 
@@ -88,7 +102,8 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
         return (
             <div className={"clue-frame"}>
                 <div className="clue-list">
-                    <ClueList selected={this.state.selected} clickHandler={(id: number) => this.setState({selected: id})} />
+                    <ClueList selected={this.state.selected} clickHandler={(id: number) => this.setState({ selected: id })}
+                    clues={new Map()} />
                 </div>
                 <div className="clue-map">
                     <ClueMap />
