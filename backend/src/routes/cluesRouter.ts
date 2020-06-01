@@ -15,14 +15,39 @@ cluesRouter.get("/", (req, res) => {
 });
 
 /**
+ * sends all the ids of incomplete clues
+ */
+cluesRouter.get("/incomplete", (req, res) => {
+  console.log("getting incomplete clues")
+  dbWrapper
+    .getAllUnfinishedClueIDs()
+    .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues }))
+    .catch((error) => res.status(400).send(error));
+});
+
+/**
+ * sends all the ids of complete clues
+ */
+cluesRouter.get("/complete", (req, res) => {
+  console.log("getting complete clues")
+  dbWrapper
+    .getAllFinishedClueIDs()
+    .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues }))
+    .catch((error) => res.status(400).send(error));
+});
+
+/**
  * deletes the specified clue from the database, sends information of that clue
  * {
-            crawlID: crawlID,
-            name: name,
-            place: place,
-            image: image,
-            finished: finished,
-    }
+          name: name,
+          listID: listID,
+          clueNumber: clueNumber,
+          description: description,
+          lat: lat,
+          long: long,
+          image: image,
+          finished: finished,
+        }
  */
 cluesRouter.get("/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
@@ -34,42 +59,45 @@ cluesRouter.get("/:clueID", (req, res) => {
 });
 
 /**
- * sends all the ids of incomplete clues
+ * sends an object containing the image string of the specified clue
+ * {
+ *  image: image
+ * }
  */
-cluesRouter.get("/incomplete", (req, res) => {
+cluesRouter.get("/:clueID/image", (req, res) => {
+  const clueID = Number(req.params.clueID);
+
   dbWrapper
-    .getAllUnfinishedClueIDs()
-    .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues }))
+    .getImageOfClue(clueID)
+    .then((image) => res.send({ image: image }))
     .catch((error) => res.status(400).send(error));
 });
 
-/**
- * sends all the ids of complete clues
- */
-cluesRouter.get("/complete", (req, res) => {
-  dbWrapper
-    .getAllFinishedClueIDs()
-    .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues }))
-    .catch((error) => res.status(400).send(error));
-});
+
 
 /**
  * adds a clue described by the request body to the table, sends information of that clue
  * {
-          clueID: clueID,
-          crawlID: crawlID,
-          name: name,
-          place: place,
-          finished: 0,
-        }
+            clueID: clueID,
+            name: clueName,
+            listID: listID,
+            clueNumber: clueNumber,
+            description: description,
+            lat: lat,
+            long: long,
+            finished: 0,
+          }
  */
 cluesRouter.post("/", (req, res) => {
   const name: string = req.body.name;
-  const place: string = req.body.place;
-  const crawlID = Number(req.body.crawlID);
+  const listID: string = req.body.listID;
+  const clueNumber = Number(req.body.clueNumber);
+  const description: string = req.body.description;
+  const lat = Number(req.body.lat);
+  const long = Number(req.body.long);
 
   dbWrapper
-    .addClue(name, place, crawlID)
+    .addClue(name, listID, clueNumber, description, lat, long)
     .then((infoObject) => res.send(infoObject))
     .catch((error) => res.status(400).send(error));
 });
@@ -77,9 +105,12 @@ cluesRouter.post("/", (req, res) => {
 /**
  * deletes the specified clue from the database, sends information of deleted clue
  * {
-          crawlID: crawlID,
           name: name,
-          place: place,
+          listID: listID,
+          clueNumber: clueNumber,
+          description: description,
+          lat: lat,
+          long: long,
           image: image,
           finished: finished,
         }

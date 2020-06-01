@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as sqlite3 from "sqlite3";
-import { isNullOrUndefined } from "util";
 
 /**
  * Wrapper class for the database to provide various ways to interact with it
@@ -22,31 +21,16 @@ class DatabaseWrapper {
       console.log("Connected to the in-memory SQlite database.");
 
       this.db.run(
-        `CREATE TABLE IF NOT EXISTS crawls (
-          crawl_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          UNIQUE(name) ON CONFLICT ABORT 
-      );`,
-        (err) => {
-          if (err) {
-            throw console.error(err.message);
-          }
-        }
-      );
-
-      this.db.run(
         `CREATE TABLE IF NOT EXISTS clues (
           clue_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          crawl_id INTEGER,
           name TEXT NOT NULL,
-          place TEXT NOT NULL,
+          list_id TEXT,
+          clue_number INTEGER,
+          description TEXT,
+          lat REAL,
+          long REAL,
           image TEXT,
           finished INTEGER NOT NULL, 
-      
-          FOREIGN KEY (crawl_id)
-              REFERENCES crawls (crawl_id)
-              ON DELETE NO ACTION
-              ON UPDATE NO ACTION,
       
           UNIQUE(name) ON CONFLICT ABORT 
       );`,
@@ -161,27 +145,62 @@ class DatabaseWrapper {
   /**
    *
    * @param clueID - the id of the clue being queried
-   * @returns an object containing the information on this clue
+   * @returns an string which is the base 64 encoding of the clue's image
    */
-  getInfoOfClue(clueID: number): Promise<object> {
+  getImageOfClue(clueID: number): Promise<string> {
     const db = this.db;
-    let crawlID: number;
-    let name: string;
-    let place: string;
     let image: string;
-    let finished: number;
 
     return new Promise((resolve, reject) => {
       db.get(
-        `SELECT crawl_id, name, place, image, finished FROM clues WHERE clue_id = ${clueID}`,
+        `SELECT image FROM clues WHERE clue_id = ${clueID}`,
         (err, row) => {
           if (err) {
             reject(err);
           }
           try {
-            crawlID = row.crawl_id;
+            image = row.image;
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
+          resolve(image);
+        }
+      );
+    });
+  }
+
+  /**
+   *
+   * @param clueID - the id of the clue being queried
+   * @returns an object containing the information on this clue
+   */
+  getInfoOfClue(clueID: number): Promise<object> {
+    //TODO updatae with new columns of database
+    const db = this.db;
+    let name: string;
+    let listID: string;
+    let clueNumber: number;
+    let description: string;
+    let lat: number;
+    let long: number;
+    let image: string;
+    let finished: number;
+
+    return new Promise((resolve, reject) => {
+      db.get(
+        `SELECT name, list_id, clue_number, description, lat, long, image, finished FROM clues WHERE clue_id = ${clueID}`,
+        (err, row) => {
+          if (err) {
+            reject(err);
+          }
+          try {
             name = row.name;
-            place = row.place;
+            listID = row.list_id;
+            clueNumber = row.clue_number;
+            description = row.description;
+            lat = row.lat;
+            long = row.long;
             image = row.image;
             finished = row.finished;
           } catch (error) {
@@ -189,9 +208,12 @@ class DatabaseWrapper {
             reject(error);
           }
           resolve({
-            crawlID: crawlID,
             name: name,
-            place: place,
+            listID: listID,
+            clueNumber: clueNumber,
+            description: description,
+            lat: lat,
+            long: long,
             image: image,
             finished: finished,
           });
@@ -273,31 +295,28 @@ class DatabaseWrapper {
    * @param crawlID - the id of the crawl the clue is part of, could be null
    * @returns - information on the created clue
    */
-  addClue(clueName: string, place: string, crawlID: number): Promise<object> {
+  addClue(
+    clueName: string,
+    listID: string,
+    clueNumber: number,
+    description: string,
+    lat: number,
+    long: number
+  ): Promise<object> {
+    //TODO update for new columns of data base
     const db = this.db;
     return new Promise((resolve, reject) => {
       // if the clue has a crawl, add its crawl to the database; else, only add the clue
-      if (!isNullOrUndefined(crawlID)) {
-        db.run(
-          `INSERT INTO clues(crawl_id, name, place, finished) VALUES(?, ?, ?, ?)`,
-          [crawlID, clueName, place, 0],
-          (err) => {
-            if (err) {
-              reject(err.message);
-            }
+
+      db.run(
+        "INSERT INTO clues(name, list_id, clue_number, description, lat, long, finished) VALUES(?, ?, ?, ?, ?, ?, ?)",
+        [clueName, listID, clueNumber, description, lat, long, 0],
+        (err) => {
+          if (err) {
+            reject(err.message);
           }
-        );
-      } else {
-        db.run(
-          "INSERT INTO clues(name, place, finished) VALUES(?, ?, ?)",
-          [clueName, place, 0],
-          (err) => {
-            if (err) {
-              reject(err.message);
-            }
-          }
-        );
-      }
+        }
+      );
 
       // retrieve the clue ID registered from the database
       let clueID: number;
@@ -315,9 +334,12 @@ class DatabaseWrapper {
           }
           resolve({
             clueID: clueID,
-            crawlID: crawlID,
             name: clueName,
-            place: place,
+            listID: listID,
+            clueNumber: clueNumber,
+            description: description,
+            lat: lat,
+            long: long,
             finished: 0,
           });
         }
@@ -331,24 +353,31 @@ class DatabaseWrapper {
    * @returns - information on the deleted clue
    */
   deleteClue(clueID: number): Promise<object> {
+    // TODO: update from new columns of database
     const db = this.db;
-    let crawlID: number;
     let name: string;
-    let place: string;
+    let listID: string;
+    let clueNumber: number;
+    let description: string;
+    let lat: number;
+    let long: number;
     let image: string;
     let finished: number;
 
     return new Promise((resolve, reject) => {
       db.get(
-        `SELECT crawl_id, name, place, image, finished FROM clues WHERE clue_id = ${clueID}`,
+        `SELECT name, list_id, clue_number, description, lat, long, image, finished FROM clues WHERE clue_id = ${clueID}`,
         (err, row) => {
           if (err) {
             reject(err);
           }
           try {
-            crawlID = row.crawl_id;
             name = row.name;
-            place = row.place;
+            listID = row.list_id;
+            clueNumber = row.clue_number;
+            description = row.description;
+            lat = row.lat;
+            long = row.long;
             image = row.image;
             finished = row.finished;
           } catch (error) {
@@ -357,14 +386,18 @@ class DatabaseWrapper {
           }
         }
       );
+
       db.run(`DELETE FROM clues WHERE clue_id = ${clueID}`, (err) => {
         if (err) {
           reject(err.message);
         }
         resolve({
-          crawlID: crawlID,
           name: name,
-          place: place,
+          listID: listID,
+          clueNumber: clueNumber,
+          description: description,
+          lat: lat,
+          long: long,
           image: image,
           finished: finished,
         });
@@ -695,7 +728,7 @@ class DatabaseWrapper {
             reject(error);
           }
 
-          resolve({name: name, clueIDs: clueIDs});
+          resolve({ name: name, clueIDs: clueIDs });
         }
       );
     });
@@ -750,7 +783,7 @@ class DatabaseWrapper {
           reject(error);
         }
 
-        resolve({name: name, clueIDs: allUnfinishedClueIDs});
+        resolve({ name: name, clueIDs: allUnfinishedClueIDs });
       });
     });
   }
@@ -805,7 +838,7 @@ class DatabaseWrapper {
           reject(error);
         }
 
-        resolve({name: name, clueIDs: allFinishedClueIDs});
+        resolve({ name: name, clueIDs: allFinishedClueIDs });
       });
     });
   }
