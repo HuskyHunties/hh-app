@@ -15,6 +15,28 @@ cluesRouter.get("/", (req, res) => {
 });
 
 /**
+ * sends all the ids of incomplete clues
+ */
+cluesRouter.get("/incomplete", (req, res) => {
+  console.log("getting incomplete clues")
+  dbWrapper
+    .getAllUnfinishedClueIDs()
+    .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues }))
+    .catch((error) => res.status(400).send(error));
+});
+
+/**
+ * sends all the ids of complete clues
+ */
+cluesRouter.get("/complete", (req, res) => {
+  console.log("getting complete clues")
+  dbWrapper
+    .getAllFinishedClueIDs()
+    .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues }))
+    .catch((error) => res.status(400).send(error));
+});
+
+/**
  * deletes the specified clue from the database, sends information of that clue
  * {
           name: name,
@@ -51,25 +73,7 @@ cluesRouter.get("/:clueID/image", (req, res) => {
     .catch((error) => res.status(400).send(error));
 });
 
-/**
- * sends all the ids of incomplete clues
- */
-cluesRouter.get("/incomplete", (req, res) => {
-  dbWrapper
-    .getAllUnfinishedClueIDs()
-    .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues }))
-    .catch((error) => res.status(400).send(error));
-});
 
-/**
- * sends all the ids of complete clues
- */
-cluesRouter.get("/complete", (req, res) => {
-  dbWrapper
-    .getAllFinishedClueIDs()
-    .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues }))
-    .catch((error) => res.status(400).send(error));
-});
 
 /**
  * adds a clue described by the request body to the table, sends information of that clue
