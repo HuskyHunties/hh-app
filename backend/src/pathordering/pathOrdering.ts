@@ -2,54 +2,54 @@
 class UnionFind {
   count: number;
   parent: Map<ClueNode, ClueNode>;
-  constructor(elements) {
+  constructor(nodes) {
     // Number of disconnected components
-    this.count = elements.length;
+    this.count = nodes.length;
 
     // Keep Track of connected components
     this.parent = new Map();
 
     // Initialize the data structure such that all
     // elements have themselves as parents
-    elements.forEach((e) => this.parent.set(e, e));
+    nodes.forEach((node) => this.parent.set(node, node));
   }
 
-  union(a: ClueNode, b: ClueNode): void {
-    const rootA: ClueNode = this.find(a);
-    const rootB: ClueNode = this.find(b);
-    //console.log(`rootA: ${rootA.id}, rootB: ${rootB.id}`)
+  union(node1: ClueNode, node2: ClueNode): void {
+    const root1: ClueNode = this.findParent(node1);
+    const root2: ClueNode = this.findParent(node2);
+    //console.log(`root1: ${root1.id}, root2: ${root2.id}`)
     // Roots are same so these are already connected.
-    if (rootA.id === rootB.id) return;
+    if (root1.id === root2.id) return;
 
     // Always make the element with smaller root the parent.
-    if (rootA.id < rootB.id) {
-      if (this.parent.get(b) != b) {
-        this.union(this.parent.get(b), a);
+    if (root1.id < root2.id) {
+      if (this.parent.get(node2) != node2) {
+        this.union(this.parent.get(node2), node1);
       } else {
-        this.parent.set(b, this.parent.get(a));
+        this.parent.set(node2, this.parent.get(node1));
       }
     } else {
-      if (this.parent.get(a) != a) {
-        this.union(this.parent.get(a), b);
+      if (this.parent.get(node1) != node1) {
+        this.union(this.parent.get(node1), node2);
       } else {
-        this.parent.set(a, this.parent.get(b));
+        this.parent.set(node1, this.parent.get(node2));
       }
     }
   }
 
   // Returns final parent of a node
-  find(a: ClueNode): ClueNode {
+  findParent(node: ClueNode): ClueNode {
     // console.log(`parent of ${a.id} is:`)
-    while (this.parent.get(a) !== a) {
-      a = this.parent.get(a);
+    while (this.parent.get(node) !== node) {
+      node = this.parent.get(node);
     }
     //console.log(`${a.id}`)
-    return a;
+    return node;
   }
 
   // Checks connectivity of the 2 nodes
-  connected(a: ClueNode, b: ClueNode): boolean {
-    return this.find(a) === this.find(b);
+  areConnected(a: ClueNode, b: ClueNode): boolean {
+    return this.findParent(a) === this.findParent(b);
   }
 }
 
@@ -83,6 +83,7 @@ class Graph {
     this.nodes = [];
   }
 
+  // returns a graph which is an MST for this graph
   kruskalsMST(): Graph {
     // Initialize graph that'll contain the MST
     const MST = new Graph();
@@ -105,7 +106,7 @@ class Graph {
 
       // console.log(`edges remaining: ${edgeQueue.length}`)
       //console.log(`are ${nodes[0].id} and ${nodes[1].id} connected?: ${uf.connected(nodes[0], nodes[1])}`)
-      if (!uf.connected(nodes[0], nodes[1])) {
+      if (!uf.areConnected(nodes[0], nodes[1])) {
         //console.log(`adding edge between ${nodes[0].id} and ${nodes[1].id}`)
         MST.addEdge(nodes[0], nodes[1]);
         uf.union(nodes[0], nodes[1]);
@@ -130,7 +131,7 @@ class Graph {
         "->" +
         this.edges
           .filter((edge) => edge.from.id === node.id)
-          .map((obj) => obj.to.id)
+          .map((edge) => edge.to.id)
           .join(", ") +
         "\n";
     });
@@ -160,6 +161,7 @@ const locs = [
  * @returns - clue IDS in their order in the path
  * @param  locations - a list of ClueNodes
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function orderPath(locations: ClueNode[]): number[] {
   const MST = makeMST(locations);
   const degreeMap = getDegrees(MST);
@@ -228,6 +230,6 @@ function makeFullyConnectedGraph(locations: ClueNode[]): Graph {
 
 //console.log(makeFullyConnectedGraph(locs).display());
 //console.log(makeFullyConnectedGraph(locs).kruskalsMST().display());
-console.log(makeMST(locs).edges);
+//console.log(makeMST(locs).edges);
 console.log(makeMST(locs).display());
 
