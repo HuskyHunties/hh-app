@@ -139,39 +139,77 @@ class Graph {
 }
 
 const locs = [
-  { id: 1, lat: 1, long: 2 },
-  { id: 2, lat: 12, long: -3 },
-  { id: 3, lat: 4, long: 54 },
-  { id: 4, lat: 23, long: 86 },
-  { id: 5, lat: 32, long: 43 },
+  { id: 1, lat: 14, long: 11 },
+  { id: 2, lat: -15, long: 41 },
+  { id: 3, lat: -49, long: 45 },
+  { id: 4, lat: -19, long: 25 },
+  { id: 5, lat: -32, long: 31 },
+  { id: 6, lat: 13, long: 16 },
+  { id: 7, lat: -45, long: 21 },
+  { id: 8, lat: -20, long: -40 },
+  { id: 9, lat: -46, long: 49 },
+  { id: 10, lat: 32, long: 24 },
+  { id: 11, lat: -8, long: -21 },
+  { id: 12, lat: -35, long: 12 },
+  { id: 13, lat: 26, long: 39 },
+  { id: 14, lat: 42, long: 22 },
+  { id: 15, lat: 27, long: 43 },
 ];
 
 /**
  * @returns - clue IDS in their order in the path
- * @param - locations a list of ClueNodes
+ * @param  locations - a list of ClueNodes
  */
 function orderPath(locations: ClueNode[]): number[] {
+  const MST = makeMST(locations);
+  const degreeMap = getDegrees(MST);
+  const oddDegreeNodes: ClueNode[] = [];
+  MST.nodes.forEach((node) => {
+    if (degreeMap.get(node) % 2 === 1) {
+      oddDegreeNodes.push(node);
+    }
+  });
+  console.log(oddDegreeNodes);
   return [];
 }
 
 // returns a list of edges in a MST of the given list of edges
-function makeMST(locations: ClueNode[]): Edge[] {
+function makeMST(locations: ClueNode[]): Graph {
   const connectedGraph = makeFullyConnectedGraph(locations);
   const MST = connectedGraph.kruskalsMST();
 
-  return MST.edges;
+  return MST;
 }
 
+function getDegrees(g: Graph): Map<ClueNode, number> {
+  const degreeMap = new Map<ClueNode, number>();
+  g.nodes.forEach((node) => {
+    degreeMap.set(node, getDegree(g, node));
+  });
+
+  return degreeMap;
+}
+
+function getDegree(g: Graph, node: ClueNode): number {
+  let degree = 0;
+
+  g.edges.forEach((edge) => {
+    if (edge.to === node || edge.from === node) {
+      degree += 1;
+    }
+  });
+
+  return degree;
+}
 function pythDistance(loc1: ClueNode, loc2: ClueNode): number {
   return Math.sqrt(
-    Math.pow(loc1.lat + loc2.lat, 2) + Math.pow(loc1.long + loc2.long, 2)
+    Math.pow(loc2.lat - loc1.lat, 2) + Math.pow(loc2.long - loc1.long, 2)
   );
 }
 
 // returns a list of Edges
 function makeFullyConnectedGraph(locations: ClueNode[]): Graph {
   const connectedGraph = new Graph();
-  const edges = [];
   for (let i = 0; i < locations.length; i++) {
     for (let j = 0; j < locations.length; j++) {
       if (i !== j) {
@@ -190,4 +228,6 @@ function makeFullyConnectedGraph(locations: ClueNode[]): Graph {
 
 //console.log(makeFullyConnectedGraph(locs).display());
 //console.log(makeFullyConnectedGraph(locs).kruskalsMST().display());
-console.log(makeMST(locs));
+console.log(makeMST(locs).edges);
+console.log(makeMST(locs).display());
+
