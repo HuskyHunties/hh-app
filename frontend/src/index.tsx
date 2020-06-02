@@ -1,38 +1,34 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import * as serviceWorker from "./serviceWorker";
 import MainPage from "./pages/main-page";
 
 /**
  * Properties type for the PageLoader Component
  */
-interface PageLoaderProps {
-
-}
+interface PageLoaderProps {}
 
 /**
  * State type for the PageLoader Component
  */
-interface PageLoaderState {
-
-}
+interface PageLoaderState {}
 
 /**
  * A wrapper component that handles displaying a page and the popup component.
  * Logic to control which page is displayed is handled in this component.
  */
 class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
-
   /**
    * Renders the component as a page and popup window contained in a div.
    */
   render() {
-    return (<div>
-      <MainPage />
-    </div>);
+    return (
+      <div>
+        <MainPage />
+      </div>
+    );
   }
-
 }
 
 /**
@@ -49,5 +45,3 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
-
-
