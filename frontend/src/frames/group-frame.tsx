@@ -21,6 +21,9 @@ interface GroupListProps {
   selected: number | undefined;
 }
 
+/**
+ * State type for the GroupList Component
+ */
 interface GroupListState {
 }
 
@@ -68,7 +71,7 @@ interface GroupFrameProps {
  * Properties type for the Group Frame Component
  */
 interface GroupFrameState {
-  selected: number | undefined;
+  selected?: number;
 }
 
 /**
