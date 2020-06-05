@@ -28,6 +28,8 @@ interface PopupState {
     inputValue: string;
     clickTypePromise: Promise<boolean>;
     clickTypeDefer?: DeferredPromise;
+    left: string;
+    top: string;
 }
 
 /**
@@ -48,7 +50,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         var p = new Promise<boolean>(function (resolve, reject) {
             deferred = { resolve: resolve, reject: reject };
         });
-        this.state = { showPopup: false, inputValue: "", clickTypePromise: p, clickTypeDefer: deferred };
+        this.state = { showPopup: false, inputValue: "", clickTypePromise: p, clickTypeDefer: deferred, left: "30%", top: "40%" };
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -83,7 +85,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
                     this.setState({ inputValue: "" });
                 } else if (this.state.popupType === PopupTypes.DropDown) {
                     resolve(this.state.inputValue);
-                    this.setState({inputValue: ""});
+                    this.setState({ inputValue: "" });
                 } else {
                     resolve();
                 }
@@ -191,13 +193,18 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 
         // Combines the buttons with the message.
         return (
-            <div className={this.state.showPopup ? "popup" : "hidden"}>
-                <div className="popup-text">
-                    {this.state.popupMessage}
-                </div>
+            <div>
+                <div className={this.state.showPopup ? "popup-bg" : "hidden"}></div>
+                <div className={this.state.showPopup ? "popup" : "hidden"}>
+                    <div className="popup-text">
+                        {this.state.popupMessage}
+                    </div>
 
-                {buttons}
+                    {buttons}
+
+                </div>
             </div>
+
         );
     }
 }
