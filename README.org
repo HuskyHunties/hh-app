@@ -1,6 +1,15 @@
 #+title: Husky Hunt App
 
-This is a boilerplate for the Husky Hunt App API. Please see [this](https://mherman.org/blog/developing-a-restful-api-with-node-and-typescript/) guide, which I used to create the infrastructure.
+This is an app designed to be used by our team during Northeastern's Husky Hunt Competition
+
+* Deploying
+*After Frontend Changes*:
+- Commit changes and merge them into the master branch
+- Run the command "yarn run deploy"
+- After a minute or two, the changes should automatically be seen https://huskyhunties.github.io/hh-app/
+
+*After Backend Changes*:
+
 
 * Logistics
 *API Team*:
