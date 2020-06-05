@@ -91,7 +91,7 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
      */
     addPath() {
         this.popupRef.current?.popupFactory(PopupTypes.Input, "Input name for new Path").then((res: string) => {
-            API.post("paths", { name: res }).then(this.props.updateInfo, (res) => this.handleAddError(res.response.status))
+            API.post("/paths", { name: res }).then(this.props.updateInfo, (res) => this.handleAddError(res.response.status))
             console.log("Tried to add path: " + res);
         }, () => {});
     }
@@ -118,7 +118,7 @@ export default class PathFrame extends React.Component<PathFrameProps, PathFrame
     deletePath() {
         if (this.state.selected) {
             this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Selected Path?").then(() => {
-                API.delete("paths/" + this.state.selected, {}).then(this.props.updateInfo, (res) => this.handleDeleteError(res.response.status));
+                API.delete("/paths/" + this.state.selected, {}).then(this.props.updateInfo, (res) => this.handleDeleteError(res.response.status));
                 console.log("deleted path: " + this.state.selected);
             }, () => {});
         } else {

@@ -55,20 +55,20 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
      */
     private updateInfo() {
         // Group API calls
-        API.get("groups", {}).then(async (res) => {
+        API.get("/groups", {}).then(async (res) => {
             const groups = new Map<number, Group>();
             for (let groupID of res.data.allGroups) {
-                await API.get("groups/" + groupID, {}).then((group) => groups.set(groupID, { name: group.data.name, pathID: group.data.pathID }));
+                await API.get("/groups/" + groupID, {}).then((group) => groups.set(groupID, { name: group.data.name, pathID: group.data.pathID }));
             }
             return groups;
         }).then((groups) => this.setState({ groups }));
 
 
         // Path API calls
-        API.get("paths", {}).then(async (res) => {
+        API.get("/paths", {}).then(async (res) => {
             const paths = new Map<number, string>();
             for (let pathID of res.data.allPaths) {
-                await API.get("paths/" + pathID, {}).then((path) => {
+                await API.get("/paths/" + pathID, {}).then((path) => {
                     if (path.data.name) {
                         paths.set(pathID, path.data.name)
                     } else {

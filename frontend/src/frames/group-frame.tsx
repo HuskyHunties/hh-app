@@ -131,7 +131,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
   private deleteGroup() {
     if (this.state.selected) {
       this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Selected Group?").then(() => {
-        API.delete("groups/" + this.state.selected).then(this.props.updateInfo, (res) => this.handleDeleteError(res.response.status));
+        API.delete("/groups/" + this.state.selected).then(this.props.updateInfo, (res) => this.handleDeleteError(res.response.status));
       }, () => {});
     } else {
       this.popupRef.current?.popupFactory(PopupTypes.Notif, "No Group Selected");
@@ -159,7 +159,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
     if (this.state.selected) {
     this.popupRef.current?.popupFactory(PopupTypes.DropDown, "Choose a path to assign to the selected group:", this.props.paths)
       .then((res: string) => {
-        API.put("groups/" + this.state.selected, { pathID: Number(res) })
+        API.put("/groups/" + this.state.selected, { pathID: Number(res) })
         .then(this.props.updateInfo, (res) => this.handleAssignError(res.response.status, Number(res)));
         console.log("Group: " + this.state.selected + " assigned path: " + res);
       }, () => {});
@@ -174,7 +174,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
     if (status === 400) {
       this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Path already assigned to another group.  Assign anyway?")
       .then(() => {
-        API.put("groups/" + this.state.selected, {pathID: pathID, override: true})
+        API.put("/groups/" + this.state.selected, {pathID: pathID, override: true})
         console.log("Group: " + this.state.selected + " assigned path: " + pathID + " via override"); 
       });
 
