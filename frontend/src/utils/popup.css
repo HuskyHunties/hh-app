@@ -1,4 +1,19 @@
 @import "../css/colors.css";
+
+/* Styling for a div to darken everything behind the popup */
+.popup-bg {
+    position: fixed;
+    display: block;
+    top: 0%;
+    left: 0%;
+    right: 0%;
+    bottom: 0%;
+    z-index: 20;
+    background-color: #000000;
+    opacity: .5;
+}
+
+
 /* Styling for the popup box */
 
 .popup {
