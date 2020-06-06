@@ -75,7 +75,7 @@ class ClueList extends React.Component<ClueListProps, ClueListState> {
         })
 
 
-        //TODO this
+        //TODO make this much much better
         return (
             <table className="clue-table">
                 <thead><tr><th>List of Clues</th></tr></thead>
@@ -106,6 +106,7 @@ interface ClueFrameState {
  * and allows operations on those clues.
  */
 export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrameState> {
+    intervalID?: NodeJS.Timeout;
     popupRef: React.Ref<Popup>;
 
     constructor(props: ClueFrameProps) {
@@ -119,17 +120,23 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
             clues: []
         };
         this.popupRef = React.createRef();
+        this.updateClues = this.updateClues.bind(this);
     }
 
     componentDidMount() {
         this.updateClues();
+
+        this.intervalID = setInterval(this.updateClues, 5000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.intervalID!);
     }
 
     /**
      * Updates the clues stored in state by making API calls
      */
     private updateClues() {
-        console.log("got here")
         const clues: Clue[] = [];
         let ids: number[] = [];
         API.get("/clues/").then((res) => {
@@ -145,7 +152,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
                     place: { lng: clue.long, lat: clue.lat }, id: ids[index]
                 })
             })
-        }).then(() => this.setState({ clues })).then(() => console.log(this.state.clues))
+        }).then(() => this.setState({ clues }));
     }
 
     /**
