@@ -5,5 +5,5 @@
   "workspaces": [
     "frontend",
     "mobile"
-  ],
+  ]
 }
