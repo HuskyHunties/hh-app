@@ -36,7 +36,7 @@ export class SearchPanel extends React.Component<SearchPanelProps, SearchPanelSt
  * Properties type for the clue map Component
  */
 interface ClueMapProps {
-    clues: Map<number, Clue>;
+    clues: Clue[];
     selected?: number;
     select(id: number): void;
 }
@@ -87,9 +87,9 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                 onClick={() => this.setState({ sidePanel: true })}>&gt;</div>
         }
 
-        const markers = Array.from(this.props.clues, ([id, clue]) => {
-            return <Marker key={id} position={clue.place} onClick={() => this.props.select(id)}>
-                {id === this.props.selected ?
+        const markers = this.props.clues.map((clue) => {
+            return <Marker key={clue.id} position={clue.place} onClick={() => this.props.select(clue.id)}>
+                {clue.id === this.props.selected ?
                     <InfoWindow>
                         <div>
                             <h1>{clue.list + clue.num + ": " + clue.name}</h1>
