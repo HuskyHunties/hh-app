@@ -61,7 +61,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         this.state = {
             center: { lat: 42.3406995, lng: -71.0897018 },
             fullscreen: false,
-            sidePanel: true
+            sidePanel: false
         }
     }
 

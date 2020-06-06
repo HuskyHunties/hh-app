@@ -81,9 +81,17 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
         return new Promise<string>((resolve, reject) => {
             if (confirm) {
                 if (this.state.popupType === PopupTypes.Input) {
+                    if (this.state.inputValue === '') {
+                        reject();
+                    }
+
                     resolve(this.state.inputValue);
                     this.setState({ inputValue: "" });
                 } else if (this.state.popupType === PopupTypes.DropDown) {
+                    if (this.state.inputValue === "") {
+                        reject();
+                    }
+
                     resolve(this.state.inputValue);
                     this.setState({ inputValue: "" });
                 } else {
@@ -150,6 +158,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
      */
     private dropdown(): JSX.Element {
         const dropdown: JSX.Element[] = [];
+        dropdown.push(<option value={""} key={""}>--</option>)
         this.state.options!.forEach((name: string, id: number) => {
             dropdown.push(<option value={String(id)} key={id}>{name}</option>);
         })

@@ -1,5 +1,5 @@
 import React from "react";
-import ClueMap, { SearchPanel } from "./maps";
+import ClueMap from "./maps";
 import '../css/clue-frame.css';
 import Popup from "../utils/popup";
 
