@@ -247,6 +247,8 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
 
                         {markers}
 
+                        {searchResults}
+
                         {sidePanel}
 
                     </GoogleMap>
