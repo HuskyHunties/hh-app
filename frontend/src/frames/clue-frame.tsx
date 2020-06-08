@@ -45,7 +45,7 @@ function clueCompare(clue1: Clue, clue2: Clue): number {
 interface ClueListProps {
     clues: Clue[];
     select(selection: number): void;
-    selected?: number;
+    selected?: number | string;
 }
 
 /**
@@ -98,7 +98,9 @@ interface ClueFrameProps {
  */
 interface ClueFrameState {
     clues: Clue[];
-    selected?: number;
+    // Note: number selection values correspond to the selection of an existing clue.
+    // Strings indicate the selection of a clue from search results
+    selected?: number | string;
 }
 
 /**
@@ -111,10 +113,6 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
 
     constructor(props: ClueFrameProps) {
         super(props);
-        // const clues = new Map<number, Clue>();
-        // clues.set(1, { name: "Amelia's", list: "A", num: 69, finished: false, desc: "", place: { lat: 42.34117, lng: -71.0874334 } });
-        // clues.set(2, { name: "Speare Hall", list: "B", num: 420, finished: false, desc: "In front of res-mail", place: { lat: 42.3406995, lng: -71.0897018 } });
-        // clues.set(3, { name: "Castle Island", list: "C", num: 3, finished: false, desc: "", place: { lat: 42.3378643, lng: -71.0125351 } });
         this.state = {
             selected: undefined,
             clues: []
@@ -123,12 +121,18 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
         this.updateClues = this.updateClues.bind(this);
     }
 
+    /**
+     * Gets the list of clues and starts refreshing the data.
+     */
     componentDidMount() {
         this.updateClues();
 
         this.intervalID = setInterval(this.updateClues, 5000);
     }
 
+    /**
+     * Stops refreshing the clue data when the component is unloaded.
+     */
     componentWillUnmount() {
         clearInterval(this.intervalID!);
     }

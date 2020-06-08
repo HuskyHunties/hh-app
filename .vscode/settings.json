@@ -4,6 +4,7 @@
         "Notif",
         "Unmount",
         "descs",
+        "geocode",
         "reqs",
         "tsdoc"
     ]
