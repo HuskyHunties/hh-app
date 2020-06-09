@@ -20,6 +20,12 @@ class DatabaseWrapper {
       }
       console.log("Connected to the in-memory SQlite database.");
 
+      this.db.run("PRAGMA journal_mode=WAL;", (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+      });
+
       this.db.run(
         `CREATE TABLE IF NOT EXISTS clues (
           clue_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,6 +102,7 @@ class DatabaseWrapper {
           }
         }
       );
+      this.db.configure("busyTimeout", 6000);
       console.log(`Initialized Database ${filepath}`);
     });
   }
@@ -314,34 +321,9 @@ class DatabaseWrapper {
         (err) => {
           if (err) {
             reject(err.message);
+          } else {
+            resolve({});
           }
-        }
-      );
-
-      // retrieve the clue ID registered from the database
-      let clueID: number;
-      db.get(
-        `SELECT clue_id FROM clues WHERE name = '${clueName}'`,
-        (err, row) => {
-          if (err) {
-            throw console.error(err.message);
-          }
-          try {
-            clueID = row.clue_id;
-          } catch (error) {
-            console.log(error);
-            reject(error);
-          }
-          resolve({
-            clueID: clueID,
-            name: clueName,
-            listID: listID,
-            clueNumber: clueNumber,
-            description: description,
-            lat: lat,
-            long: long,
-            finished: 0,
-          });
         }
       );
     });
@@ -355,52 +337,14 @@ class DatabaseWrapper {
   deleteClue(clueID: number): Promise<object> {
     // TODO: update from new columns of database
     const db = this.db;
-    let name: string;
-    let listID: string;
-    let clueNumber: number;
-    let description: string;
-    let lat: number;
-    let long: number;
-    let image: string;
-    let finished: number;
 
     return new Promise((resolve, reject) => {
-      db.get(
-        `SELECT name, list_id, clue_number, description, lat, long, image, finished FROM clues WHERE clue_id = ${clueID}`,
-        (err, row) => {
-          if (err) {
-            reject(err);
-          }
-          try {
-            name = row.name;
-            listID = row.list_id;
-            clueNumber = row.clue_number;
-            description = row.description;
-            lat = row.lat;
-            long = row.long;
-            image = row.image;
-            finished = row.finished;
-          } catch (error) {
-            console.log(error);
-            reject(error);
-          }
-        }
-      );
-
       db.run(`DELETE FROM clues WHERE clue_id = ${clueID}`, (err) => {
         if (err) {
           reject(err.message);
+        } else {
+          resolve({});
         }
-        resolve({
-          name: name,
-          listID: listID,
-          clueNumber: clueNumber,
-          description: description,
-          lat: lat,
-          long: long,
-          image: image,
-          finished: finished,
-        });
       });
     });
   }
@@ -512,32 +456,16 @@ class DatabaseWrapper {
    * @returns information on created group
    */
   addGroup(groupName: string): Promise<object> {
+    console.log("adding group " + groupName);
     const db = this.db;
     return new Promise(function (resolve, reject) {
       db.run(`INSERT INTO groups (name) VALUES(?)`, [groupName], (err) => {
         if (err) {
           reject(err);
+        } else {
+          resolve({});
         }
       });
-
-      let groupID: number;
-      let name: string;
-      db.get(
-        `SELECT group_id, name from groups WHERE name = '${groupName}'`,
-        (err, row) => {
-          if (err) {
-            reject(err);
-          }
-          try {
-            groupID = row.group_id;
-            name = row.name;
-          } catch (error) {
-            console.log(error);
-            reject(error);
-          }
-          resolve({ groupID: groupID, name: name });
-        }
-      );
     });
   }
 
@@ -549,30 +477,11 @@ class DatabaseWrapper {
   deleteGroup(groupID: number): Promise<object> {
     const db = this.db;
     return new Promise(function (resolve, reject) {
-      let name: string;
-      let pathID: number;
-
-      db.get(
-        `SELECT name, path_id from groups WHERE group_id = ${groupID}`,
-        (err, row) => {
-          if (err) {
-            reject(err.message);
-          }
-          try {
-            name = row.name;
-            pathID = row.path_id;
-          } catch (error) {
-            console.log(error);
-            reject(error);
-          }
-        }
-      );
-
       db.run(`DELETE FROM groups WHERE group_id = ${groupID}`, (err) => {
         if (err) {
           reject(err.message);
         } else {
-          resolve({ name: name, pathID: pathID });
+          resolve({});
         }
       });
     });
@@ -593,27 +502,9 @@ class DatabaseWrapper {
         (err) => {
           if (err) {
             reject(err.message);
+          } else {
+            resolve({});
           }
-        }
-      );
-
-      let name: string;
-      let pathID: number;
-
-      db.get(
-        `SELECT name, path_id from groups WHERE group_id = ${groupID}`,
-        (err, row) => {
-          if (err) {
-            reject(err.message);
-          }
-          try {
-            name = row.name;
-            pathID = row.path_id;
-          } catch (error) {
-            console.log(error);
-            reject(error);
-          }
-          resolve({ name: name, pathID: pathID });
         }
       );
     });
@@ -634,27 +525,9 @@ class DatabaseWrapper {
         (err) => {
           if (err) {
             reject(err.message);
+          } else {
+            resolve({});
           }
-        }
-      );
-
-      let name: string;
-      let pathID: number;
-
-      db.get(
-        `SELECT name, path_id from groups WHERE group_id = ${groupID}`,
-        (err, row) => {
-          if (err) {
-            reject(err.message);
-          }
-          try {
-            name = row.name;
-            pathID = row.path_id;
-          } catch (error) {
-            console.log(error);
-            reject(error);
-          }
-          resolve({ name: name, pathID: pathID });
         }
       );
     });
@@ -854,22 +727,9 @@ class DatabaseWrapper {
       db.run(`INSERT INTO paths (name) VALUES(?)`, [name], (err) => {
         if (err) {
           reject(err);
+        } else {
+          resolve({});
         }
-      });
-
-      let pathID: number;
-
-      db.get(`SELECT path_id from paths WHERE name = '${name}'`, (err, row) => {
-        if (err) {
-          reject(err);
-        }
-        try {
-          pathID = row.path_id;
-        } catch (error) {
-          console.log(error);
-          reject(error);
-        }
-        resolve({ pathID: pathID, name: name });
       });
     });
   }
@@ -882,44 +742,13 @@ class DatabaseWrapper {
   removePath(pathID: number): Promise<object> {
     const db = this.db;
     return new Promise((resolve, reject) => {
-      let name: string;
-      const clueIDs: number[] = [];
-      db.get(`SELECT name FROM paths WHERE path_id = ${pathID}`, (err, row) => {
-        if (err) {
-          reject(err.message);
-        }
-        try {
-          name = row.name;
-        } catch (error) {
-          console.log(error);
-          reject(error);
-        }
-      });
-
-      // collecting the clue ids from the join table
-      db.all(
-        `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID}`,
-        (err, rows) => {
-          if (err) {
-            reject(err.message);
-          }
-          try {
-            rows.forEach((row) => {
-              clueIDs.push(row.clue_id);
-            });
-          } catch (error) {
-            console.log(error);
-            reject(error);
-          }
-        }
-      );
-
       //deleting the path from the path table
       db.run(`DELETE FROM paths WHERE path_id = ${pathID}`, (err) => {
         if (err) {
           reject(err.message);
+        } else {
+          resolve({});
         }
-        resolve({ name: name, clueIDs: clueIDs });
       });
     });
   }
@@ -939,8 +768,9 @@ class DatabaseWrapper {
         (err) => {
           if (err) {
             reject(err.message);
+          } else {
+            resolve({});
           }
-          resolve({ pathID: pathID, clueID: clueID });
         }
       );
     });
@@ -960,8 +790,9 @@ class DatabaseWrapper {
         (err) => {
           if (err) {
             reject(err.message);
+          } else {
+            resolve({});
           }
-          resolve({ pathID: pathID, clueID: clueID });
         }
       );
     });
@@ -1091,27 +922,11 @@ class DatabaseWrapper {
         if (err) {
           if (err) {
             reject(err);
+          } else {
+            resolve({});
           }
         }
-        console.log("Added crawl to database");
       });
-
-      let crawlID: number;
-      db.get(
-        `SELECT crawl_id FROM crawls WHERE name = '${crawlName}'`,
-        (err, row) => {
-          if (err) {
-            reject(err.message);
-          }
-          try {
-            crawlID = row.crawl_id;
-          } catch (error) {
-            console.log(error);
-            reject(error);
-          }
-          resolve({ crawlID: crawlID, name: crawlName });
-        }
-      );
     });
   }
 
@@ -1150,16 +965,16 @@ class DatabaseWrapper {
    */
   async removeCrawl(crawlID: number): Promise<object> {
     const db = this.db;
-    const infoObject = await this.getInfoOfCrawl(crawlID);
     return new Promise((resolve, reject) => {
       db.run(`DELETE FROM crawls where crawl_id = ${crawlID}`, (err) => {
         if (err) {
           reject(err.message);
+        } else {
+          resolve({});
         }
-        resolve(infoObject);
       });
     });
   }
 }
 
-export const dbWrapper = new DatabaseWrapper("build/hh.db");
+export const dbWrapper = new DatabaseWrapper("hh.db");

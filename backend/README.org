@@ -1,0 +1,7 @@
+#+title: Husky Hunt App
+
+This branch is in production, hosted on Microsft Azure Web Services at 
+https://husky-hunties.azurewebsites.net
+
+To install all the dependencies, run "npm install".
+To start this api on your machine, run "npm run tsc" followed by "npm run start".

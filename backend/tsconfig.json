@@ -5,6 +5,14 @@
     "sourceMap": true,
     "baseUrl": "src"
   },
-  "include": ["src/**/*.ts", "gulpfile.js", "test/**/*.test.ts", "src/**.js"],
+  "include": [
+    "**/*.js",
+    "**/*.ts",
+    "gulpfile.js",
+    "test/**/*.test.ts",
+    "**.js",
+    "routes/main/main.js",
+    "server/server.js"
+  ],
   "exclude": ["node_modules"]
 }

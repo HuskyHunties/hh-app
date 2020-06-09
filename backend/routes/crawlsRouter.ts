@@ -1,6 +1,6 @@
 /* eslint-disable tsdoc/syntax */
 import * as express from "express";
-import { dbWrapper } from "../database/DatabaseWrapper";
+import { dbWrapper } from "../public/DatabaseWrapper";
 
 const crawlsRouter: express.Router = express.Router();
 

@@ -3,10 +3,10 @@ import * as logger from "morgan";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
 
-import groupsRouter from "./routes/groupsRouter";
-import cluesRouter from "./routes/cluesRouter";
-import pathsRouter from "./routes/pathsRouter";
-import crawlsRouter from "./routes/crawlsRouter";
+import groupsRouter from "../routes/groupsRouter";
+import cluesRouter from "../routes/cluesRouter";
+import pathsRouter from "../routes/pathsRouter";
+import crawlsRouter from "../routes/crawlsRouter";
 
 class Main {
   public express: express.Application;

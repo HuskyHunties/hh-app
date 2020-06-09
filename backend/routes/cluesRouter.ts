@@ -1,6 +1,6 @@
 /* eslint-disable tsdoc/syntax */
 import * as express from "express";
-import { dbWrapper } from "../database/DatabaseWrapper";
+import { dbWrapper } from "../public/DatabaseWrapper";
 
 const cluesRouter: express.Router = express.Router();
 
@@ -18,7 +18,7 @@ cluesRouter.get("/", (req, res) => {
  * sends all the ids of incomplete clues
  */
 cluesRouter.get("/incomplete", (req, res) => {
-  console.log("getting incomplete clues")
+  console.log("getting incomplete clues");
   dbWrapper
     .getAllUnfinishedClueIDs()
     .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues }))
@@ -29,7 +29,7 @@ cluesRouter.get("/incomplete", (req, res) => {
  * sends all the ids of complete clues
  */
 cluesRouter.get("/complete", (req, res) => {
-  console.log("getting complete clues")
+  console.log("getting complete clues");
   dbWrapper
     .getAllFinishedClueIDs()
     .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues }))
@@ -72,8 +72,6 @@ cluesRouter.get("/:clueID/image", (req, res) => {
     .then((image) => res.send({ image: image }))
     .catch((error) => res.status(400).send(error));
 });
-
-
 
 /**
  * adds a clue described by the request body to the table, sends information of that clue
