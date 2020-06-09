@@ -1,5 +1,5 @@
 import React from "react";
-import ClueMap from "./maps";
+import ClueMap from "./clue-map";
 import '../css/clue-frame.css';
 import Popup from "../utils/popup";
 import API from "../utils/API";
