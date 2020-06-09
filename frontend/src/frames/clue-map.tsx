@@ -12,7 +12,7 @@ import "../css/maps.css"
 interface ClueMapProps {
     clues: Clue[];
     selected?: number | string;
-    select(id: number | string): void;
+    select(id?: number | string): void;
 }
 
 /**
@@ -60,7 +60,8 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
 
         if (this.state.sidePanel) {
             sidePanel = (<div>
-                <SearchPanel map={this.map} setPlaces={this.setSearchedPlaces} places={this.state.searchedPlaces} select={this.props.select} />
+                <SearchPanel map={this.map} setPlaces={this.setSearchedPlaces} places={this.state.searchedPlaces} 
+                select={this.props.select} selected={this.props.selected} />
                 <div className="side-handle" style={{ left: "20%" }}
                     onClick={() => this.setState({ sidePanel: false })}>&lt;</div>
             </div>)
@@ -72,7 +73,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         const markers = this.props.clues.map((clue) => {
             return <Marker key={clue.id} position={clue.place} onClick={() => this.props.select(clue.id)} label={clue.list + clue.num}>
                 {clue.id === this.props.selected ?
-                    <InfoWindow>
+                    <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                         <div>
                             <h1>{clue.list + clue.num + ": " + clue.name}</h1>
                             {clue.desc}
@@ -85,7 +86,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
             if (place.location) {
                 return <Marker key={place.place_id} position={place.location!} onClick={() => this.props.select(place.place_id!)}>
                     {place.place_id === this.props.selected ?
-                        <InfoWindow>
+                        <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <div>
                                 <h1>{place.name}</h1>
                             </div>
@@ -93,7 +94,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                         : ""}
                 </Marker>
             } else {
-                return <div></div>
+                return <div key={place.place_id}></div>
             }
         })
 

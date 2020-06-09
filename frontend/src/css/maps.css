@@ -68,3 +68,7 @@
     border-radius: 10px;
     text-overflow: ellipsis;
 }
+
+.selected {
+    background-color: var(--secondary-color);
+}

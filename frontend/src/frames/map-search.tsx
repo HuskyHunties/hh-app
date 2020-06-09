@@ -17,6 +17,7 @@ interface SearchPanelProps {
     setPlaces(places: SearchResult[]): void;
     places: SearchResult[];
     select(id: string): void;
+    selected?: string | number;
 }
 
 /**
@@ -55,12 +56,10 @@ export default class SearchPanel extends React.Component<SearchPanelProps, Searc
 
             this.service.textSearch(request, (results: SearchResult[], status) => {
                 if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    console.log(results.length)
                     results.slice(0, 10).forEach((place) => {
                         this.geocoder?.geocode({ "placeId": place.place_id }, (results, status) => {
                             if (status === google.maps.GeocoderStatus.OK) {
                                 place.location = results[0].geometry.location;
-                                console.log(results[0])
                             } else {
                                 console.log(status);
                                 throw new Error("Geocode failed")
@@ -100,11 +99,12 @@ export default class SearchPanel extends React.Component<SearchPanelProps, Searc
         } else {
             const entries = this.props.places.map((place) => {
                 if (place.location) {
-                    return (<div className="search-entry" key={place.place_id} onClick={() => this.props.select(place.place_id!)}>
+                    return (<div className={this.props.selected === place.place_id ? "search-entry selected" : "search-entry"} 
+                    key={place.place_id} onClick={() => this.props.select(place.place_id!)}>
                         <h6>{place.name}</h6>
                     </div>)
                 } else {
-                    return <div></div>
+                    return <div key={place.place_id}></div>
                 }
             })
 
