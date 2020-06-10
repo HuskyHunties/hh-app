@@ -2,8 +2,8 @@
 /* Class for positioning the main-page */
 
 .main-page {
-    position: relative;
-    width: 100%;
-    height: 1450px;
-    overflow-y: scroll;
+  position: relative;
+  width: 100%;
+  height: 1450px;
+  overflow-y: scroll;
 }
