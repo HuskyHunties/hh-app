@@ -124,8 +124,8 @@ export default class SearchPanel extends React.Component<
       listID: listID,
       clueNumber: clueNumber,
       description: "description",
-      lat: place.geometry?.location.lat,
-      long: place.geometry?.location.lng,
+      lat: place.geometry?.location.lat(),
+      long: place.geometry?.location.lng(),
     });
   }
 
@@ -147,8 +147,8 @@ export default class SearchPanel extends React.Component<
           <br />
           {place.website ? <a href={place.website}>Website</a> : ""}
           <button onClick={() => this.addClue(place)}>AddClue</button>
-          {place.photos?.map((photo) => {
-            return <img className="search-img" src={photo.getUrl({})} alt="" />;
+          {place.photos?.map((photo, index) => {
+            return <img key={index} className="search-img" src={photo.getUrl({})} alt="" />;
           })}
         </div>
       );

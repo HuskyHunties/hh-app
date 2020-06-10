@@ -118,6 +118,7 @@ export default class ClueMap extends React.Component<
     });
 
     const searchResults = this.state.searchedPlaces.map((place) => {
+
       return (
         <Marker
           key={place.place_id}
