@@ -1,83 +1,82 @@
 @import "./colors.css";
 
 .fullscreen-control {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: var(--bg-color);
-    font-size: 20px;
-    cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--bg-color);
+  font-size: 20px;
+  cursor: pointer;
 }
 
 .search-panel {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    width: 20%;
-    height: 100%;
-    background: var(--bg-color);
-    z-index: 20;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 20%;
+  height: 100%;
+  background: var(--bg-color);
+  z-index: 20;
 }
 
 .wrapper-fullscreen {
-    position: fixed;
-    left: 0px;
-    top: 0px;
-    width: 100vw;
-    height: 100vh;
-    z-index: 15;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100vw;
+  height: 100vh;
+  z-index: 15;
 }
 
 .wrapper-default {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    width: 100%;
-    height: 100%;
-
+  position: relative;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
 }
 
 .side-handle {
-    position: absolute;
-    height: 40px;
-    line-height: 40px;
-    width: 20px;
-    top: calc(50% - 20px);
-    left: 0px;
-    background: var(--bg-color);
-    color: var(--font-color);
-    font-size: 20px;
-    cursor: pointer;
-    text-align: center;
+  position: absolute;
+  height: 40px;
+  line-height: 40px;
+  width: 20px;
+  top: calc(50% - 20px);
+  left: 0px;
+  background: var(--bg-color);
+  color: var(--font-color);
+  font-size: 20px;
+  cursor: pointer;
+  text-align: center;
 }
 
 .search-results {
-    position: relative;
-    top: 40px;
-    width: 90%;
-    height: calc(100% - 60px);
-    overflow-y: scroll;
-    border: 2px solid var(--accent-color);
+  position: relative;
+  top: 40px;
+  width: 90%;
+  height: calc(100% - 60px);
+  overflow-y: scroll;
+  border: 2px solid var(--accent-color);
 }
 
 .search-entry {
-    position: relative;
-    width: 100%;
-    background-color: var(--primary-color);
-    border-radius: 10px;
-    text-overflow: ellipsis;
-    margin: 0px;
-    font-size: 12pt;
+  position: relative;
+  width: 100%;
+  background-color: var(--primary-color);
+  border-radius: 10px;
+  text-overflow: ellipsis;
+  margin: 0px;
+  font-size: 12pt;
 }
 
 .selected {
-    background-color: var(--secondary-color);
+  background-color: var(--secondary-color);
 }
 
 .icon {
-    width: 20%;
+  width: 20%;
 }
 
 .search-img {
-    width: 90%;
+  width: 90%;
 }
