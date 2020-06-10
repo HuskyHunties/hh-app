@@ -2,7 +2,7 @@ import React from "react";
 import GLOBALSECRETS from "../secrets";
 import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import { Clue, Place } from "./clue-frame";
-import SearchPanel, { SearchResult } from "./map-search"
+import SearchPanel from "./map-search"
 import "../css/maps.css"
 
 
@@ -22,7 +22,7 @@ interface ClueMapState {
     center: Place;
     fullscreen: boolean;
     sidePanel: boolean;
-    searchedPlaces: SearchResult[];
+    searchedPlaces: google.maps.places.PlaceResult[];
 }
 
 /**
@@ -83,8 +83,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         })
 
         const searchResults = this.state.searchedPlaces.map((place) => {
-            if (place.location) {
-                return <Marker key={place.place_id} position={place.location!} onClick={() => this.props.select(place.place_id!)}>
+                return <Marker key={place.place_id} position={place.geometry?.location!} onClick={() => this.props.select(place.place_id!)}>
                     {place.place_id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <div>
@@ -93,9 +92,6 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                         </InfoWindow>
                         : ""}
                 </Marker>
-            } else {
-                return <div key={place.place_id}></div>
-            }
         })
 
         return (

@@ -63,12 +63,21 @@
 .search-entry {
     position: relative;
     width: 100%;
-    height: 100px;
     background-color: var(--primary-color);
     border-radius: 10px;
     text-overflow: ellipsis;
+    margin: 0px;
+    font-size: 12pt;
 }
 
 .selected {
     background-color: var(--secondary-color);
+}
+
+.icon {
+    width: 20%;
+}
+
+.search-img {
+    width: 90%;
 }
