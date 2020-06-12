@@ -91,8 +91,7 @@ class ClueInfo extends React.Component<AddClueProps, AddClueState> {
 
         if (this.props.clueLists.has(body.listID)) {
             if (this.clue) {
-                this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "Behavior Not Implemented");
-                //API.put("/clues", body).then(() => { }, (res) => this.handleAddError(res.response.status));
+                API.put("/clues/update/" + this.props.clue?.id, body).then(() => { }, (res) => this.handleAddError(res.response.status));
             } else {
                 API.post("/clues", body).then(this.props.updateClues, (res) => this.handleAddError(res.response.status));
             }
@@ -100,8 +99,7 @@ class ClueInfo extends React.Component<AddClueProps, AddClueState> {
             this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "List " + body.listID + " does not exist.  Should list be created?")
                 .then(() => {
                     if (this.clue) {
-                        this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "Behavior Not Implemented");
-                        //API.put("/clues", body).then(() => { }, (res) => this.handleAddError(res.response.status));
+                        API.put("/clues/update/" + this.props.clue?.id, body).then(() => { }, (res) => this.handleAddError(res.response.status));
                     } else {
                         API.post("/clues", body).then(this.props.updateClues, (res) => this.handleAddError(res.response.status));
                     }
