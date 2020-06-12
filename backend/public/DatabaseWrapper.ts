@@ -38,7 +38,8 @@ class DatabaseWrapper {
           image TEXT,
           finished INTEGER NOT NULL, 
       
-          UNIQUE(name) ON CONFLICT ABORT 
+          UNIQUE(list_id, clue_number) ON CONFLICT ABORT
+          UNIQUE(lat, long) ON CONFLICT ABORT 
       );`,
         (err) => {
           if (err) {

@@ -83,10 +83,7 @@ interface GroupFrameState {
 /**
  * A component to display group information and allow operations on the groups.
  */
-export default class GroupFrame extends React.Component<
-  GroupFrameProps,
-  GroupFrameState
-> {
+export default class GroupFrame extends React.Component<GroupFrameProps, GroupFrameState> {
   popupRef: RefObject<Popup>;
 
   constructor(props: GroupFrameProps) {
