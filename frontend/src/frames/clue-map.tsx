@@ -69,7 +69,7 @@ class AddClue extends React.Component<AddClueProps, AddClueState> {
                 description: this.state.desc,
                 lat: this.props.place.geometry?.location.lat(),
                 long: this.props.place.geometry?.location.lng(),
-            }).then(() => {}, (res) => this.handleError(res.status));
+            }).then(() => {}, (res) => this.handleError(res));
         } else {
             this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "List " + list + " does not exist.  Should list be created?")
             .then(() => {
@@ -89,8 +89,8 @@ class AddClue extends React.Component<AddClueProps, AddClueState> {
      * Handles errors from the add clue method.
      * @param res the error code.
      */
-    handleError(res: number) {
-
+    handleError(res:Response) {
+        console.log(res.body)
     }
 
 

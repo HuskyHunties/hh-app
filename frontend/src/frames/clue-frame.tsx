@@ -1,7 +1,7 @@
 import React, { RefObject } from "react";
 import ClueMap from "./clue-map";
 import "../css/clue-frame.css";
-import Popup from "../utils/popup";
+import Popup, { PopupTypes } from "../utils/popup";
 import API from "../utils/API";
 import Axios, { AxiosResponse } from "axios";
 
@@ -162,6 +162,44 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
   }
 
   /**
+   * Tell the backend to delete a clue and update the component's state
+   */
+  deleteClue() {
+    if (this.state.selected && (typeof this.state.selected) === 'number') {
+      this.popupRef.current
+        ?.popupFactory(PopupTypes.Confirm, "Delete Selected Clue?")
+        .then(
+          () => {
+            API.delete("/clues/" + this.state.selected, {}).then(
+              this.updateClues,
+              (res) => this.handleDeleteError(res.response.status)
+            );
+            console.log("deleted clue: " + this.state.selected);
+          },
+          () => {}
+        );
+    } else {
+      this.popupRef.current?.popupFactory(PopupTypes.Notif, "No Clue Selected");
+    }
+  }
+
+  /**
+   * Handles errors in the delete clue function
+   * @param status error code for the delete request
+   */
+  handleDeleteError(status: number) {
+    // Item already deleted TODO Actual Error code
+    if (status === 400) {
+      this.updateClues();
+
+      // Unknown error
+    } else {
+      console.log(status);
+      throw new Error("Unknown error code");
+    }
+  }
+
+  /**
    * Renders the ClueFrame.
    */
   render() {
@@ -174,7 +212,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
             clues={this.state.clues}
           />
         </div>
-        <button className="clue-delete">Delete Clue</button>
+        <button onClick={() => this.deleteClue()}className="clue-delete">Delete Clue</button>
         <div className="clue-map">
           <ClueMap
             clues={this.state.clues} selected={this.state.selected} clueLists={this.state.clueLists}
