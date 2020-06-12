@@ -174,6 +174,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
             clues={this.state.clues}
           />
         </div>
+        <button className="clue-delete">Delete Clue</button>
         <div className="clue-map">
           <ClueMap
             clues={this.state.clues} selected={this.state.selected} clueLists={this.state.clueLists}
