@@ -11,9 +11,11 @@ import API from "../utils/API";
  * Properties type for the AddClue Component
  */
 interface AddClueProps {
-    place: google.maps.places.PlaceResult;
+    place?: google.maps.places.PlaceResult;
+    clue?: Clue;
     clueLists: Set<string>;
     popupRef: RefObject<Popup>;
+    updateClues(): void;
 }
 
 /**
@@ -26,18 +28,33 @@ interface AddClueState {
     desc: string;
 }
 
-class AddClue extends React.Component<AddClueProps, AddClueState> {
+class ClueInfo extends React.Component<AddClueProps, AddClueState> {
+    private clue: boolean;
+
     constructor(props: AddClueProps) {
         super(props);
-        this.state = {
-            name: props.place.name,
-            num: "",
-            desc: ""
+        if (props.place && !props.clue) {
+            this.state = {
+                name: props.place.name,
+                num: "",
+                desc: ""
+            }
+            this.clue = false;
+        } else if (props.clue && !props.place) {
+            this.state = {
+                name: props.clue.name,
+                list: props.clue.list,
+                num: String(props.clue.num),
+                desc: props.clue.desc
+            }
+            this.clue = true;
+        } else {
+            throw new Error("Must supply info box with either a clue or a place, but not both.")
         }
     }
 
-    // onClick to add clue from the search bar
-    addClue() {
+    // onClick to add clue from the search bar or modify an existing clue
+    addModifyClue() {
         if (this.state.name === "") {
             this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "Invalid Clue Name");
             return;
@@ -48,7 +65,12 @@ class AddClue extends React.Component<AddClueProps, AddClueState> {
             return;
         }
 
-        if (!this.props.place.geometry?.location) {
+        if (this.clue && !this.props.clue!.place) {
+            console.log(this.props.place);
+            throw new Error("Something has gone horribly wrong");
+        }
+
+        if (!this.clue && !this.props.place!.geometry?.location) {
             console.log(this.props.place);
             throw new Error("Something has gone horribly wrong");
         }
@@ -58,30 +80,32 @@ class AddClue extends React.Component<AddClueProps, AddClueState> {
             return;
         }
 
-        const list = this.state.list.toUpperCase();
-        const number = Number(this.state.num);
+        const body = {
+            name: this.state.name,
+            listID: this.state.list.toUpperCase(),
+            clueNumber: Number(this.state.num),
+            description: this.state.desc,
+            lat: this.clue ? this.props.clue!.place.lat : this.props.place!.geometry!.location.lat(),
+            long: this.clue ? this.props.clue!.place.lng : this.props.place!.geometry!.location.lng(),
+        }
 
-        if (this.props.clueLists.has(list)) {
-            API.post("/clues", {
-                name: this.state.name,
-                listID: list,
-                clueNumber: number,
-                description: this.state.desc,
-                lat: this.props.place.geometry?.location.lat(),
-                long: this.props.place.geometry?.location.lng(),
-            }).then(() => {}, (res) => this.handleError(res.response.status));
+        if (this.props.clueLists.has(body.listID)) {
+            if (this.clue) {
+                this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "Behavior Not Implemented");
+                //API.put("/clues", body).then(() => { }, (res) => this.handleAddError(res.response.status));
+            } else {
+                API.post("/clues", body).then(this.props.updateClues, (res) => this.handleAddError(res.response.status));
+            }
         } else {
-            this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "List " + list + " does not exist.  Should list be created?")
-            .then(() => {
-                API.post("/clues", {
-                    name: this.state.name,
-                    listID: list,
-                    clueNumber: number,
-                    description: this.state.desc,
-                    lat: this.props.place.geometry?.location.lat(),
-                    long: this.props.place.geometry?.location.lng(),
-                }).then(() => {}, (res) => this.handleError(res.response.status));
-            })
+            this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "List " + body.listID + " does not exist.  Should list be created?")
+                .then(() => {
+                    if (this.clue) {
+                        this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "Behavior Not Implemented");
+                        //API.put("/clues", body).then(() => { }, (res) => this.handleAddError(res.response.status));
+                    } else {
+                        API.post("/clues", body).then(this.props.updateClues, (res) => this.handleAddError(res.response.status));
+                    }
+                })
         }
     }
 
@@ -89,17 +113,49 @@ class AddClue extends React.Component<AddClueProps, AddClueState> {
      * Handles errors from the add clue method.
      * @param resCode the error code.
      */
-    handleError(resCode: number) {
-        if(resCode === 401){
-            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "This clue's location already exists.");
+    handleAddError(resCode: number) {
+        if (resCode === 401) {
+            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "There is another clue at this location.");
         }
-        else if(resCode === 402){
-            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "This clue list and number already exists.");
+        else if (resCode === 402) {
+            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "There is already a solution for this clue");
         }
-        else{
+        else {
             // 400
             console.log(`Error: ${resCode} from unknown error`);
             throw new Error("unknown error code");
+        }
+    }
+
+    /**
+   * Tell the backend to delete a clue and update the component's state
+   */
+    deleteClue() {
+        this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Clue: " + this.props.clue?.list + this.props.clue?.num + "?")
+            .then(() => {
+                API.delete("/clues/" + this.props.clue?.id, {}).then(
+                    this.props.updateClues,
+                    (res) => this.handleDeleteError(res.response.status)
+                );
+                console.log("deleted clue: " + this.props.clue?.list + this.props.clue?.num);
+            },
+                () => { }
+            );
+    }
+
+    /**
+     * Handles errors in the delete clue function
+     * @param status error code for the delete request
+     */
+    handleDeleteError(status: number) {
+        // Item already deleted TODO Actual Error code
+        if (status === 400) {
+            this.props.updateClues();
+
+            // Unknown error
+        } else {
+            console.log(status);
+            throw new Error("Unknown error code");
         }
     }
 
@@ -117,12 +173,16 @@ class AddClue extends React.Component<AddClueProps, AddClueState> {
                 onChange={(e) => this.setState({ name: e.target.value })} /> <br />
             Description: <input type="text" value={this.state.desc} placeholder="Clue Description"
                 onChange={(e) => this.setState({ desc: e.target.value })} /> <br />
-            Clue List: <input list="clue-lists" value={this.state.list} style={{width: "30px"}}
+            Clue List: <input list="clue-lists" value={this.state.list} style={{ width: "30px" }}
                 onChange={(e) => this.setState({ list: e.target.value })} />
             {datalist}
-            Clue Number: <input type="text" value={this.state.num} style={{width: "30px"}}
+            Clue Number: <input type="text" value={this.state.num} style={{ width: "30px" }}
                 onChange={(e) => this.setState({ num: e.target.value })} /> <br />
-            <button onClick={() => this.addClue()}>AddClue</button>
+            {this.clue ? <div>
+                <button onClick={() => this.addModifyClue()}>Modify Clue</button>
+                <button onClick={() => this.deleteClue()}>Delete Clue</button>
+            </div>
+                : <button onClick={() => this.addModifyClue()}>Add Clue</button>}
         </div>
     }
 }
@@ -137,6 +197,7 @@ interface ClueMapProps {
     select(id?: number | string): void;
     clueLists: Set<string>;
     popupRef: RefObject<Popup>;
+    updateClues(): void;
 }
 
 /**
@@ -208,16 +269,12 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                     onClick={() => this.props.select(clue.id)}
                     label={clue.list + clue.num}
                 >
-                    {clue.id === this.props.selected ? (
+                    {clue.id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
-                            <div>
-                                <h1>{clue.list + clue.num + ": " + clue.name}</h1>
-                                {clue.desc}
-                            </div>
+                            <ClueInfo clue={clue} clueLists={this.props.clueLists} popupRef={this.props.popupRef}
+                                updateClues={this.props.updateClues} />
                         </InfoWindow>
-                    ) : (
-                            ""
-                        )}
+                        : ""}
                 </Marker>
             );
         });
@@ -230,13 +287,12 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                     position={place.geometry?.location!}
                     onClick={() => this.props.select(place.place_id!)}
                 >
-                    {place.place_id === this.props.selected ? (
+                    {place.place_id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
-                            {<AddClue place={place} clueLists={this.props.clueLists} popupRef={this.props.popupRef} />}
+                            <ClueInfo place={place} clueLists={this.props.clueLists} popupRef={this.props.popupRef}
+                                updateClues={this.props.updateClues} />
                         </InfoWindow>
-                    ) : (
-                            ""
-                        )}
+                        : ""}
                 </Marker>
             );
         });

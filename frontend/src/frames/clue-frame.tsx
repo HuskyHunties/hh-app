@@ -214,7 +214,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
         </div>
         <button onClick={() => this.deleteClue()}className="clue-delete">Delete Clue</button>
         <div className="clue-map">
-          <ClueMap
+          <ClueMap updateClues={this.updateClues}
             clues={this.state.clues} selected={this.state.selected} clueLists={this.state.clueLists}
             select={(id: number) => this.setState({ selected: id })} popupRef={this.popupRef}
           />
