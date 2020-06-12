@@ -113,21 +113,7 @@ export default class SearchPanel extends React.Component<
     }
   }
 
-  // onClick to add clue from the search bar
-  addClue(place: google.maps.places.PlaceResult) {
-    const listID = ["A", "B", "C", "D", "E", "F"][
-      Math.floor(Math.random() * 6)
-    ];
-    const clueNumber = Math.floor(Math.random() * 100);
-    API.post("/clues", {
-      name: place.name,
-      listID: listID,
-      clueNumber: clueNumber,
-      description: "description",
-      lat: place.geometry?.location.lat(),
-      long: place.geometry?.location.lng(),
-    });
-  }
+
 
   render() {
     let searchResults: JSX.Element = <div></div>;
@@ -146,7 +132,6 @@ export default class SearchPanel extends React.Component<
           Types: {place.types?.join(", ")}
           <br />
           {place.website ? <a href={place.website}>Website</a> : ""}
-          <button onClick={() => this.addClue(place)}>AddClue</button>
           {place.photos?.map((photo, index) => {
             return <img key={index} className="search-img" src={photo.getUrl({})} alt="" />;
           })}

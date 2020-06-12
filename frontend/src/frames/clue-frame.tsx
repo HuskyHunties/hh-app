@@ -1,17 +1,9 @@
-import React from "react";
+import React, { RefObject } from "react";
 import ClueMap from "./clue-map";
 import "../css/clue-frame.css";
 import Popup from "../utils/popup";
 import API from "../utils/API";
 import Axios, { AxiosResponse } from "axios";
-
-/**
- * Holds a lat and a lng
- */
-export interface Place {
-  lat: number;
-  lng: number;
-}
 
 /**
  * Holds information about a clue
@@ -22,7 +14,7 @@ export interface Clue {
   num: number;
   name: string;
   desc: string;
-  place: Place;
+  place: google.maps.LatLngLiteral;
   finished: boolean;
 }
 
@@ -98,24 +90,23 @@ interface ClueFrameState {
   // Note: number selection values correspond to the selection of an existing clue.
   // Strings indicate the selection of a clue from search results
   selected?: number | string;
+  clueLists: Set<string>;
 }
 
 /**
  * A class to represent a clue frame component.  This displays a list and map of clues,
  * and allows operations on those clues.
  */
-export default class ClueFrame extends React.Component<
-  ClueFrameProps,
-  ClueFrameState
-> {
+export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrameState> {
   intervalID?: NodeJS.Timeout;
-  popupRef: React.Ref<Popup>;
+  popupRef: RefObject<Popup>;
 
   constructor(props: ClueFrameProps) {
     super(props);
     this.state = {
       selected: undefined,
       clues: [],
+      clueLists: new Set<string>(),
     };
     this.popupRef = React.createRef();
     this.updateClues = this.updateClues.bind(this);
@@ -143,6 +134,7 @@ export default class ClueFrame extends React.Component<
   private updateClues() {
     const clues: Clue[] = [];
     let ids: number[] = [];
+    const clueLists = new Set<string>();
     API.get("/clues/")
       .then((res) => {
         ids = res.data.clueIDs;
@@ -155,7 +147,7 @@ export default class ClueFrame extends React.Component<
         res.forEach((res: AxiosResponse, index: number) => {
           const clue = res.data;
           clues.push({
-            list: clue.listID,
+            list: (clue.listID as string).toUpperCase(),
             num: clue.clueNumber,
             name: clue.name,
             desc: clue.description,
@@ -163,9 +155,10 @@ export default class ClueFrame extends React.Component<
             place: { lng: clue.long, lat: clue.lat },
             id: ids[index],
           });
+          clueLists.add((clue.listID as string).toUpperCase())
         });
       })
-      .then(() => this.setState({ clues }));
+      .then(() => this.setState({ clues, clueLists }));
   }
 
   /**
@@ -183,9 +176,8 @@ export default class ClueFrame extends React.Component<
         </div>
         <div className="clue-map">
           <ClueMap
-            clues={this.state.clues}
-            selected={this.state.selected}
-            select={(id: number) => this.setState({ selected: id })}
+            clues={this.state.clues} selected={this.state.selected} clueLists={this.state.clueLists}
+            select={(id: number) => this.setState({ selected: id })} popupRef={this.popupRef}
           />
         </div>
         <Popup ref={this.popupRef} />
