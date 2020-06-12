@@ -137,7 +137,7 @@ cluesRouter.delete("/:clueID", (req, res) => {
 /**
  * modifies the image and finished fields of the specified clue, returns information of modified clue
  */
-cluesRouter.put("/:clueID", (req, res) => {
+cluesRouter.put("/image/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
   const imageString: string = req.body.image;
 
@@ -147,6 +147,21 @@ cluesRouter.put("/:clueID", (req, res) => {
       dbWrapper.finishClue(clueID);
       res.send({ image: image, finished: 1 });
     })
+    .catch((error) => res.status(400).send(error));
+});
+
+cluesRouter.put("/update/:clueID", (req, res) => {
+  const clueID = Number(req.params.clueID);
+  const name: string = req.body.name;
+  const listID: string = req.body.listID;
+  const clueNumber = Number(req.body.clueNumber);
+  const description: string = req.body.description;
+  const lat = Number(req.body.lat);
+  const long = Number(req.body.long);
+
+  dbWrapper
+    .updateClue(clueID, name, listID, clueNumber, description, lat, long)
+    .then((infoObject) => res.send(infoObject))
     .catch((error) => res.status(400).send(error));
 });
 export default cluesRouter;

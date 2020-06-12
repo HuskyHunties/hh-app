@@ -230,6 +230,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         this.setState({ searchedPlaces: places });
     }
 
+<<<<<<< HEAD
     /**
      * Renders the ClueMap.
      */
@@ -257,6 +258,54 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                     &gt;
                 </div>
             );
+=======
+    const markers = this.props.clues.map((clue) => {
+      return (
+        <Marker
+          key={clue.id}
+          position={clue.place}
+          onClick={() => this.props.select(clue.id)}
+          label={clue.list + clue.num}
+        >
+          {clue.id === this.props.selected ? (
+            <InfoWindow onCloseClick={() => this.props.select(undefined)}>
+              <div>
+                <h1>{clue.list + clue.num + ": " + clue.name}</h1>
+                {clue.desc}
+              </div>
+            </InfoWindow>
+          ) : (
+            ""
+          )}
+        </Marker>
+      );
+    });
+
+    const searchResults = this.state.searchedPlaces.map((place) => {
+      return (
+        <Marker
+          key={place.place_id}
+          position={place.geometry?.location!}
+          onClick={() => this.props.select(place.place_id!)}
+        >
+          {place.place_id === this.props.selected ? (
+            <InfoWindow onCloseClick={() => this.props.select(undefined)}>
+              <div>
+                <h1>{place.name}</h1>
+              </div>
+            </InfoWindow>
+          ) : (
+            ""
+          )}
+        </Marker>
+      );
+    });
+
+    return (
+      <div
+        className={
+          this.state.fullscreen ? "wrapper-fullscreen" : "wrapper-default"
+>>>>>>> origin/update-clue-route
         }
 
         const markers = this.props.clues.map((clue) => {

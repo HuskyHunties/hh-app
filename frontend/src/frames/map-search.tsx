@@ -38,7 +38,7 @@ export default class SearchPanel extends React.Component<
     "types",
     "photos",
     "website",
-    "geometry"
+    "geometry",
   ];
 
   constructor(props: SearchPanelProps) {
@@ -133,7 +133,14 @@ export default class SearchPanel extends React.Component<
           <br />
           {place.website ? <a href={place.website}>Website</a> : ""}
           {place.photos?.map((photo, index) => {
-            return <img key={index} className="search-img" src={photo.getUrl({})} alt="" />;
+            return (
+              <img
+                key={index}
+                className="search-img"
+                src={photo.getUrl({})}
+                alt=""
+              />
+            );
           })}
         </div>
       );

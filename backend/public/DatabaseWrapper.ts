@@ -311,7 +311,6 @@ class DatabaseWrapper {
     lat: number,
     long: number
   ): Promise<object> {
-    //TODO update for new columns of data base
     const db = this.db;
     return new Promise((resolve, reject) => {
       // if the clue has a crawl, add its crawl to the database; else, only add the clue
@@ -366,6 +365,30 @@ class DatabaseWrapper {
             reject(err.message);
           }
           resolve(imageEncoding);
+        }
+      );
+    });
+  }
+
+  updateClue(
+    clueID: number,
+    name: string,
+    listID: string,
+    clueNumber: number,
+    description: string,
+    lat: number,
+    long: number
+  ): Promise<object> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.run(
+        `UPDATE clues SET name = '${name}', list_id = '${listID}', clue_number = ${clueNumber}, description = '${description}', lat = ${lat}, long = ${long} WHERE clue_id = ${clueID}`,
+        (err) => {
+          if (err) {
+            console.log(err);
+            reject(err.message);
+          }
+          resolve({});
         }
       );
     });
