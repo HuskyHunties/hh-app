@@ -69,7 +69,7 @@ class AddClue extends React.Component<AddClueProps, AddClueState> {
                 description: this.state.desc,
                 lat: this.props.place.geometry?.location.lat(),
                 long: this.props.place.geometry?.location.lng(),
-            }).then(() => {}, (res) => this.handleError(res));
+            }).then(() => {}, (res) => this.handleError(res.response.status));
         } else {
             this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "List " + list + " does not exist.  Should list be created?")
             .then(() => {
@@ -80,17 +80,27 @@ class AddClue extends React.Component<AddClueProps, AddClueState> {
                     description: this.state.desc,
                     lat: this.props.place.geometry?.location.lat(),
                     long: this.props.place.geometry?.location.lng(),
-                }).then(() => {}, (res) => this.handleError(res.status));
+                }).then(() => {}, (res) => this.handleError(res.response.status));
             })
         }
     }
 
     /**
      * Handles errors from the add clue method.
-     * @param res the error code.
+     * @param resCode the error code.
      */
-    handleError(res:Response) {
-        console.log(res.body)
+    handleError(resCode: number) {
+        if(resCode === 401){
+            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "This clue's location already exists.");
+        }
+        else if(resCode === 402){
+            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "This clue list and number already exists.");
+        }
+        else{
+            // 400
+            console.log(`Error: ${resCode} from unknown error`);
+            throw new Error("unknown error code");
+        }
     }
 
 
