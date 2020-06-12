@@ -9,7 +9,7 @@ This is an app designed to be used by our team during Northeastern's Husky Hunt 
 - After a minute or two, the changes should automatically be seen at https://huskyhunties.github.io/hh-app/
 
 *After Backend Changes*:
-
+- Ask Michael to Redeploy it
 
 * Logistics
 *API Team*:
