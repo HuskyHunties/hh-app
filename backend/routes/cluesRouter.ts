@@ -97,7 +97,20 @@ cluesRouter.post("/", (req, res) => {
   dbWrapper
     .addClue(name, listID, clueNumber, description, lat, long)
     .then((infoObject) => res.send(infoObject))
-    .catch((error) => res.status(400).send(error));
+    .catch((errorMessage: string) => {
+      if (
+        errorMessage.includes("SQLITE_CONSTRAINT: UNIQUE constraint failed:")
+      ) {
+        if (errorMessage.includes("clues.lat, clues.long")) {
+          res.status(401).send(errorMessage);
+          return;
+        } else if (errorMessage.includes("clues.list_id, clues.clue_number")) {
+          res.status(402).send(errorMessage);
+          return;
+        }
+      }
+      res.status(400).send(errorMessage);
+    });
 });
 
 /**
