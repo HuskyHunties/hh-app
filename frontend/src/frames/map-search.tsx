@@ -20,6 +20,7 @@ interface SearchPanelProps {
  */
 interface SearchPanelState {
   placeDetails?: google.maps.places.PlaceResult;
+  textInput: string;
 }
 
 /**
@@ -40,7 +41,7 @@ export default class SearchPanel extends React.Component<SearchPanelProps, Searc
 
   constructor(props: SearchPanelProps) {
     super(props);
-    this.state = {};
+    this.state = { textInput: "" };
   }
 
   /**
@@ -48,6 +49,7 @@ export default class SearchPanel extends React.Component<SearchPanelProps, Searc
    */
   private onPlaceChanged(place: google.maps.places.PlaceResult) {
     this.props.select(undefined);
+    this.setState({textInput: ""})
 
     if (Object.entries(place).length === 1) {
       const request: google.maps.places.TextSearchRequest = {
@@ -173,7 +175,8 @@ export default class SearchPanel extends React.Component<SearchPanelProps, Searc
           }
           bounds={this.props.map?.getBounds()!}
         >
-          <input type="text" placeholder="Search"
+          <input type="text" placeholder="Search" value={this.state.textInput} autoFocus
+            onChange={(e) => this.setState({ textInput: e.target.value })}
             style={{
               boxSizing: `border-box`,
               border: `1px solid transparent`,

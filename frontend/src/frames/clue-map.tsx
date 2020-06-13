@@ -177,6 +177,16 @@ class ClueInfo extends React.Component<ClueInfoProps, ClueInfoState> {
         }
     }
 
+    /**
+     * Tries to auto-submit if enter is pressed
+     * @param e keypress event
+     */
+    handleKeypress(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (e.key === "Enter") {
+            this.addModifyClue();
+        }
+    }
+
 
     render() {
         const listArray: string[] = Array.from(this.props.clueLists).sort();
@@ -187,15 +197,19 @@ class ClueInfo extends React.Component<ClueInfoProps, ClueInfoState> {
         </datalist>
 
         return <div style={{ background: "#232323" }}>
-            Name: <input type="text" value={this.state.name} placeholder="Clue Name"
-                onChange={(e) => this.setState({ name: e.target.value })} /> <br />
+            Name: <input type="text" value={this.state.name} placeholder="Clue Name" autoFocus
+                onChange={(e) => this.setState({ name: e.target.value })} 
+                onKeyPress={(e) => this.handleKeypress(e)} /> <br />
             Description: <input type="text" value={this.state.desc} placeholder="Clue Description"
-                onChange={(e) => this.setState({ desc: e.target.value })} /> <br />
+                onChange={(e) => this.setState({ desc: e.target.value })} 
+                onKeyPress={(e) => this.handleKeypress(e)} /> <br />
             Clue List: <input list="clue-lists" value={this.state.list} style={{ width: "30px" }}
-                onChange={(e) => this.setState({ list: e.target.value })} />
+                onChange={(e) => this.setState({ list: e.target.value })} 
+                onKeyPress={(e) => this.handleKeypress(e)} />
             {datalist}
             Clue Number: <input type="text" value={this.state.num} style={{ width: "30px" }}
-                onChange={(e) => this.setState({ num: e.target.value })} /> <br />
+                onChange={(e) => this.setState({ num: e.target.value })} 
+                onKeyPress={(e) => this.handleKeypress(e)} /> <br />
             {this.clue ? <div>
                 <button onClick={() => this.addModifyClue()}>Modify Clue</button>
                 <button onClick={() => this.deleteClue()}>Delete Clue</button>
