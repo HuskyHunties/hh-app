@@ -6,6 +6,7 @@ import SearchPanel from "./map-search";
 import "../css/maps.css";
 import Popup, { PopupTypes } from "../utils/popup";
 import API from "../utils/API";
+import searchPin from "../map-icons/pin.png";
 
 /**
  * Properties type for the ClueInfo Component
@@ -331,10 +332,8 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         const markers = this.props.clues.map((clue) => {
             return (
                 <Marker
-                    key={clue.id}
-                    position={clue.place}
-                    onClick={() => this.props.select(clue.id)}
-                    label={clue.list + clue.num}
+                    key={clue.id} position={clue.place} onClick={() => this.props.select(clue.id)}
+                    label={clue.list + clue.num} zIndex={0}
                 >
                     {clue.id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
@@ -350,11 +349,8 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         let searchResults = this.state.searchedPlaces.map((place) => {
 
             return (
-                <Marker
-                    key={place.place_id}
-                    position={place.geometry?.location!}
-                    onClick={() => this.props.select(place.place_id!)}
-                >
+                <Marker key={place.place_id} position={place.geometry?.location!} onClick={() => this.props.select(place.place_id!)}
+                    zIndex={1} icon={searchPin}>
                     {place.place_id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <ClueInfo place={place} clueLists={this.props.clueLists} popupRef={this.props.popupRef}
