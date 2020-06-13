@@ -1,7 +1,7 @@
-import React from "react";
+import React, { RefObject } from "react";
 import { Autocomplete } from "@react-google-maps/api";
 import "../css/maps.css";
-import API from "../utils/API";
+import Popup, { PopupTypes } from "../utils/popup";
 
 /**
  * Properties type for the search panel component.
@@ -12,6 +12,7 @@ interface SearchPanelProps {
   places: google.maps.places.PlaceResult[];
   select(id?: string): void;
   selected?: string | number;
+  popupRef: RefObject<Popup>;
 }
 
 /**
@@ -24,14 +25,10 @@ interface SearchPanelState {
 /**
  * A class to represent a search panel component that facilitates easy searching for locations on the map.
  */
-export default class SearchPanel extends React.Component<
-  SearchPanelProps,
-  SearchPanelState
-> {
+export default class SearchPanel extends React.Component<SearchPanelProps, SearchPanelState> {
   private autocomplete?: google.maps.places.Autocomplete;
   private service?: google.maps.places.PlacesService;
-  private geocoder?: google.maps.Geocoder;
-  private static placeRequestFields: string[] = [
+  public static placeRequestFields: string[] = [
     "name",
     "icon",
     "vicinity",
@@ -50,10 +47,6 @@ export default class SearchPanel extends React.Component<
    * Handles the user either selecting a place from the list, or searching for a term.
    */
   private onPlaceChanged(place: google.maps.places.PlaceResult) {
-    if (!this.geocoder) {
-      this.geocoder = new google.maps.Geocoder();
-    }
-
     this.props.select(undefined);
 
     if (Object.entries(place).length === 1) {
@@ -71,6 +64,9 @@ export default class SearchPanel extends React.Component<
         (results: google.maps.places.PlaceResult[], status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK) {
             this.props.setPlaces(results);
+          } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+            this.props.setPlaces([]);
+            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "No Results Found");
           } else {
             console.log(status);
             throw new Error("Places Search Request Failed");
@@ -126,6 +122,7 @@ export default class SearchPanel extends React.Component<
 
       searchResults = (
         <div className="search-results">
+          <u onClick={() => this.props.select()} >Back to Search Results</u>
           <h4>{place.name}</h4>
           <img src={place.icon} className="icon" alt="icon" />
           {place.vicinity} <br></br>
@@ -176,9 +173,7 @@ export default class SearchPanel extends React.Component<
           }
           bounds={this.props.map?.getBounds()!}
         >
-          <input
-            type="text"
-            placeholder="Search"
+          <input type="text" placeholder="Search"
             style={{
               boxSizing: `border-box`,
               border: `1px solid transparent`,

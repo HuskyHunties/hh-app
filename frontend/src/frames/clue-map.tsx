@@ -8,36 +8,39 @@ import Popup, { PopupTypes } from "../utils/popup";
 import API from "../utils/API";
 
 /**
- * Properties type for the AddClue Component
+ * Properties type for the ClueInfo Component
  */
-interface AddClueProps {
+interface ClueInfoProps {
     place?: google.maps.places.PlaceResult;
     clue?: Clue;
     clueLists: Set<string>;
     popupRef: RefObject<Popup>;
     updateClues(): void;
+    setPlaces(places: google.maps.places.PlaceResult[]): void;
+    select(id?: string): void;
 }
 
 /**
- * State type for the AddClue Component
+ * State type for the ClueInfo Component
  */
-interface AddClueState {
+interface ClueInfoState {
     name: string;
-    list?: string;
+    list: string;
     num: string;
     desc: string;
 }
 
-class ClueInfo extends React.Component<AddClueProps, AddClueState> {
+class ClueInfo extends React.Component<ClueInfoProps, ClueInfoState> {
     private clue: boolean;
 
-    constructor(props: AddClueProps) {
+    constructor(props: ClueInfoProps) {
         super(props);
         if (props.place && !props.clue) {
             this.state = {
                 name: props.place.name,
                 num: "",
-                desc: ""
+                desc: "",
+                list: ""
             }
             this.clue = false;
         } else if (props.clue && !props.place) {
@@ -91,17 +94,31 @@ class ClueInfo extends React.Component<AddClueProps, AddClueState> {
 
         if (this.props.clueLists.has(body.listID)) {
             if (this.clue) {
-                API.put("/clues/update/" + this.props.clue?.id, body).then(() => { }, (res) => this.handleAddError(res.response.status));
+                API.put("/clues/update/" + this.props.clue?.id, body).then(() => {
+                    this.props.updateClues();
+                    this.props.select(undefined);
+                }, (res) => this.handleAddError(res.response.status));
             } else {
-                API.post("/clues", body).then(this.props.updateClues, (res) => this.handleAddError(res.response.status));
+                API.post("/clues", body).then(() => {
+                    this.props.updateClues();
+                    this.props.select(undefined);
+                    this.props.setPlaces([]);
+                }, (res) => this.handleAddError(res.response.status));
             }
         } else {
             this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "List " + body.listID + " does not exist.  Should list be created?")
                 .then(() => {
                     if (this.clue) {
-                        API.put("/clues/update/" + this.props.clue?.id, body).then(() => { }, (res) => this.handleAddError(res.response.status));
+                        API.put("/clues/update/" + this.props.clue?.id, body).then(() => {
+                            this.props.updateClues();
+                            this.props.select(undefined);
+                        }, (res) => this.handleAddError(res.response.status));
                     } else {
-                        API.post("/clues", body).then(this.props.updateClues, (res) => this.handleAddError(res.response.status));
+                        API.post("/clues", body).then(() => {
+                            this.props.updateClues();
+                            this.props.select(undefined);
+                            this.props.setPlaces([]);
+                        }, (res) => this.handleAddError(res.response.status));
                     }
                 })
         }
@@ -131,8 +148,10 @@ class ClueInfo extends React.Component<AddClueProps, AddClueState> {
     deleteClue() {
         this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Clue: " + this.props.clue?.list + this.props.clue?.num + "?")
             .then(() => {
-                API.delete("/clues/" + this.props.clue?.id, {}).then(
-                    this.props.updateClues,
+                API.delete("/clues/" + this.props.clue?.id, {}).then(() => {
+                    this.props.updateClues();
+                    this.props.select(undefined);
+                },
                     (res) => this.handleDeleteError(res.response.status)
                 );
                 console.log("deleted clue: " + this.props.clue?.list + this.props.clue?.num);
@@ -149,6 +168,7 @@ class ClueInfo extends React.Component<AddClueProps, AddClueState> {
         // Item already deleted TODO Actual Error code
         if (status === 400) {
             this.props.updateClues();
+            this.props.select(undefined);
 
             // Unknown error
         } else {
@@ -162,7 +182,7 @@ class ClueInfo extends React.Component<AddClueProps, AddClueState> {
         const listArray: string[] = Array.from(this.props.clueLists).sort();
         const datalist = <datalist id="clue-lists">
             {listArray.map((list) => {
-                return <option value={list} />
+                return <option value={list} key={list} />
             })}
         </datalist>
 
@@ -214,6 +234,14 @@ interface ClueMapState {
 export default class ClueMap extends React.Component<ClueMapProps, ClueMapState> {
     private map?: google.maps.Map<Element>;
     private static libraries = ["places", "geometry"];
+    private service?: google.maps.places.PlacesService;
+    public static placeRequestFields: string[] = [
+        "name",
+        "formatted_address",
+        "icon",
+        "types",
+        "geometry",
+      ];
 
     constructor(props: ClueMapProps) {
         super(props);
@@ -231,6 +259,33 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
     }
 
     /**
+    * Handles Clicking on a POI on the map.
+    */
+    handlePOIClick(event: google.maps.IconMouseEvent) {
+        if (event.placeId) {
+            if (!this.service) {
+                this.service = new google.maps.places.PlacesService(this.map!);
+            }
+            event.stop();
+
+            this.service.getDetails({
+                placeId: event.placeId,
+                fields: ClueMap.placeRequestFields
+            }, (res, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK) {
+                    res.place_id = event.placeId;
+                    this.setSearchedPlaces([res]);
+                    this.setState({ sidePanel: true });
+                    this.props.select(event.placeId);
+                } else {
+                    console.log(status);
+                    throw new Error("Place Detail Request Failed.");
+                }
+            })
+        }
+    }
+
+    /**
      * Renders the ClueMap.
      */
     render() {
@@ -245,7 +300,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
             sidePanel = (
                 <div>
                     <SearchPanel map={this.map} setPlaces={this.setSearchedPlaces} places={this.state.searchedPlaces}
-                        select={this.props.select} selected={this.props.selected} />
+                        select={this.props.select} selected={this.props.selected} popupRef={this.props.popupRef} />
                     <div className="side-handle" style={{ left: "20%" }} onClick={() => this.setState({ sidePanel: false })}>
                         &lt;
           </div>
@@ -270,14 +325,15 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                     {clue.id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <ClueInfo clue={clue} clueLists={this.props.clueLists} popupRef={this.props.popupRef}
-                                updateClues={this.props.updateClues} />
+                                updateClues={this.props.updateClues} select={this.props.select}
+                                setPlaces={this.setSearchedPlaces} />
                         </InfoWindow>
                         : ""}
                 </Marker>
             );
         });
 
-        const searchResults = this.state.searchedPlaces.map((place) => {
+        let searchResults = this.state.searchedPlaces.map((place) => {
 
             return (
                 <Marker
@@ -288,12 +344,17 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                     {place.place_id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <ClueInfo place={place} clueLists={this.props.clueLists} popupRef={this.props.popupRef}
-                                updateClues={this.props.updateClues} />
+                                updateClues={this.props.updateClues} select={this.props.select}
+                                setPlaces={this.setSearchedPlaces} />
                         </InfoWindow>
                         : ""}
                 </Marker>
             );
         });
+
+        if (!this.state.sidePanel) {
+            searchResults = [];
+        }
 
         return (
             <div
@@ -305,15 +366,9 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                     googleMapsApiKey={GLOBALSECRETS.mapsKey}
                     libraries={ClueMap.libraries}
                 >
-                    <GoogleMap
-                        mapContainerStyle={{ width: "100%", height: "100%" }}
-                        center={this.state.center}
-                        zoom={13}
-                        options={options}
-                        onLoad={(map) => {
-                            this.map = map;
-                        }}
-                    >
+                    <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }}
+                        center={this.state.center} zoom={13} options={options}
+                        onLoad={(map) => { this.map = map; }} onClick={(event) => this.handlePOIClick(event as google.maps.IconMouseEvent)}>
                         <div
                             className="fullscreen-control"
                             onClick={() =>
