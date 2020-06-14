@@ -1,0 +1,4 @@
+{
+  "appService.deploySubpath": ".",
+  "appService.defaultWebAppToDeploy": "/subscriptions/931e3ff1-2823-4887-9b88-8f32b48d291c/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/husky-hunties"
+}

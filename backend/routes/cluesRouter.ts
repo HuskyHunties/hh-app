@@ -45,7 +45,6 @@ cluesRouter.get("/complete", (req, res) => {
           description: description,
           lat: lat,
           long: long,
-          image: image,
           finished: finished,
         }
  */

@@ -3,6 +3,7 @@ import { Autocomplete } from "@react-google-maps/api";
 import "../css/maps.css";
 import Popup, { PopupTypes } from "../utils/popup";
 
+
 /**
  * Properties type for the search panel component.
  */
