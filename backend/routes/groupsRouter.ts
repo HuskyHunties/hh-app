@@ -37,13 +37,14 @@ groupsRouter.post("/", (req, res) => {
   dbWrapper
     .addGroup(groupName)
     .then((infoObject) => res.send(infoObject))
-    .catch(err => {
-      res.status(400).send("Group of that name already exists")});
+    .catch(() => {
+      res.status(400).send("Group of that name already exists");
+    });
 });
 
 /**
  * deletes the group specified by the given ID, sends information on deleted group
- * { name: name, pathID: pathID }
+ *
  */
 
 groupsRouter.delete("/:groupID", (req, res) => {
@@ -54,30 +55,61 @@ groupsRouter.delete("/:groupID", (req, res) => {
     .catch((error) => res.status(400).send(error));
 });
 
+// removes the path assignment from ths specified group
+groupsRouter.delete("/:groupID/path", (req, res) => {
+  const groupID = Number(req.params.groupID);
+  dbWrapper
+    .setPathOfGroupTo(groupID, null)
+    .then((infoObject) => res.send(infoObject))
+    .catch((error) => res.status(400).send(error));
+});
+
 /**
  * changes either/or of the name/pathID fields of the specified group,
  * sends information on modified group
  * { groupID: groupID, name: name, pathID: pathID }
  */
-groupsRouter.put("/:groupID", (req, res) => {
+groupsRouter.put("/:groupID", async (req, res) => {
   const groupID = Number(req.params.groupID);
   const newPathID = Number(req.body.pathID);
   const newName: string = req.body.name;
 
   if (newPathID) {
-    dbWrapper.setPathOfGroupTo(groupID, newPathID).catch(err => {
-      res.status(400).send("Path already assigned to a group")
-    });
+    const alreadyAssigned = await dbWrapper.isPathAssigned(newPathID);
+    if (alreadyAssigned) {
+      res.status(401).send("Path already assigned to a group");
+    } else {
+      dbWrapper
+        .setPathOfGroupTo(groupID, newPathID)
+        .then((infoObject) => res.send(infoObject))
+        .catch((err) => {
+          res.status(400).send(err);
+        });
+    }
   }
 
   if (newName) {
-    dbWrapper.changeGroupName(groupID, newName).catch(err => {
-      res.status(400).send("Group of that name already exists")});
+    dbWrapper.changeGroupName(groupID, newName).catch(() => {
+      res.status(402).send("Group of that name already exists");
+    });
   }
+});
+
+/**
+ * changes the pathID of the specified group, regardless of whether the path has already been assigned,
+ * sends information on modified group
+ * { groupID: groupID, name: name, pathID: pathID }
+ */
+groupsRouter.put("/:groupID/override", async (req, res) => {
+  const groupID = Number(req.params.groupID);
+  const newPathID = Number(req.body.pathID);
 
   dbWrapper
-    .getInfofGroup(groupID)
+    .setPathOfGroupTo(groupID, newPathID)
     .then((infoObject) => res.send(infoObject))
-    .catch((error) => res.status(400).send(error));
+    .catch((err) => {
+      res.status(400).send(err);
+    });
 });
+
 export default groupsRouter;

@@ -3,6 +3,8 @@ node_modules
 .DS_Store
 package-lock.json
 secrets.json
-hh.db
-hh.db-shm
-hh.db-wal
+
+backend/hh.db
+backend/hh.db-shm
+backend/hh.db-wal
+

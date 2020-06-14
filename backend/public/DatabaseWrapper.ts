@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as sqlite3 from "sqlite3";
+import { resolve } from "dns";
 
 /**
  * Wrapper class for the database to provide various ways to interact with it
@@ -73,7 +74,6 @@ class DatabaseWrapper {
               ON DELETE NO ACTION
               ON UPDATE NO ACTION,
           
-          UNIQUE(path_id) ON CONFLICT ABORT
           UNIQUE(name) ON CONFLICT ABORT  
       );`,
         (err) => {
@@ -510,6 +510,27 @@ class DatabaseWrapper {
   }
 
   /**
+   * 
+   * @param pathID - pathID being investigated
+   * @returns - whether this pathID is currently assigned to a group
+   */
+  isPathAssigned(pathID: number): Promise<boolean> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.all(`SELECT path_id FROM groups`, (err, rows) => {
+        if (err) {
+          reject(err.message);
+        }
+        rows.forEach((row) => {
+          if (row.path_id == pathID) {
+            resolve(true);
+          }
+        });
+        resolve(false);
+      });
+    });
+  }
+  /**
    *
    * @param groupID - id of the group being modified
    * @param pathID - the id of the path being added to this group
@@ -518,7 +539,7 @@ class DatabaseWrapper {
    */
   setPathOfGroupTo(groupID: number, newPathID: number): Promise<object> {
     const db = this.db;
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       db.run(
         `UPDATE groups SET path_id = ${newPathID} WHERE group_id = ${groupID}`,
         (err) => {
