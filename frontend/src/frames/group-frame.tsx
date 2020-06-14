@@ -182,6 +182,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
   }
 
   private assignPath() {
+    let pathID: number;
     if (this.state.selected) {
       this.popupRef.current
         ?.popupFactory(
@@ -191,10 +192,11 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
         )
         .then(
           (res: string) => {
+            pathID = Number(res);
             API.put("/groups/" + this.state.selected, {
-              pathID: Number(res),
+              pathID: pathID,
             }).then(this.props.updateInfo, (res) =>
-              this.handleAssignError(res.response.status, Number(res))
+              this.handleAssignError(res.response.status, pathID)
             );
             console.log(
               "Group: " + this.state.selected + " assigned path: " + res
@@ -212,16 +214,15 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
 
   private handleAssignError(status: number, pathID: number) {
     // Path Already Assigned to another group TODO actual error code
-    if (status === 400) {
+    if (status === 401) {
       this.popupRef.current
         ?.popupFactory(
           PopupTypes.Confirm,
           "Path already assigned to another group.  Assign anyway?"
         )
         .then(() => {
-          API.put("/groups/" + this.state.selected, {
+          API.put("/groups/" + this.state.selected + "/override", {
             pathID: pathID,
-            override: true,
           });
           console.log(
             "Group: " +

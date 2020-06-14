@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as sqlite3 from "sqlite3";
-import { resolve } from "dns";
 
 /**
  * Wrapper class for the database to provide various ways to interact with it
@@ -510,7 +509,7 @@ class DatabaseWrapper {
   }
 
   /**
-   * 
+   *
    * @param pathID - pathID being investigated
    * @returns - whether this pathID is currently assigned to a group
    */
