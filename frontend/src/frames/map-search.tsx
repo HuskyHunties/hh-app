@@ -1,7 +1,6 @@
 import React from "react";
 import { Autocomplete } from "@react-google-maps/api";
 import "../css/maps.css";
-import API from "../utils/API";
 
 /**
  * Properties type for the search panel component.
