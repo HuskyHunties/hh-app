@@ -37,7 +37,8 @@ groupsRouter.post("/", (req, res) => {
   dbWrapper
     .addGroup(groupName)
     .then((infoObject) => res.send(infoObject))
-    .catch((error) => res.status(400).send(error));
+    .catch(err => {
+      res.status(400).send("Group of that name already exists")});
 });
 
 /**
@@ -64,11 +65,14 @@ groupsRouter.put("/:groupID", (req, res) => {
   const newName: string = req.body.name;
 
   if (newPathID) {
-    dbWrapper.setPathOfGroupTo(groupID, newPathID);
+    dbWrapper.setPathOfGroupTo(groupID, newPathID).catch(err => {
+      res.status(400).send("Path already assigned to a group")
+    });
   }
 
   if (newName) {
-    dbWrapper.changeGroupName(groupID, newName);
+    dbWrapper.changeGroupName(groupID, newName).catch(err => {
+      res.status(400).send("Group of that name already exists")});
   }
 
   dbWrapper

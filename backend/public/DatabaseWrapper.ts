@@ -73,6 +73,7 @@ class DatabaseWrapper {
               ON DELETE NO ACTION
               ON UPDATE NO ACTION,
           
+          UNIQUE(path_id) ON CONFLICT ABORT
           UNIQUE(name) ON CONFLICT ABORT  
       );`,
         (err) => {
@@ -192,7 +193,6 @@ class DatabaseWrapper {
     let description: string;
     let lat: number;
     let long: number;
-    let image: string;
     let finished: number;
 
     return new Promise((resolve, reject) => {
@@ -209,7 +209,6 @@ class DatabaseWrapper {
             description = row.description;
             lat = row.lat;
             long = row.long;
-            image = row.image;
             finished = row.finished;
           } catch (error) {
             console.log(error);
@@ -222,7 +221,6 @@ class DatabaseWrapper {
             description: description,
             lat: lat,
             long: long,
-            image: image,
             finished: finished,
           });
         }
@@ -525,6 +523,7 @@ class DatabaseWrapper {
         `UPDATE groups SET path_id = ${newPathID} WHERE group_id = ${groupID}`,
         (err) => {
           if (err) {
+            console.log(err.message);
             reject(err.message);
           } else {
             resolve({});
