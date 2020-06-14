@@ -1,5 +1,5 @@
 import React from "react";
-import "../css/main-page.css";
+import "../css/nav-bar.css";
 
 /**
  * Properties type for the NavBarFrame Component
