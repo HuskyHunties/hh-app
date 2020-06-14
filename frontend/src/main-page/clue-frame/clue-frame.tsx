@@ -3,7 +3,6 @@ import ClueMap from "./clue-map";
 import "./clue-frame.css";
 import Popup, { PopupTypes } from "../../utils/popup";
 import API from "../../utils/API";
-import Axios, { AxiosResponse } from "axios";
 
 /**
  * Holds information about a clue
@@ -80,17 +79,19 @@ class ClueList extends React.Component<ClueListProps, ClueListState> {
 /**
  * Properties type for the ClueFrame Component
  */
-interface ClueFrameProps {}
+interface ClueFrameProps {
+  clues: Clue[];
+  clueLists: Set<string>;
+  updateClues(): void;
+}
 
 /**
  * State type for the ClueFrame Component
  */
 interface ClueFrameState {
-  clues: Clue[];
   // Note: number selection values correspond to the selection of an existing clue.
   // Strings indicate the selection of a clue from search results
   selected?: number | string;
-  clueLists: Set<string>;
 }
 
 /**
@@ -98,67 +99,14 @@ interface ClueFrameState {
  * and allows operations on those clues.
  */
 export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrameState> {
-  intervalID?: NodeJS.Timeout;
   popupRef: RefObject<Popup>;
 
   constructor(props: ClueFrameProps) {
     super(props);
     this.state = {
       selected: undefined,
-      clues: [],
-      clueLists: new Set<string>(),
     };
     this.popupRef = React.createRef();
-    this.updateClues = this.updateClues.bind(this);
-  }
-
-  /**
-   * Gets the list of clues and starts refreshing the data.
-   */
-  componentDidMount() {
-    this.updateClues();
-
-    this.intervalID = setInterval(this.updateClues, 5000);
-  }
-
-  /**
-   * Stops refreshing the clue data when the component is unloaded.
-   */
-  componentWillUnmount() {
-    clearInterval(this.intervalID!);
-  }
-
-  /**
-   * Updates the clues stored in state by making API calls
-   */
-  private updateClues() {
-    const clues: Clue[] = [];
-    let ids: number[] = [];
-    const clueLists = new Set<string>();
-    API.get("/clues/")
-      .then((res) => {
-        ids = res.data.clueIDs;
-        return res.data.clueIDs.map((id: number) => {
-          return API.get<AxiosResponse>("/clues/" + id, {});
-        });
-      })
-      .then((routes) => Axios.all<AxiosResponse>(routes))
-      .then((res: AxiosResponse[]) => {
-        res.forEach((res: AxiosResponse, index: number) => {
-          const clue = res.data;
-          clues.push({
-            list: (clue.listID as string).toUpperCase(),
-            num: clue.clueNumber,
-            name: clue.name,
-            desc: clue.description,
-            finished: clue.finished,
-            place: { lng: clue.long, lat: clue.lat },
-            id: ids[index],
-          });
-          clueLists.add((clue.listID as string).toUpperCase())
-        });
-      })
-      .then(() => this.setState({ clues, clueLists }));
   }
 
   /**
@@ -171,7 +119,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
         .then(
           () => {
             API.delete("/clues/" + this.state.selected, {}).then(
-              this.updateClues,
+              this.props.updateClues,
               (res) => this.handleDeleteError(res.response.status)
             );
             console.log("deleted clue: " + this.state.selected);
@@ -190,7 +138,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
   handleDeleteError(status: number) {
     // Item already deleted TODO Actual Error code
     if (status === 400) {
-      this.updateClues();
+      this.props.updateClues();
 
       // Unknown error
     } else {
@@ -209,14 +157,15 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
           <ClueList
             selected={this.state.selected}
             select={(id: number) => this.setState({ selected: id })}
-            clues={this.state.clues}
+            clues={this.props.clues}
           />
         </div>
         <button onClick={() => this.deleteClue()}className="clue-delete">Delete Clue</button>
         <div className="clue-map">
-          <ClueMap updateClues={this.updateClues}
-            clues={this.state.clues} selected={this.state.selected} clueLists={this.state.clueLists}
+          <ClueMap updateClues={this.props.updateClues}
+            clues={this.props.clues} selected={this.state.selected} clueLists={this.props.clueLists}
             select={(id: number) => this.setState({ selected: id })} popupRef={this.popupRef}
+            deleteClue={() => this.deleteClue()}
           />
         </div>
         <Popup ref={this.popupRef} />

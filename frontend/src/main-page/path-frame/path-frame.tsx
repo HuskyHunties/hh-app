@@ -2,6 +2,7 @@ import React, { RefObject } from "react";
 import "./path-frame.css";
 import API from "../../utils/API";
 import Popup, { PopupTypes } from "../../utils/popup";
+import { PageTypes } from "../..";
 
 /**
  * Properties type for the PathList Component
@@ -57,6 +58,7 @@ class PathList extends React.Component<PathListProps, PathListState> {
 interface PathFrameProps {
   paths: Map<number, string>;
   updateInfo(): void;
+  updatePage(type: PageTypes, routeID?: number): void;
 }
 
 /**
@@ -69,10 +71,7 @@ interface PathFrameState {
 /**
  * A component to display a list of paths and allow operations on those paths.
  */
-export default class PathFrame extends React.Component<
-  PathFrameProps,
-  PathFrameState
-> {
+export default class PathFrame extends React.Component<PathFrameProps, PathFrameState> {
   private popupRef: RefObject<Popup>;
 
   constructor(props: PathFrameProps) {
@@ -172,10 +171,7 @@ export default class PathFrame extends React.Component<
    */
   modifyPath() {
     if (this.state.selected) {
-      this.popupRef.current?.popupFactory(
-        PopupTypes.Notif,
-        "Operation Not Implemented"
-      );
+      this.props.updatePage(PageTypes.ROUTES, this.state.selected);
     } else {
       this.popupRef.current?.popupFactory(PopupTypes.Notif, "No Path Selected");
     }
