@@ -1,10 +1,10 @@
 import React from "react";
-import ClueFrame from "../frames/clue-frame";
-import "../css/main-page.css";
+import ClueFrame from "./clue-frame/clue-frame";
+import "./main-page.css";
 import "../css/nav-bar.css";
 import NavBarFrame from "../utils/nav-bar";
-import PathFrame from "../frames/path-frame";
-import GroupFrame, { Group } from "../frames/group-frame";
+import PathFrame from "./path-frame/path-frame";
+import GroupFrame, { Group } from "./group-frame/group-frame";
 import API from "../utils/API";
 
 /**

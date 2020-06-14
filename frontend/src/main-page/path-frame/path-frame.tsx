@@ -1,7 +1,7 @@
 import React, { RefObject } from "react";
-import "../css/path-frame.css";
-import API from "../utils/API";
-import Popup, { PopupTypes } from "../utils/popup";
+import "./path-frame.css";
+import API from "../../utils/API";
+import Popup, { PopupTypes } from "../../utils/popup";
 
 /**
  * Properties type for the PathList Component

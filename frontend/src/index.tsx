@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
+import "./css/index.css";
 import * as serviceWorker from "./serviceWorker";
-import MainPage from "./pages/main-page";
+import MainPage from "./main-page/main-page";
 
 /**
  * Properties type for the PageLoader Component

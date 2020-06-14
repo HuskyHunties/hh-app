@@ -1,7 +1,7 @@
 import React, { RefObject } from "react";
-import "../css/group-frame.css";
-import API from "../utils/API";
-import Popup, { PopupTypes } from "../utils/popup";
+import "./group-frame.css";
+import API from "../../utils/API";
+import Popup, { PopupTypes } from "../../utils/popup";
 
 /**
  * Holds a name and pathID of a group

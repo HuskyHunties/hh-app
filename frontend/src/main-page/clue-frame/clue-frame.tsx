@@ -1,8 +1,8 @@
 import React, { RefObject } from "react";
 import ClueMap from "./clue-map";
-import "../css/clue-frame.css";
-import Popup, { PopupTypes } from "../utils/popup";
-import API from "../utils/API";
+import "./clue-frame.css";
+import Popup, { PopupTypes } from "../../utils/popup";
+import API from "../../utils/API";
 import Axios, { AxiosResponse } from "axios";
 
 /**
