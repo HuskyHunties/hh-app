@@ -1,4 +1,4 @@
-@import "./colors.css";
+@import "../../css/colors.css";
 
 .fullscreen-control {
   position: absolute;
@@ -16,7 +16,6 @@
   width: 20%;
   height: 100%;
   background: var(--bg-color);
-  z-index: 20;
 }
 
 .wrapper-fullscreen {

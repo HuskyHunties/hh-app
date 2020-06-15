@@ -1,7 +1,7 @@
 import React, { RefObject } from "react";
-import "../css/group-frame.css";
-import API from "../utils/API";
-import Popup, { PopupTypes } from "../utils/popup";
+import "./group-frame.css";
+import API from "../../utils/API";
+import Popup, { PopupTypes } from "../../utils/popup";
 
 /**
  * Holds a name and pathID of a group
@@ -24,7 +24,7 @@ interface GroupListProps {
 /**
  * State type for the GroupList Component
  */
-interface GroupListState {}
+interface GroupListState { }
 
 /**
  * A component that displays all of the currently created groups as a selectable list.
@@ -118,7 +118,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
           );
           console.log("Tried to add group: " + res);
         },
-        () => {}
+        () => { }
       );
   }
 
@@ -127,8 +127,8 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
    * @param status error code for the add request
    */
   private handleAddError(status: number) {
-    // TODO Actual error code for name already in use
-    if (status === 400) {
+    // Name already in use
+    if (status === 401) {
       this.popupRef.current
         ?.popupFactory(PopupTypes.Notif, "Name already in use")
         .then(() => this.addGroup());
@@ -155,7 +155,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
               (res) => this.handleDeleteError(res.response.status)
             );
           },
-          () => {}
+          () => { }
         );
     } else {
       this.popupRef.current?.popupFactory(
@@ -202,7 +202,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
               "Group: " + this.state.selected + " assigned path: " + res
             );
           },
-          () => {}
+          () => { }
         );
     } else {
       this.popupRef.current?.popupFactory(
@@ -213,7 +213,7 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
   }
 
   private handleAssignError(status: number, pathID: number) {
-    // Path Already Assigned to another group TODO actual error code
+    // Path Already Assigned to another group
     if (status === 401) {
       this.popupRef.current
         ?.popupFactory(
@@ -221,16 +221,10 @@ export default class GroupFrame extends React.Component<GroupFrameProps, GroupFr
           "Path already assigned to another group.  Assign anyway?"
         )
         .then(() => {
-          API.put("/groups/" + this.state.selected + "/override", {
-            pathID: pathID,
-          });
-          console.log(
-            "Group: " +
-              this.state.selected +
-              " assigned path: " +
-              pathID +
-              " via override"
-          );
+          API.put("/groups/" + this.state.selected, { pathID: pathID, override: true, })
+            .then(() => {
+              console.log("Group: " + this.state.selected + " assigned path: " + pathID + " via override");
+            }, (res) => this.handleAddError(res.response.status))
         });
 
       // Unknown Error

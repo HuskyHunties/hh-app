@@ -1,12 +1,12 @@
 import React, { RefObject } from "react";
-import GLOBALSECRETS from "../secrets";
+import GLOBALSECRETS from "../../secrets";
 import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import { Clue } from "./clue-frame";
 import SearchPanel from "./map-search";
-import "../css/maps.css";
-import Popup, { PopupTypes } from "../utils/popup";
-import API from "../utils/API";
-import searchPin from "../map-icons/pin.png";
+import "./maps.css";
+import Popup, { PopupTypes } from "../../utils/popup";
+import API from "../../utils/API";
+import searchPin from "../../utils/map-icons/pin.png";
 
 /**
  * Properties type for the ClueInfo Component

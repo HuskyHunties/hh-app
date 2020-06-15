@@ -1,7 +1,7 @@
 import React, { RefObject } from "react";
 import { Autocomplete } from "@react-google-maps/api";
-import "../css/maps.css";
-import Popup, { PopupTypes } from "../utils/popup";
+import "./maps.css";
+import Popup, { PopupTypes } from "../../utils/popup";
 
 
 /**
