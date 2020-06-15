@@ -38,15 +38,6 @@ cluesRouter.get("/complete", (req, res) => {
 
 /**
  * deletes the specified clue from the database, sends information of that clue
- * {
-          name: name,
-          listID: listID,
-          clueNumber: clueNumber,
-          description: description,
-          lat: lat,
-          long: long,
-          finished: finished,
-        }
  */
 cluesRouter.get("/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
@@ -74,16 +65,6 @@ cluesRouter.get("/:clueID/image", (req, res) => {
 
 /**
  * adds a clue described by the request body to the table, sends information of that clue
- * {
-            clueID: clueID,
-            name: clueName,
-            listID: listID,
-            clueNumber: clueNumber,
-            description: description,
-            lat: lat,
-            long: long,
-            finished: 0,
-          }
  */
 cluesRouter.post("/", (req, res) => {
   const name: string = req.body.name;
@@ -114,16 +95,6 @@ cluesRouter.post("/", (req, res) => {
 
 /**
  * deletes the specified clue from the database, sends information of deleted clue
- * {
-          name: name,
-          listID: listID,
-          clueNumber: clueNumber,
-          description: description,
-          lat: lat,
-          long: long,
-          image: image,
-          finished: finished,
-        }
  */
 cluesRouter.delete("/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
@@ -149,6 +120,7 @@ cluesRouter.put("/image/:clueID", (req, res) => {
     .catch((error) => res.status(400).send(error));
 });
 
+// updates the fields of the specified clue to that which was given in the request body
 cluesRouter.put("/update/:clueID", (req, res) => {
   const clueID = Number(req.params.clueID);
   const name: string = req.body.name;
