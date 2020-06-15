@@ -53,7 +53,6 @@ pathsRouter.get("/:pathID/complete", (req, res) => {
 /**
  * makes a new path based off the list of clues in the request body,
  * sends back the information of the path created.
- * { pathID: pathID, name: name }
  */
 pathsRouter.post("/", (req, res) => {
   const name: string = req.body.name;
@@ -65,7 +64,6 @@ pathsRouter.post("/", (req, res) => {
 
 /**
  * deletes the path specified by the given pathID param, sends back information on deleted path
- * { name: name, clueIDs: clueIDs }
  */
 pathsRouter.delete("/:pathID", (req, res) => {
   const pathID = Number(req.params.pathID);
@@ -77,7 +75,6 @@ pathsRouter.delete("/:pathID", (req, res) => {
 
 /**
  * adds or removes the specified clue to the specified path, sends back information on modified path
- * { pathID: pathID, clueID: clueID }
  */
 pathsRouter.put("/:pathID", (req, res) => {
   const pathID = Number(req.params.pathID);

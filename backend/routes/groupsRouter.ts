@@ -29,7 +29,6 @@ groupsRouter.get("/:groupID", (req, res) => {
 /**
  * adds a group to the database, JSON with group name in request body,
  * sends information on the created group
- * { groupID: row.group_id, name: row.name }
  */
 
 groupsRouter.post("/", (req, res) => {
@@ -67,7 +66,6 @@ groupsRouter.delete("/:groupID/path", (req, res) => {
 /**
  * changes either/or of the name/pathID fields of the specified group,
  * sends information on modified group
- * { groupID: groupID, name: name, pathID: pathID }
  */
 groupsRouter.put("/:groupID", async (req, res) => {
   const groupID = Number(req.params.groupID);
@@ -98,7 +96,6 @@ groupsRouter.put("/:groupID", async (req, res) => {
 /**
  * changes the pathID of the specified group, regardless of whether the path has already been assigned,
  * sends information on modified group
- * { groupID: groupID, name: name, pathID: pathID }
  */
 groupsRouter.put("/:groupID/override", async (req, res) => {
   const groupID = Number(req.params.groupID);
