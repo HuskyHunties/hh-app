@@ -1,0 +1,220 @@
+import CluesOnPathPage from "./Pages/cluesOnPathPage";
+import SelectGroupPathPage from "./Pages/selectGroupPath";
+import CreateGroupPathPage from './Pages/createGroupPath'
+
+import React, { Component } from "react";
+import { View, StyleSheet, Dimensions, Text, Button } from "react-native";
+import API from "./utils/API";
+import Axios, { AxiosResponse } from "axios";
+
+import { Clue, Group, Path, screenHeight, screenWidth } from './utils/data';
+enum Pages {
+  SELECTGROUPPATHPAGE,
+  ClUESONPATHPAGE,
+  CREATEGROUPPATHPAGE
+}
+
+
+interface AppProps {}
+
+interface AppState {
+  clues: Clue[];
+  groups: Map<number, Group>;
+  selectedGroupID: number;
+  paths: Map<number, Path>;
+  selectedPathID: number;
+  pageDisplayed: Pages;
+}
+// react-native expects an export from this file, so this main page app will probably manage the state of the app and pass it down to the actual
+// pages as props, and display the correct page based off some navigation structure.
+export default class App extends Component<AppProps, AppState> {
+  constructor(props: AppProps) {
+    super(props);
+
+    this.state = {
+      clues: [],
+      groups: new Map(),
+      selectedGroupID: 0,
+      paths: new Map(),
+      selectedPathID: 0,
+      pageDisplayed: Pages.SELECTGROUPPATHPAGE,
+    };
+    this.updateInfo = this.updateInfo.bind(this);
+    this.setSelectedGroupID = this.setSelectedGroupID.bind(this);
+    setInterval(this.updateInfo, 1000);
+  }
+
+  /**
+   * Sorts clues according first to their list, then their number.
+   * @param clue1 comes first if < 0
+   * @param clue2 comes first if > 0
+   */
+  clueCompare(clue1: Clue, clue2: Clue): number {
+    if (clue1.listID === clue2.listID) {
+      return clue1.clueNumber - clue2.clueNumber;
+    } else {
+      return clue1.listID.localeCompare(clue2.listID);
+    }
+  }
+
+  // updates the selectedGroupID state of the app from the select group page
+  setSelectedGroupID(selectedGroupID: number) {
+    this.setState({ selectedGroupID });
+  }
+
+  // calls the api to update the state of the app
+  private updateInfo() {
+    // Clue API Calls
+    const clues: Clue[] = [];
+    let ids: number[] = [];
+    API.get("/clues/")
+      .then((res) => {
+        ids = res.data.clueIDs;
+        return ids.map((id: number) => {
+          return API.get<AxiosResponse>("/clues/" + id, {});
+        });
+      })
+      .then((routes) => Axios.all<AxiosResponse>(routes))
+      .then((res: AxiosResponse[]) => {
+        res.forEach((res: AxiosResponse, index: number) => {
+          const clue = res.data;
+          clues.push({
+            id: ids[index],
+            listID: (clue.listID as string).toUpperCase(),
+            clueNumber: clue.clueNumber,
+            name: clue.name,
+            description: clue.description,
+            lat: clue.lat,
+            long: clue.long,
+          });
+        });
+        clues.sort(this.clueCompare);
+      })
+      .then(() => this.setState({ clues }));
+    // Group API calls
+    API.get("/groups", {})
+      .then(async (res) => {
+        const groups = new Map<number, Group>();
+        for (let groupID of res.data.allGroups) {
+          await API.get("/groups/" + groupID, {}).then((group) =>
+            groups.set(groupID, {
+              groupID: groupID,
+              name: group.data.name,
+              pathID: group.data.pathID,
+            })
+          );
+        }
+        return groups;
+      })
+      .then((groups) => this.setState({ groups }));
+
+    // Path API calls
+    API.get("/paths", {})
+      .then(async (res) => {
+        const paths = new Map<number, Path>();
+        for (let pathID of res.data.allPaths) {
+          await API.get("/paths/" + pathID, {}).then((path) => {
+            if (path.data.name) {
+              paths.set(pathID, { name: path.data.name, pathID });
+            } else {
+              paths.set(pathID, this.state.paths.get(pathID)!);
+            }
+          });
+        }
+        return paths;
+      })
+      .then((paths) => this.setState({ paths }));
+  }
+
+  // returns the page component based off what is supposed to
+  // be displayed
+  displayPage() {
+    let page;
+    switch (this.state.pageDisplayed) {
+      case Pages.SELECTGROUPPATHPAGE:
+        page = (
+          <SelectGroupPathPage
+            groups={this.state.groups}
+            selectedGroupID={this.state.selectedGroupID}
+            updateGroup={this.setSelectedGroupID}
+            paths={this.state.paths}
+          />
+        );
+        break;
+      case Pages.ClUESONPATHPAGE:
+        page = <CluesOnPathPage clues={this.state.clues} />;
+        break;
+      case Pages.CREATEGROUPPATHPAGE:
+        page = <CreateGroupPathPage />
+        break;
+    }
+    return page;
+  }
+
+  styles = StyleSheet.create({
+    app: {},
+    navbar: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: screenWidth,
+      height: screenHeight * 0.1,
+      backgroundColor: "#a85858",
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    imagepagebutton: {
+      marginTop: 10,
+      marginHorizontal: 3,
+    },
+    selectpagebutton: {
+      marginTop: 10,
+      marginHorizontal: 3,
+    },
+    createpagebutton: {
+      marginTop: 10,
+      marginHorizontal: 3,
+    },
+    displayedPage: {
+      position: "absolute",
+      top: screenHeight * 0.1,
+      left: 0,
+    },
+  });
+  render() {
+    return (
+      <View style={this.styles.app}>
+        <View style={this.styles.navbar}>
+          <View style={this.styles.selectpagebutton}>
+            <Button
+              title={"Select \n Group/Path Page"}
+              onPress={() =>
+                this.setState({ pageDisplayed: Pages.SELECTGROUPPATHPAGE })
+              }
+              color="black"
+            />
+          </View>
+          <View style={this.styles.imagepagebutton}>
+            <Button
+              title={"Clues on \n Path Page"}
+              onPress={() => this.setState({ pageDisplayed: Pages.ClUESONPATHPAGE })}
+              color="black"
+            />
+          </View>
+          <View style={this.styles.createpagebutton}>
+            <Button
+              title={"Create \nGroup/Path Page"}
+              onPress={() =>
+                this.setState({ pageDisplayed: Pages.CREATEGROUPPATHPAGE })
+              }
+              color="black"
+            />
+          </View>
+        </View>
+        <View style={this.styles.displayedPage}>{this.displayPage()}</View>
+      </View>
+    );
+  }
+}
