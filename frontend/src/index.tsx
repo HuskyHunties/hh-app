@@ -6,6 +6,7 @@ import MainPage from "./main-page/main-page";
 import { Clue } from "./main-page/clue-frame/clue-frame";
 import API from "./utils/API";
 import Axios, { AxiosResponse } from "axios";
+import PathPage from "./path-page/path-page";
 
 export enum PageTypes {
   MAINPAGE = 0,
@@ -25,7 +26,7 @@ interface PageLoaderState {
   currentPage: PageTypes;
   clues: Clue[];
   clueLists: Set<string>;
-  currentRoute?: number;
+  currentPath?: number;
 }
 
 /**
@@ -38,9 +39,11 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
   constructor(props: PageLoaderProps) {
     super(props);
     this.state = {
-      currentPage: PageTypes.MAINPAGE,
+      currentPage: PageTypes.ROUTES,
       clues: [],
       clueLists: new Set<string>(),
+      // REMOVE THIS, ONLY FOR TESTING
+      currentPath: 1
     }
     this.updateClues = this.updateClues.bind(this);
     this.updatePage = this.updatePage.bind(this);
@@ -69,7 +72,7 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
 
     this.setState({
       currentPage: type,
-      currentRoute: routeID
+      currentPath: routeID
     })
   }
 
@@ -114,7 +117,8 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
         break;
 
       case PageTypes.ROUTES:
-        page = <div>Page not yet implemented</div>
+        page = <PathPage clues={this.state.clues} clueLists={this.state.clueLists}
+        currentRoute={this.state.currentPath!} updatePage={this.updatePage} />
         break;
 
       case PageTypes.IMAGES:

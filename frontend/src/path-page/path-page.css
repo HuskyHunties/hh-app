@@ -1,0 +1,12 @@
+@import "../css/colors.css";
+
+.path-page-container {
+    position: absolute;
+    width: 95%;
+    height: 95%;
+    top: 2.5%;
+    left: 2.5%;
+    box-sizing: border-box;
+    border-radius: 25px;
+    background-color: var(--primary-color);
+}
