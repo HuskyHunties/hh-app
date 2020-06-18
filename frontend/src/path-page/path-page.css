@@ -10,3 +10,35 @@
     border-radius: 25px;
     background-color: var(--primary-color);
 }
+
+.path-info-container {
+    position: absolute;
+    box-sizing: border-box;
+    width: 35%;
+    height: 100%;
+}
+
+.path-map-container {
+    position: absolute;
+    width: 65%;
+    height: 100%;
+    left: 35%;
+    box-sizing: border-box;
+    padding: 2.5%;
+}
+
+.confirm-path {
+    position: absolute;
+    width: 40%;
+    height: 10%;
+    left: 7%;
+    top: 85%;
+}
+
+.discard-path {
+    position: absolute;
+    width: 40%;
+    height: 10%;
+    left: 53%;
+    top: 85%;
+}
