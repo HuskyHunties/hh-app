@@ -41,7 +41,6 @@ export default class MainPage extends React.Component<
   componentDidMount() {
     this.updateInfo();
 
-    //@ts-ignore
     this.intervalID = setInterval(this.updateInfo, 5000);
   }
 

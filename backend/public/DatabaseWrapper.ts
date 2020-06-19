@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as sqlite3 from "sqlite3";
+import { rejects } from "assert";
 
 /**
  * Wrapper class for the database to provide various ways to interact with it
@@ -92,7 +93,9 @@ class DatabaseWrapper {
         `CREATE TABLE IF NOT EXISTS paths_join_clues (
           path_id INTEGER,
           clue_id INTEGER,
+          order_in_path INTEGER,
 
+          UNIQUE(path_id, clue_id) ON CONFLICT ABORT
           PRIMARY KEY (path_id, clue_id)
           FOREIGN KEY (path_id)
               REFERENCES paths (path_id)
@@ -101,8 +104,7 @@ class DatabaseWrapper {
           FOREIGN KEY (clue_id)
               REFERENCES clues (clue_id)
                   ON DELETE CASCADE
-                  ON UPDATE NO ACTION
-      );`,
+                  ON UPDATE NO ACTION);`,
         (err) => {
           if (err) {
             throw console.error(err.message);
@@ -164,7 +166,6 @@ class DatabaseWrapper {
   getImageOfClue(clueID: number): Promise<string> {
     const db = this.db;
     let image: string;
-
     return new Promise((resolve, reject) => {
       db.get(
         `SELECT image FROM clues WHERE clue_id = ${clueID}`,
@@ -636,7 +637,7 @@ class DatabaseWrapper {
 
       // collecting the clue ids from the join table
       db.all(
-        `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID}`,
+        `SELECT clue_id FROM paths_join_clues WHERE path_id = ${pathID} ORDER BY order_in_path ASC`,
         (err, rows) => {
           if (err) {
             reject(err.message);
@@ -807,16 +808,16 @@ class DatabaseWrapper {
    * @param  clueID- pathID being investigated
    * @returns - whether this pathID is currently assigned to a group
    */
-  isClueAssigned(clueID: number): Promise<boolean> {
+  isClueAssigned(clueID: number): Promise<boolean | number> {
     const db = this.db;
     return new Promise((resolve, reject) => {
-      db.all(`SELECT clue_id FROM paths_join_clues`, (err, rows) => {
+      db.all(`SELECT path_id, clue_id FROM paths_join_clues`, (err, rows) => {
         if (err) {
           reject(err.message);
         }
         rows.forEach((row) => {
           if (row.clue_id == clueID) {
-            resolve(true);
+            resolve(row.path_id);
           }
         });
         resolve(false);
@@ -834,10 +835,11 @@ class DatabaseWrapper {
     const db = this.db;
     return new Promise((resolve, reject) => {
       db.run(
-        `INSERT INTO paths_join_clues (path_id, clue_id) VALUES(?, ?)`,
+        `INSERT INTO paths_join_clues (path_id, clue_id, order_in_path) VALUES(?, ?, 10000)`,
         [pathID, clueID],
         (err) => {
           if (err) {
+            console.log(err.message)
             reject(err.message);
           } else {
             resolve({});
@@ -867,6 +869,48 @@ class DatabaseWrapper {
         }
       );
     });
+  }
+
+  /**
+   * 
+   * @param pathID 
+   * @param clueIDs 
+   */
+  async orderCluesInPath(pathID: number, clueIDs: number[]): Promise<object> {
+    const db = this.db;
+    return new Promise(async (resolve, reject) => {
+      //@ts-ignore
+      const clueIDSInPath: number[] = (await this.getCluesofPath(pathID)).clueIDs;
+
+      if (!(clueIDs.length === clueIDSInPath.length && clueIDs.every(value => clueIDSInPath.includes(value)))) {
+        reject("Given clue IDs not same as existing ")
+      }
+
+      for (let i = 0; i < clueIDs.length; i++) {
+        await this.orderClueInPath(pathID, clueIDs[i], i).catch(err => reject(err));
+
+      }
+      resolve({})
+    })
+  }
+
+  /**
+   * 
+   * @param pathID 
+   * @param clueID 
+   * @param order 
+   */
+  orderClueInPath(pathID: number, clueID: number, order: number): Promise<object> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.run(`UPDATE paths_join_clues SET order_in_path = ${order} WHERE path_id = ${pathID} AND clue_id = ${clueID}`, (err) => {
+        if (err) {
+          console.log(err.message);
+          reject(err.message);
+        }
+        resolve({});
+      })
+    })
   }
 }
 
