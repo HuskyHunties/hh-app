@@ -797,6 +797,28 @@ class DatabaseWrapper {
   }
 
   /**
+   *
+   * @param  clueID- pathID being investigated
+   * @returns - whether this pathID is currently assigned to a group
+   */
+  isClueAssigned(clueID: number): Promise<boolean> {
+    const db = this.db;
+    return new Promise((resolve, reject) => {
+      db.all(`SELECT clue_id FROM paths_join_clues`, (err, rows) => {
+        if (err) {
+          reject(err.message);
+        }
+        rows.forEach((row) => {
+          if (row.clue_id == clueID) {
+            resolve(true);
+          }
+        });
+        resolve(false);
+      });
+    });
+  }
+
+  /**
    * adds the specified clue to the specified path in the join table
    * @param pathID - path being modified
    * @param clueID - clue being added to path

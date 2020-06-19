@@ -74,22 +74,45 @@ pathsRouter.delete("/:pathID", (req, res) => {
 });
 
 /**
- * adds or removes the specified clue to the specified path, sends back information on modified path
+ * adds specified clue to the specified path
  */
-pathsRouter.put("/:pathID", (req, res) => {
+pathsRouter.put("/:pathID/clue/override", (req, res) => {
   const pathID = Number(req.params.pathID);
   const clueID = Number(req.body.clueID);
-  if (Boolean(req.body.addClue)) {
+  dbWrapper
+    .addClueToPath(pathID, clueID)
+    .then((infoObject) => res.send(infoObject))
+    .catch((error) => res.status(400).send(error));
+
+});
+
+/**
+ * adds specified clue to the specified path if it is not already assigned to a path
+ */
+pathsRouter.put("/:pathID/clue", async (req, res) => {
+  const pathID = Number(req.params.pathID);
+  const clueID = Number(req.body.clueID);
+
+  const alreadyAssigned = await dbWrapper.isClueAssigned(clueID);
+  if (alreadyAssigned) {
+    res.status(401).send("Clue is already assigned to a path");
+  }
+  else {
     dbWrapper
       .addClueToPath(pathID, clueID)
-      .then((infoObject) => res.send(infoObject))
-      .catch((error) => res.status(400).send(error));
-  } else {
-    dbWrapper
-      .removeClueFromPath(pathID, clueID)
       .then((infoObject) => res.send(infoObject))
       .catch((error) => res.status(400).send(error));
   }
 });
 
+/* removes the specified clue from the specified path
+*/
+pathsRouter.delete("/:pathID/clue", (req, res) => {
+  const pathID = Number(req.params.pathID);
+  const clueID = Number(req.body.clueID);
+  dbWrapper
+    .removeClueFromPath(pathID, clueID)
+    .then((infoObject) => res.send(infoObject))
+    .catch((error) => res.status(400).send(error));
+})
 export default pathsRouter;
