@@ -26,6 +26,12 @@ class DatabaseWrapper {
         }
       });
 
+      this.db.run("PRAGMA foreign_keys=ON;", (err) => {
+        if (err) {
+          throw console.error(err.message);
+        }
+      });
+
       this.db.run(
         `CREATE TABLE IF NOT EXISTS clues (
           clue_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,8 +92,8 @@ class DatabaseWrapper {
         `CREATE TABLE IF NOT EXISTS paths_join_clues (
           path_id INTEGER,
           clue_id INTEGER,
-      
-          PRIMARY KEY (path_id, clue_id),
+
+          PRIMARY KEY (path_id, clue_id)
           FOREIGN KEY (path_id)
               REFERENCES paths (path_id)
                   ON DELETE CASCADE

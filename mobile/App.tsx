@@ -1,6 +1,7 @@
 import CluesOnPathPage from "./Pages/cluesOnPathPage";
 import SelectGroupPathPage from "./Pages/selectGroupPath";
 import CreateGroupPathPage from './Pages/createGroupPath'
+import AddToPathPage from './Pages/addToPathPage'
 
 import React, { Component } from "react";
 import { View, StyleSheet, Dimensions, Text, Button } from "react-native";
@@ -11,18 +12,18 @@ import { Clue, Group, Path, screenHeight, screenWidth } from './utils/data';
 enum Pages {
   SELECTGROUPPATHPAGE,
   ClUESONPATHPAGE,
-  CREATEGROUPPATHPAGE
+  CREATEGROUPPATHPAGE,
+  ADDTOPATHPAGE
 }
 
 
-interface AppProps {}
+interface AppProps { }
 
 interface AppState {
   clues: Clue[];
   groups: Map<number, Group>;
   selectedGroupID: number;
   paths: Map<number, Path>;
-  selectedPathID: number;
   pageDisplayed: Pages;
 }
 // react-native expects an export from this file, so this main page app will probably manage the state of the app and pass it down to the actual
@@ -36,8 +37,7 @@ export default class App extends Component<AppProps, AppState> {
       groups: new Map(),
       selectedGroupID: 0,
       paths: new Map(),
-      selectedPathID: 0,
-      pageDisplayed: Pages.SELECTGROUPPATHPAGE,
+      pageDisplayed: Pages.ADDTOPATHPAGE,
     };
     this.updateInfo = this.updateInfo.bind(this);
     this.setSelectedGroupID = this.setSelectedGroupID.bind(this);
@@ -147,6 +147,9 @@ export default class App extends Component<AppProps, AppState> {
       case Pages.CREATEGROUPPATHPAGE:
         page = <CreateGroupPathPage />
         break;
+      case Pages.ADDTOPATHPAGE:
+        page = <AddToPathPage clues={this.state.clues} pathID={this.state.groups.get(this.state.selectedGroupID)?.pathID} />
+        break;
     }
     return page;
   }
@@ -208,6 +211,15 @@ export default class App extends Component<AppProps, AppState> {
               title={"Create \nGroup/Path Page"}
               onPress={() =>
                 this.setState({ pageDisplayed: Pages.CREATEGROUPPATHPAGE })
+              }
+              color="black"
+            />
+          </View>
+          <View style={this.styles.createpagebutton}>
+            <Button
+              title={"Add Clues \nto Path Page"}
+              onPress={() =>
+                this.setState({ pageDisplayed: Pages.ADDTOPATHPAGE })
               }
               color="black"
             />

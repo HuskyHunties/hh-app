@@ -118,6 +118,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
   componentDidMount() {
     this.updateClues();
 
+    //@ts-ignore
     this.intervalID = setInterval(this.updateClues, 5000);
   }
 
