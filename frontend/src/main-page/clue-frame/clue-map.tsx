@@ -19,6 +19,7 @@ interface ClueInfoProps {
     updateClues(): void;
     setPlaces(places: google.maps.places.PlaceResult[]): void;
     select(id?: string): void;
+    deleteClue(): void;
 }
 
 /**
@@ -144,41 +145,6 @@ class ClueInfo extends React.Component<ClueInfoProps, ClueInfoState> {
     }
 
     /**
-   * Tell the backend to delete a clue and update the component's state
-   */
-    deleteClue() {
-        this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Clue: " + this.props.clue?.list + this.props.clue?.num + "?")
-            .then(() => {
-                API.delete("/clues/" + this.props.clue?.id, {}).then(() => {
-                    this.props.updateClues();
-                    this.props.select(undefined);
-                },
-                    (res) => this.handleDeleteError(res.response.status)
-                );
-                console.log("deleted clue: " + this.props.clue?.list + this.props.clue?.num);
-            },
-                () => { }
-            );
-    }
-
-    /**
-     * Handles errors in the delete clue function
-     * @param status error code for the delete request
-     */
-    handleDeleteError(status: number) {
-        // Item already deleted TODO Actual Error code
-        if (status === 400) {
-            this.props.updateClues();
-            this.props.select(undefined);
-
-            // Unknown error
-        } else {
-            console.log(status);
-            throw new Error("Unknown error code");
-        }
-    }
-
-    /**
      * Tries to auto-submit if enter is pressed
      * @param e keypress event
      */
@@ -213,7 +179,7 @@ class ClueInfo extends React.Component<ClueInfoProps, ClueInfoState> {
                 onKeyPress={(e) => this.handleKeypress(e)} /> <br />
             {this.clue ? <div>
                 <button onClick={() => this.addModifyClue()}>Modify Clue</button>
-                <button onClick={() => this.deleteClue()}>Delete Clue</button>
+                <button onClick={() => this.props.deleteClue()}>Delete Clue</button>
             </div>
                 : <button onClick={() => this.addModifyClue()}>Add Clue</button>}
         </div>
@@ -231,6 +197,7 @@ interface ClueMapProps {
     clueLists: Set<string>;
     popupRef: RefObject<Popup>;
     updateClues(): void;
+    deleteClue(): void;
 }
 
 /**
@@ -339,7 +306,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <ClueInfo clue={clue} clueLists={this.props.clueLists} popupRef={this.props.popupRef}
                                 updateClues={this.props.updateClues} select={this.props.select}
-                                setPlaces={this.setSearchedPlaces} />
+                                setPlaces={this.setSearchedPlaces} deleteClue={this.props.deleteClue} />
                         </InfoWindow>
                         : ""}
                 </Marker>
@@ -355,7 +322,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <ClueInfo place={place} clueLists={this.props.clueLists} popupRef={this.props.popupRef}
                                 updateClues={this.props.updateClues} select={this.props.select}
-                                setPlaces={this.setSearchedPlaces} />
+                                setPlaces={this.setSearchedPlaces} deleteClue={this.props.deleteClue} />
                         </InfoWindow>
                         : ""}
                 </Marker>

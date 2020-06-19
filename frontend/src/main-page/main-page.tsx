@@ -1,16 +1,22 @@
 import React from "react";
-import ClueFrame from "./clue-frame/clue-frame";
+import ClueFrame, { Clue } from "./clue-frame/clue-frame";
 import "./main-page.css";
 import "../css/nav-bar.css";
 import NavBarFrame from "../utils/nav-bar";
 import PathFrame from "./path-frame/path-frame";
 import GroupFrame, { Group } from "./group-frame/group-frame";
 import API from "../utils/API";
+import { PageTypes } from "..";
 
 /**
  * Properties type for the MainPage Component.
  */
-interface MainPageProps {}
+interface MainPageProps {
+  clues: Clue[];
+  clueLists: Set<string>;
+  updateClues(): void,
+  updatePage(type: PageTypes, routeID?: number): void;
+}
 
 /**
  * State type for the MainPage Component.
@@ -24,10 +30,7 @@ interface MainPageState {
  * A component that will serve as the main page of the application.  This page will contain clue, path,
  * and group information and allow for modification of those categories.
  */
-export default class MainPage extends React.Component<
-  MainPageProps,
-  MainPageState
-> {
+export default class MainPage extends React.Component<MainPageProps, MainPageState> {
   private intervalID?: NodeJS.Timeout;
   constructor(props: MainPageProps) {
     super(props);
@@ -93,12 +96,11 @@ export default class MainPage extends React.Component<
     return (
       <div className="main-page">
         <NavBarFrame />
-        <ClueFrame />
-        <PathFrame paths={this.state.paths} updateInfo={this.updateInfo} />
-        <GroupFrame
-          groups={this.state.groups}
-          paths={this.state.paths}
-          updateInfo={this.updateInfo}
+        <ClueFrame clues={this.props.clues} clueLists={this.props.clueLists}
+          updateClues={this.props.updateClues} />
+        <PathFrame paths={this.state.paths} updateInfo={this.updateInfo} updatePage={this.props.updatePage} />
+        <GroupFrame groups={this.state.groups}
+          paths={this.state.paths} updateInfo={this.updateInfo}
         />
       </div>
     );
