@@ -73,6 +73,14 @@ pathsRouter.delete("/:pathID", (req, res) => {
     .catch((error) => res.status(400).send(error));
 });
 
+pathsRouter.put('/:pathID/order', (req, res) => {
+  const pathID = Number(req.params.pathID);
+  const clueIDs = (req.body.clueIDs as number[]);
+  console.log(clueIDs)
+  dbWrapper.orderCluesInPath(pathID, clueIDs)
+    .then((infoObject) => res.send(infoObject))
+    .catch((error) => res.status(400).send(error))
+})
 /**
  * adds specified clue to the specified path
  */
@@ -94,14 +102,14 @@ pathsRouter.put("/:pathID/clue", async (req, res) => {
   const clueID = Number(req.body.clueID);
 
   const alreadyAssigned = await dbWrapper.isClueAssigned(clueID);
-  if (alreadyAssigned) {
-    res.status(401).send("Clue is already assigned to a path");
-  }
-  else {
+
+  if (alreadyAssigned === false) {
     dbWrapper
       .addClueToPath(pathID, clueID)
       .then((infoObject) => res.send(infoObject))
       .catch((error) => res.status(400).send(error));
+  } else {
+    res.status(401).send({ pathID: alreadyAssigned });
   }
 });
 
