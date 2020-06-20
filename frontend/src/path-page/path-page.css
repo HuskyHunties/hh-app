@@ -27,18 +27,22 @@
     padding: 2.5%;
 }
 
-.confirm-path {
+.exit {
     position: absolute;
-    width: 40%;
+    width: 80%;
     height: 10%;
-    left: 7%;
+    left: 10%;
     top: 85%;
 }
 
-.discard-path {
+/* Positioning for the table itself */
+.clue-table {
     position: absolute;
-    width: 40%;
-    height: 10%;
-    left: 53%;
-    top: 85%;
-}
+    width: calc(100% - 50px);
+  }
+
+/* Indicates that a table cell is currently selected */
+.selected {
+    background: var(--accent-color);
+    color: var(--bg-color);
+  }

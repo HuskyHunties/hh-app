@@ -4,12 +4,15 @@ import { Clue } from "../main-page/clue-frame/clue-frame";
 import { PageTypes } from "..";
 
 interface PathInfoProps {
-    routeName: string;
-    routeClues: Clue[];
+    pathName: string;
+    pathClues: Clue[];
     updatePage(type: PageTypes): void;
+    selected?: number;
+    select(id: number): void;
 }
 
 interface PathInfoState {
+
 }
 
 export default class PathInfo extends React.Component<PathInfoProps, PathInfoState> {
@@ -20,13 +23,15 @@ export default class PathInfo extends React.Component<PathInfoProps, PathInfoSta
     }
 
 
+
+
     render() {
-        console.log(this.props.routeClues);
         return (
             <div className="path-info-container" >
-                <PathList routeName={this.props.routeName} routeClues={this.props.routeClues} />
-                <button className="confirm-path">Save Path</button>
-                <button className="discard-path" onClick={() => this.props.updatePage(PageTypes.MAINPAGE)}>Discard Changes</button>
+                <PathList pathName={this.props.pathName} pathClues={this.props.pathClues} selected={this.props.selected}
+                    select={this.props.select} />
+                    {/** TODO: Actually handle exiting */}
+                <button className="exit" onClick={() => this.props.updatePage(PageTypes.MAINPAGE)}>Done Modifying</button>
             </div>
         )
     }
@@ -34,8 +39,10 @@ export default class PathInfo extends React.Component<PathInfoProps, PathInfoSta
 
 
 interface PathListProps {
-    routeName: string;
-    routeClues: Clue[];
+    pathName: string;
+    pathClues: Clue[];
+    selected?: number;
+    select(id: number): void;
 }
 
 interface PathListState {
@@ -44,10 +51,26 @@ interface PathListState {
 class PathList extends React.Component<PathListProps, PathListState> {
 
     render() {
+        const clues = this.props.pathClues.map((clue) => {
+            return <tr key={clue.id} onClick={() => this.props.select(clue.id)}>
+                <td className={clue.id === this.props.selected ? "selected" : ""}>
+                    {clue.list + clue.num + ": " + clue.name}
+                </td>
+            </tr>
+        })
+
+
         return (
-            <div>
-                <h1>{this.props.routeName}</h1>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Path Clues</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {clues}
+                </tbody>
+            </table>
         )
     }
 

@@ -24,7 +24,7 @@ interface PageLoaderProps { }
  */
 interface PageLoaderState {
   currentPage: PageTypes;
-  clues: Clue[];
+  clues: Map<number,Clue>;
   clueLists: Set<string>;
   currentPath?: number;
 }
@@ -39,11 +39,9 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
   constructor(props: PageLoaderProps) {
     super(props);
     this.state = {
-      currentPage: PageTypes.ROUTES,
-      clues: [],
+      currentPage: PageTypes.MAINPAGE,
+      clues: new Map(),
       clueLists: new Set<string>(),
-      // REMOVE THIS, ONLY FOR TESTING
-      currentPath: 1
     }
     this.updateClues = this.updateClues.bind(this);
     this.updatePage = this.updatePage.bind(this);
@@ -80,7 +78,7 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
    * Updates the clues stored in state by making API calls
    */
   private updateClues() {
-    const clues: Clue[] = [];
+    const clues: Map<number, Clue> = new Map();
     let ids: number[] = [];
     const clueLists = new Set<string>();
     API.get("/clues/").then((res) => {
@@ -91,7 +89,7 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
     }).then((routes) => Axios.all<AxiosResponse>(routes)).then((res: AxiosResponse[]) => {
       res.forEach((res: AxiosResponse, index: number) => {
         const clue = res.data;
-        clues.push({
+        clues.set(ids[index], {
           list: (clue.listID as string).toUpperCase(),
           num: clue.clueNumber,
           name: clue.name,
@@ -112,13 +110,13 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
     let page: JSX.Element;
     switch (this.state.currentPage) {
       case PageTypes.MAINPAGE:
-        page = <MainPage clues={this.state.clues} clueLists={this.state.clueLists}
+        page = <MainPage clues={Array.from(this.state.clues.values())} clueLists={this.state.clueLists}
           updateClues={this.updateClues} updatePage={this.updatePage} />;
         break;
 
       case PageTypes.ROUTES:
         page = <PathPage clues={this.state.clues} clueLists={this.state.clueLists}
-        currentRoute={this.state.currentPath!} updatePage={this.updatePage} />
+        currentPath={this.state.currentPath!} updatePage={this.updatePage} />
         break;
 
       case PageTypes.IMAGES:
