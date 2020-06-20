@@ -71,9 +71,9 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
         return (
             <div className="path-page-container" >
                 <PathInfo pathName={this.state.pathName} pathClues={this.state.pathClues} updatePage={this.props.updatePage}
-                    select={this.setSelection} selected={this.state.selected} />
+                    select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath} updateInfo={this.updateInfo} />
                 <PathMap clues={Array.from(this.props.clues.values())} clueLists={this.props.clueLists} pathClues={this.state.pathClues}
-                    select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath} 
+                    select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath}
                     updateInfo={this.updateInfo} />
             </div>
         )

@@ -39,6 +39,7 @@
 .clue-table {
     position: absolute;
     width: calc(100% - 50px);
+    margin: 25px;
   }
 
 /* Indicates that a table cell is currently selected */
