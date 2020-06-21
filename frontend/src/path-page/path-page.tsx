@@ -6,6 +6,9 @@ import API from "../utils/API";
 import PathInfo from "./path-info";
 import PathMap from "./path-map";
 
+/**
+ * Properties type for PathPage
+ */
 interface PathPageProps {
     clues: Map<number, Clue>;
     clueLists: Set<string>;
@@ -13,12 +16,19 @@ interface PathPageProps {
     updatePage(type: PageTypes): void;
 }
 
+/**
+ * State type for PathPage
+ */
 interface PathPageState {
     pathName: string;
     pathClues: Clue[];
     selected?: number;
 }
 
+/**
+ * A component that represents a page that allows the user to add, remove, and modify the order of clues
+ * in a path.
+ */
 export default class PathPage extends React.Component<PathPageProps, PathPageState> {
     private intervalID?: NodeJS.Timeout;
 
@@ -33,12 +43,18 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
 
     }
 
+    /**
+     * Start auto refreshing the Path info
+     */
     componentDidMount() {
         this.updateInfo()
 
         this.intervalID = setInterval(this.updateInfo, 5000);
     }
 
+    /**
+     * Stop refreshing when the component is unmounted
+     */
     componentWillUnmount() {
         clearInterval(this.intervalID!);
     }
@@ -66,7 +82,9 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
         })
     }
 
-
+    /**
+     * Render the component
+     */
     render() {
         return (
             <div className="path-page-container" >

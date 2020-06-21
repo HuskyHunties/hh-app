@@ -5,6 +5,9 @@ import { Clue } from "../main-page/clue-frame/clue-frame";
 import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import API from "../utils/API";
 
+/**
+ * Props type for the Path Map component.
+ */
 interface PathMapProps {
     currentPath: number;
     clues: Clue[];
@@ -15,10 +18,16 @@ interface PathMapProps {
     updateInfo(): void;
 }
 
+/**
+ * State type for the Path Map component.
+ */
 interface PathMapState {
     center: google.maps.LatLngLiteral;
 }
 
+/**
+ * Shows all clues on a map and allows them to be clicked to be added to a path.
+ */
 export default class PathMap extends React.Component<PathMapProps, PathMapState> {
     private static libraries = ["places"];
 
@@ -30,7 +39,7 @@ export default class PathMap extends React.Component<PathMapProps, PathMapState>
     }
 
     /**
-     * Adds the currently selected clue to the current route
+     * Adds the currently selected clue to the current path in the backend
      */
     addClueToPath() {
         API.put("/paths/" + this.props.currentPath + "/clue", {
@@ -39,7 +48,9 @@ export default class PathMap extends React.Component<PathMapProps, PathMapState>
         // TODO handle errors
     }
 
-
+    /**
+     * Renders the component
+     */
     render() {
         const clueMarkers = this.props.clues.map((clue) => {
             return <Marker key={clue.id} label={clue.list + clue.num} position={clue.place} onClick={() => this.props.select(clue.id)}>

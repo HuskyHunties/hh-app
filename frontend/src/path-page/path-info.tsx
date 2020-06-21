@@ -4,6 +4,9 @@ import { Clue } from "../main-page/clue-frame/clue-frame";
 import { PageTypes } from "..";
 import API from "../utils/API";
 
+/**
+ * Props type for the Path Info component.
+ */
 interface PathInfoProps {
     pathName: string;
     pathClues: Clue[];
@@ -14,10 +17,16 @@ interface PathInfoProps {
     updateInfo(): void;
 }
 
+/**
+ * State type for the Path Info component.
+ */
 interface PathInfoState {
 
 }
 
+/**
+ * A component to display the list of clues and buttons to manipulate that list.
+ */
 export default class PathInfo extends React.Component<PathInfoProps, PathInfoState> {
     constructor(props: PathInfoProps) {
         super(props);
@@ -25,9 +34,9 @@ export default class PathInfo extends React.Component<PathInfoProps, PathInfoSta
         }
     }
 
-
-
-
+    /**
+     * Render the component.
+     */
     render() {
         return (
             <div className="path-info-container" >
@@ -40,7 +49,9 @@ export default class PathInfo extends React.Component<PathInfoProps, PathInfoSta
     }
 }
 
-
+/**
+ * Props types for the Path List component.
+ */
 interface PathListProps {
     pathName: string;
     pathClues: Clue[];
@@ -50,11 +61,17 @@ interface PathListProps {
     updateInfo(): void;
 }
 
+/**
+ * State type for the Path List component.
+ */
 interface PathListState {
     dragIndex?: number;
     overIndex?: number;
 }
 
+/**
+ * A component to display the list of clues in the path
+ */
 class PathList extends React.Component<PathListProps, PathListState> {
     constructor(props: PathListProps) {
         super(props);
@@ -62,6 +79,12 @@ class PathList extends React.Component<PathListProps, PathListState> {
         }
     }
 
+    /**
+     * Handles when a clue in the list starts to be dragged
+     * @param e the drag event
+     * @param clue the clue being dragged
+     * @param idx the index of the original position
+     */
     private startDrag(e: React.DragEvent<HTMLTableRowElement>, clue: Clue, idx: number) {
         // TODO deal with mouse icons
         const element = document.createElement("div");
@@ -71,6 +94,9 @@ class PathList extends React.Component<PathListProps, PathListState> {
         this.setState({ dragIndex: idx, overIndex: idx })
     }
 
+    /**
+     * Handles when a clue in the list is dropped in its new position, updating the path order in the backend.
+     */
     private dragEnd() {
         const clueIDs = this.props.pathClues.map((clue) => clue.id);
         const dragClue = clueIDs.splice(this.state.dragIndex!, 1);
@@ -80,6 +106,9 @@ class PathList extends React.Component<PathListProps, PathListState> {
         // TODO handle error
     }
 
+    /**
+     * Render the component.
+     */
     render() {
         const clues = this.props.pathClues.map((clue, idx) => {
             return <tr key={clue.id} onClick={() => this.props.select(clue.id)} draggable
