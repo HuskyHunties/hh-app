@@ -20,7 +20,8 @@ enum Pages {
 interface AppProps { }
 
 interface AppState {
-  clues: Clue[];
+  allClues: Clue[];
+  cluesOnPath: Clue[];
   groups: Map<number, Group>;
   selectedGroupID: number;
   paths: Map<number, Path>;
@@ -33,11 +34,12 @@ export default class App extends Component<AppProps, AppState> {
     super(props);
 
     this.state = {
-      clues: [],
+      allClues: [],
+      cluesOnPath: [],
       groups: new Map(),
       selectedGroupID: 0,
       paths: new Map(),
-      pageDisplayed: Pages.ADDTOPATHPAGE,
+      pageDisplayed: Pages.SELECTGROUPPATHPAGE,
     };
     this.updateInfo = this.updateInfo.bind(this);
     this.setSelectedGroupID = this.setSelectedGroupID.bind(this);
@@ -64,13 +66,13 @@ export default class App extends Component<AppProps, AppState> {
 
   // calls the api to update the state of the app
   private updateInfo() {
-    // Clue API Calls
-    const clues: Clue[] = [];
-    let ids: number[] = [];
-    API.get("/clues/")
+    // Gets all the unfinished clues into the state of the app
+    const allClues: Clue[] = [];
+    let allIDs: number[] = [];
+    API.get("/clues/incomplete")
       .then((res) => {
-        ids = res.data.clueIDs;
-        return ids.map((id: number) => {
+        allIDs = res.data.clueIDs;
+        return allIDs.map((id: number) => {
           return API.get<AxiosResponse>("/clues/" + id, {});
         });
       })
@@ -78,8 +80,8 @@ export default class App extends Component<AppProps, AppState> {
       .then((res: AxiosResponse[]) => {
         res.forEach((res: AxiosResponse, index: number) => {
           const clue = res.data;
-          clues.push({
-            id: ids[index],
+          allClues.push({
+            id: allIDs[index],
             listID: (clue.listID as string).toUpperCase(),
             clueNumber: clue.clueNumber,
             name: clue.name,
@@ -88,9 +90,38 @@ export default class App extends Component<AppProps, AppState> {
             long: clue.long,
           });
         });
-        clues.sort(this.clueCompare);
+        allClues.sort(this.clueCompare);
       })
-      .then(() => this.setState({ clues }));
+      .then(() => this.setState({ allClues: allClues }));
+
+      // gets all the unfinished clues on the selected group's path onto the state of the app
+      if(this.state.groups.get(this.state.selectedGroupID))
+    {const cluesOnPath: Clue[] = [];
+    let idsOnPath: number[] = [];
+    API.get(`/paths/${this.state.groups.get(this.state.selectedGroupID)?.pathID}/incomplete`)
+      .then((res) => {
+        idsOnPath = res.data.clueIDs;
+        return idsOnPath.map((id: number) => {
+          return API.get<AxiosResponse>("/clues/" + id, {});
+        });
+      })
+      .then((routes) => Axios.all<AxiosResponse>(routes))
+      .then((res: AxiosResponse[]) => {
+        res.forEach((res: AxiosResponse, index: number) => {
+          const clue = res.data;
+          cluesOnPath.push({
+            id: allIDs[index],
+            listID: (clue.listID as string).toUpperCase(),
+            clueNumber: clue.clueNumber,
+            name: clue.name,
+            description: clue.description,
+            lat: clue.lat,
+            long: clue.long,
+          });
+        });
+        cluesOnPath.sort(this.clueCompare);
+      })
+      .then(() => this.setState({ cluesOnPath: cluesOnPath }));}
     // Group API calls
     API.get("/groups", {})
       .then(async (res) => {
@@ -142,13 +173,13 @@ export default class App extends Component<AppProps, AppState> {
         );
         break;
       case Pages.ClUESONPATHPAGE:
-        page = <CluesOnPathPage clues={this.state.clues} />;
+        page = <CluesOnPathPage clues={this.state.cluesOnPath} />;
         break;
       case Pages.CREATEGROUPPATHPAGE:
         page = <CreateGroupPathPage />
         break;
       case Pages.ADDTOPATHPAGE:
-        page = <AddToPathPage clues={this.state.clues} pathID={this.state.groups.get(this.state.selectedGroupID)?.pathID} />
+        page = <AddToPathPage clues={this.state.allClues} pathID={this.state.groups.get(this.state.selectedGroupID)?.pathID} />
         break;
     }
     return page;

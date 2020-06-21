@@ -151,14 +151,14 @@ export default class ImagePage extends Component<
   render() {
     return (
       <View style={this.styles.cluespage}>
-        <View style={this.styles.image}>
+        {/*<View style={this.styles.image}>
           <Image
             source={{
               uri: `data:image/png;base64,${this.state.displayedImage}`,
             }}
             style={{ height: 300, width: 300 }}
           />
-        </View>
+          </View>*/}
         <View style={this.styles.picturebutton}>
           <Button
             title="Take a photo"
