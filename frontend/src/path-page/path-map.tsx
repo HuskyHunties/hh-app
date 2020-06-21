@@ -2,9 +2,10 @@ import React, { RefObject } from "react";
 import GLOBALSECRETS from "../secrets";
 import "./path-page.css";
 import { Clue } from "../main-page/clue-frame/clue-frame";
-import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline } from "@react-google-maps/api";
 import API from "../utils/API";
 import Popup from "../utils/popup";
+import ReactDOM from "react-dom";
 
 /**
  * Props type for the Path Map component.
@@ -18,6 +19,7 @@ interface PathMapProps {
     select(id: number): void;
     updateInfo(): void;
     popupRef: RefObject<Popup>;
+    removeClue(): void;
 }
 
 /**
@@ -25,6 +27,7 @@ interface PathMapProps {
  */
 interface PathMapState {
     center: google.maps.LatLngLiteral;
+    showPath: boolean;
 }
 
 /**
@@ -32,12 +35,16 @@ interface PathMapState {
  */
 export default class PathMap extends React.Component<PathMapProps, PathMapState> {
     private static libraries = ["places"];
+    private map?: google.maps.Map<Element>;
 
     constructor(props: PathMapProps) {
         super(props);
         this.state = {
-            center: { lat: 42.3406995, lng: -71.0897018 }
+            center: { lat: 42.3406995, lng: -71.0897018 },
+            showPath: true
         }
+
+        this.handleMapLoad = this.handleMapLoad.bind(this);
     }
 
     /**
@@ -50,15 +57,33 @@ export default class PathMap extends React.Component<PathMapProps, PathMapState>
         // TODO handle errors
     }
 
+    handleMapLoad(map: google.maps.Map<Element>) {
+        this.map = map;
+        const showPathControl = <div onClick={() => this.setState({ showPath: !this.state.showPath })} className="show-path-control">
+            Toggle Path
+        </div>;
+        const controlDiv = document.createElement("div");
+        ReactDOM.render(showPathControl, controlDiv);
+        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(controlDiv);
+    }
+
     /**
      * Renders the component
      */
     render() {
-        const clueMarkers = this.props.clues.map((clue) => {
-            return <Marker key={clue.id} label={clue.list + clue.num} position={clue.place} onClick={() => this.props.select(clue.id)}>
+        const options = {
+            streetViewControl: false,
+            fullscreenControl: false,
+        };
+
+        const pathClueIDs = this.props.pathClues.map((clue) => clue.id);
+        const mapClues = this.props.clues.filter((clue) => !pathClueIDs.includes(clue.id));
+
+        const clueMarkers = mapClues.map((clue) => {
+            return <Marker key={clue.id} label={clue.list + clue.num} position={clue.place} onClick={() => this.props.select(clue.id)} >
                 {clue.id === this.props.selected ?
                     <InfoWindow>
-                        <div style={{background: "#232323"}}>
+                        <div style={{ background: "#232323" }}>
                             {clue.list + clue.num + ": " + clue.name} <br />
                             {clue.desc} <br />
                             <button onClick={() => this.addClueToPath()}>Add Clue</button>
@@ -66,14 +91,43 @@ export default class PathMap extends React.Component<PathMapProps, PathMapState>
                     </InfoWindow>
                     : ""}
             </Marker>
-        })
+        });
+
+        let pathMarkers: JSX.Element[] = [];
+        let polylines: JSX.Element[] = [];
+        if (this.state.showPath) {
+            pathMarkers = this.props.pathClues.map((clue) => {
+                return <Marker key={clue.id} label={clue.list + clue.num} position={clue.place} onClick={() => this.props.select(clue.id)} >
+                    {clue.id === this.props.selected ?
+                        <InfoWindow>
+                            <div style={{ background: "#232323" }}>
+                                {clue.list + clue.num + ": " + clue.name} <br />
+                                {clue.desc} <br />
+                                <button onClick={this.props.removeClue}>Remove Clue</button>
+                            </div>
+                        </InfoWindow>
+                        : ""}
+                </Marker>
+            });
+
+            const lineSymbol = {path: 2}; //google.maps.SymbolPath.FORWARD_OPEN_ARROW
+            const polyOptions = {icons: [{icon: lineSymbol, offset: "100%"}], clickable: false};
+            const pathCluesPlaces = this.props.pathClues.map((clue) => clue.place);
+            for (let i = 0; i < this.props.pathClues.length - 1; i++) {
+                polylines.push(<Polyline key={"pl" + i} path={pathCluesPlaces.slice(i, i+2)} options={polyOptions} />)
+            }
+
+        }
+
 
         return (
             <div className="path-map-container">
                 <LoadScript googleMapsApiKey={GLOBALSECRETS.mapsKey} libraries={PathMap.libraries}>
-                    <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }}
-                        center={this.state.center} zoom={13} >
+                    <GoogleMap mapContainerStyle={{ width: "100%", height: "100%" }} options={options}
+                        center={this.state.center} zoom={13} onLoad={this.handleMapLoad}>
                         {clueMarkers}
+                        {pathMarkers}
+                        {polylines}
                     </GoogleMap>
                 </LoadScript>
             </div>

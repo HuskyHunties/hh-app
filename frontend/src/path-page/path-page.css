@@ -61,3 +61,14 @@
     background: var(--accent-color);
     color: var(--bg-color);
   }
+
+  /* Styling for the show path control on the path map. */
+  .show-path-control {
+    background-color: var(--bg-color);
+    color: var(--font-color);
+    margin: 15px;
+    width: 125px;
+    font-size: 14pt;
+    text-align: center;
+    cursor: pointer;
+  }

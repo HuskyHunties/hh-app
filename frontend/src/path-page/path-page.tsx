@@ -5,7 +5,7 @@ import { PageTypes } from "..";
 import API from "../utils/API";
 import PathInfo from "./path-info";
 import PathMap from "./path-map";
-import Popup from "../utils/popup";
+import Popup, { PopupTypes } from "../utils/popup";
 
 /**
  * Properties type for PathPage
@@ -45,6 +45,7 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
 
         this.setSelection = this.setSelection.bind(this);
         this.updateInfo = this.updateInfo.bind(this);
+        this.removeClue = this.removeClue.bind(this);
     }
 
     /**
@@ -87,17 +88,48 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
     }
 
     /**
+     * Removes the selected clue from the current path
+     */
+    removeClue() {
+        if (!this.state.selected || !this.state.pathClues.map((clue) => clue.id).includes(this.state.selected)) {
+            this.popupRef.current?.popupFactory(PopupTypes.Notif, "No Clue Selected");
+            return;
+        }
+
+        API.delete("/paths/" + this.props.currentPath + "/clue/" + this.state.selected).then(() => {
+            this.updateInfo();
+            this.setSelection(undefined);
+        },
+            (res) => this.handleRemoveError(res.response.status))
+    }
+
+    /**
+     * Handles errors in the removeClue API request
+     * @param err the error code
+     */
+    handleRemoveError(err: number) {
+        // Clue already removed
+        if (err === 400) {
+            this.updateInfo();
+            this.setSelection(undefined);
+        } else {
+            console.log(err);
+            throw new Error("Unknown Error Code");
+        }
+    }
+
+    /**
      * Render the component
      */
     render() {
         return (
             <div className="path-page-container" >
                 <PathInfo pathName={this.state.pathName} pathClues={this.state.pathClues} updatePage={this.props.updatePage}
-                    select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath} updateInfo={this.updateInfo} 
-                    popupRef={this.popupRef} />
+                    select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath} updateInfo={this.updateInfo}
+                    popupRef={this.popupRef} removeClue={this.removeClue} />
                 <PathMap clues={Array.from(this.props.clues.values())} clueLists={this.props.clueLists} pathClues={this.state.pathClues}
                     select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath}
-                    updateInfo={this.updateInfo} popupRef={this.popupRef} />
+                    updateInfo={this.updateInfo} popupRef={this.popupRef} removeClue={this.removeClue} />
                 <Popup ref={this.popupRef} />
             </div>
         )

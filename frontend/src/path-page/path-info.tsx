@@ -17,6 +17,7 @@ interface PathInfoProps {
     currentPath: number;
     updateInfo(): void;
     popupRef: RefObject<Popup>;
+    removeClue(): void;
 }
 
 /**
@@ -32,37 +33,6 @@ export default class PathInfo extends React.Component<PathInfoProps, PathInfoSta
     constructor(props: PathInfoProps) {
         super(props);
         this.state = {
-        }
-    }
-
-    /**
-     * Removes the selected clue from the current path
-     */
-    removeClue() {
-        if (!this.props.selected || !this.props.pathClues.map((clue) => clue.id).includes(this.props.selected)) {
-            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "No Clue Selected");
-            return;
-        }
-
-        API.delete("/paths/" + this.props.currentPath + "/clue/" + this.props.selected).then(() => {
-            this.props.updateInfo();
-            this.props.select(undefined);
-        },
-            (res) => this.handleRemoveError(res.response.status))
-    }
-
-    /**
-     * Handles errors in the removeClue API request
-     * @param err the error code
-     */
-    handleRemoveError(err: number) {
-        // Clue already removed
-        if (err === 400) {
-            this.props.updateInfo();
-            this.props.select(undefined);
-        } else {
-            console.log(err);
-            throw new Error("Unknown Error Code");
         }
     }
 
@@ -87,7 +57,7 @@ export default class PathInfo extends React.Component<PathInfoProps, PathInfoSta
                 <PathList pathName={this.props.pathName} pathClues={this.props.pathClues} selected={this.props.selected}
                     select={this.props.select} updateInfo={this.props.updateInfo} currentPath={this.props.currentPath}
                     popupRef={this.props.popupRef} />
-                <button className="remove-clue" onClick={() => this.removeClue()}>Remove Selected Clue</button>
+                <button className="remove-clue" onClick={this.props.removeClue}>Remove Selected Clue</button>
                 <button className="exit" onClick={() => this.handleExit()}>Done Modifying</button>
             </div>
         )
@@ -147,11 +117,10 @@ class PathList extends React.Component<PathListProps, PathListState> {
         const clueIDs = this.props.pathClues.map((clue) => clue.id);
         const dragClue = clueIDs.splice(this.state.dragIndex!, 1);
         clueIDs.splice(this.state.overIndex! < this.state.dragIndex! ? this.state.overIndex! + 1 : this.state.overIndex!, 0, dragClue[0]);
-        this.setState({ dragIndex: undefined, overIndex: undefined })
         API.put("paths/" + this.props.currentPath + "/order", { clueIDs }).then(this.props.updateInfo, () => {
             this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "Reorder Failed, Please Try Again");
             this.props.updateInfo();
-        })
+        }).then(() => this.setState({ dragIndex: undefined, overIndex: undefined }))
     }
 
     /**
