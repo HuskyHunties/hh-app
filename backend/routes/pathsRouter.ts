@@ -73,14 +73,14 @@ pathsRouter.delete("/:pathID", (req, res) => {
     .catch((error) => res.status(400).send(error));
 });
 
-pathsRouter.put('/:pathID/order', (req, res) => {
+pathsRouter.put("/:pathID/order", (req, res) => {
   const pathID = Number(req.params.pathID);
-  const clueIDs = (req.body.clueIDs as number[]);
-  console.log(clueIDs)
-  dbWrapper.orderCluesInPath(pathID, clueIDs)
+  const clueIDs = req.body.clueIDs as number[];
+  dbWrapper
+    .orderCluesInPath(pathID, clueIDs)
     .then((infoObject) => res.send(infoObject))
-    .catch((error) => res.status(400).send(error))
-})
+    .catch((error) => res.status(400).send(error));
+});
 /**
  * adds specified clue to the specified path
  */
@@ -91,7 +91,6 @@ pathsRouter.put("/:pathID/clue/override", (req, res) => {
     .addClueToPath(pathID, clueID)
     .then((infoObject) => res.send(infoObject))
     .catch((error) => res.status(400).send(error));
-
 });
 
 /**
@@ -114,13 +113,13 @@ pathsRouter.put("/:pathID/clue", async (req, res) => {
 });
 
 /* removes the specified clue from the specified path
-*/
-pathsRouter.delete("/:pathID/clue", (req, res) => {
+ */
+pathsRouter.delete("/:pathID/clue/:clueID", (req, res) => {
   const pathID = Number(req.params.pathID);
-  const clueID = Number(req.body.clueID);
+  const clueID = Number(req.params.clueID);
   dbWrapper
     .removeClueFromPath(pathID, clueID)
     .then((infoObject) => res.send(infoObject))
     .catch((error) => res.status(400).send(error));
-})
+});
 export default pathsRouter;
