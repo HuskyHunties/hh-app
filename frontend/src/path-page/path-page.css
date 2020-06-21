@@ -30,13 +30,22 @@
     padding: 2.5%;
 }
 
+/* Formatting for the remove clue button */
+.remove-clue {
+    position: absolute;
+    width: 80%;
+    height: 7%;
+    left: 10%;
+    top: 80%;
+}
+
 /* Formatting for the exit button */
 .exit {
     position: absolute;
     width: 80%;
-    height: 10%;
+    height: 7%;
     left: 10%;
-    top: 85%;
+    top: 90%;
 }
 
 /* Positioning for the table itself */
@@ -44,6 +53,7 @@
     position: absolute;
     width: calc(100% - 50px);
     margin: 25px;
+    height: calc(80% - 50px);
   }
 
 /* Indicates that a table cell is currently selected */

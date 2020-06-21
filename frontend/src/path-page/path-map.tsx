@@ -1,9 +1,10 @@
-import React from "react";
+import React, { RefObject } from "react";
 import GLOBALSECRETS from "../secrets";
 import "./path-page.css";
 import { Clue } from "../main-page/clue-frame/clue-frame";
 import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 import API from "../utils/API";
+import Popup from "../utils/popup";
 
 /**
  * Props type for the Path Map component.
@@ -16,6 +17,7 @@ interface PathMapProps {
     selected?: number;
     select(id: number): void;
     updateInfo(): void;
+    popupRef: RefObject<Popup>;
 }
 
 /**

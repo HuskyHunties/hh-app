@@ -1,8 +1,9 @@
-import React from "react";
+import React, { RefObject } from "react";
 import "./path-page.css";
 import { Clue } from "../main-page/clue-frame/clue-frame";
 import { PageTypes } from "..";
 import API from "../utils/API";
+import Popup, { PopupTypes } from "../utils/popup";
 
 /**
  * Props type for the Path Info component.
@@ -12,16 +13,16 @@ interface PathInfoProps {
     pathClues: Clue[];
     updatePage(type: PageTypes): void;
     selected?: number;
-    select(id: number): void;
+    select(id?: number): void;
     currentPath: number;
     updateInfo(): void;
+    popupRef: RefObject<Popup>;
 }
 
 /**
  * State type for the Path Info component.
  */
 interface PathInfoState {
-
 }
 
 /**
@@ -35,15 +36,59 @@ export default class PathInfo extends React.Component<PathInfoProps, PathInfoSta
     }
 
     /**
+     * Removes the selected clue from the current path
+     */
+    removeClue() {
+        if (!this.props.selected || !this.props.pathClues.map((clue) => clue.id).includes(this.props.selected)) {
+            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "No Clue Selected");
+            return;
+        }
+
+        API.delete("/paths/" + this.props.currentPath + "/clue/" + this.props.selected).then(() => {
+            this.props.updateInfo();
+            this.props.select(undefined);
+        },
+            (res) => this.handleRemoveError(res.response.status))
+    }
+
+    /**
+     * Handles errors in the removeClue API request
+     * @param err the error code
+     */
+    handleRemoveError(err: number) {
+        // Clue already removed
+        if (err === 400) {
+            this.props.updateInfo();
+            this.props.select(undefined);
+        } else {
+            console.log(err);
+            throw new Error("Unknown Error Code");
+        }
+    }
+
+    /**
+     * Handle exiting the page and returning to the main page.
+     */
+    handleExit() {
+        const clueIDs = this.props.pathClues.map((clue) => clue.id);
+        API.put("paths/" + this.props.currentPath + "/order", { clueIDs })
+            .then(() => this.props.updatePage(PageTypes.MAINPAGE), () => {
+                this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "Order may not be preserved. Exit anyway?")
+                    .then(() => this.props.updatePage(PageTypes.MAINPAGE));
+            });
+    }
+
+    /**
      * Render the component.
      */
     render() {
         return (
             <div className="path-info-container" >
                 <PathList pathName={this.props.pathName} pathClues={this.props.pathClues} selected={this.props.selected}
-                    select={this.props.select} updateInfo={this.props.updateInfo} currentPath={this.props.currentPath} />
-                {/** TODO: Actually handle exiting */}
-                <button className="exit" onClick={() => this.props.updatePage(PageTypes.MAINPAGE)}>Done Modifying</button>
+                    select={this.props.select} updateInfo={this.props.updateInfo} currentPath={this.props.currentPath}
+                    popupRef={this.props.popupRef} />
+                <button className="remove-clue" onClick={() => this.removeClue()}>Remove Selected Clue</button>
+                <button className="exit" onClick={() => this.handleExit()}>Done Modifying</button>
             </div>
         )
     }
@@ -59,6 +104,7 @@ interface PathListProps {
     select(id: number): void;
     currentPath: number;
     updateInfo(): void;
+    popupRef: RefObject<Popup>;
 }
 
 /**
@@ -102,8 +148,10 @@ class PathList extends React.Component<PathListProps, PathListState> {
         const dragClue = clueIDs.splice(this.state.dragIndex!, 1);
         clueIDs.splice(this.state.overIndex! < this.state.dragIndex! ? this.state.overIndex! + 1 : this.state.overIndex!, 0, dragClue[0]);
         this.setState({ dragIndex: undefined, overIndex: undefined })
-        API.put("paths/" + this.props.currentPath + "/order", { clueIDs }).then(this.props.updateInfo)
-        // TODO handle error
+        API.put("paths/" + this.props.currentPath + "/order", { clueIDs }).then(this.props.updateInfo, () => {
+            this.props.popupRef.current?.popupFactory(PopupTypes.Notif, "Reorder Failed, Please Try Again");
+            this.props.updateInfo();
+        })
     }
 
     /**

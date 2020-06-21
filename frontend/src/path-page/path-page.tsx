@@ -1,10 +1,11 @@
-import React from "react";
+import React, { RefObject } from "react";
 import "./path-page.css";
 import { Clue } from "../main-page/clue-frame/clue-frame";
 import { PageTypes } from "..";
 import API from "../utils/API";
 import PathInfo from "./path-info";
 import PathMap from "./path-map";
+import Popup from "../utils/popup";
 
 /**
  * Properties type for PathPage
@@ -31,6 +32,7 @@ interface PathPageState {
  */
 export default class PathPage extends React.Component<PathPageProps, PathPageState> {
     private intervalID?: NodeJS.Timeout;
+    private popupRef: RefObject<Popup>;
 
     constructor(props: PathPageProps) {
         super(props);
@@ -38,9 +40,11 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
             pathName: "",
             pathClues: [],
         }
+
+        this.popupRef = React.createRef();
+
         this.setSelection = this.setSelection.bind(this);
         this.updateInfo = this.updateInfo.bind(this);
-
     }
 
     /**
@@ -63,7 +67,7 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
      * Sets the selected value to be the given value
      * @param id the new selection
      */
-    setSelection(id: number) {
+    setSelection(id?: number) {
         this.setState({
             selected: id
         })
@@ -89,10 +93,12 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
         return (
             <div className="path-page-container" >
                 <PathInfo pathName={this.state.pathName} pathClues={this.state.pathClues} updatePage={this.props.updatePage}
-                    select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath} updateInfo={this.updateInfo} />
+                    select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath} updateInfo={this.updateInfo} 
+                    popupRef={this.popupRef} />
                 <PathMap clues={Array.from(this.props.clues.values())} clueLists={this.props.clueLists} pathClues={this.state.pathClues}
                     select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath}
-                    updateInfo={this.updateInfo} />
+                    updateInfo={this.updateInfo} popupRef={this.popupRef} />
+                <Popup ref={this.popupRef} />
             </div>
         )
     }
