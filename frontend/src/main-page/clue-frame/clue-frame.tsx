@@ -42,7 +42,7 @@ interface ClueListProps {
 /**
  * State type for the GroupList Component
  */
-interface ClueListState {}
+interface ClueListState { }
 
 /**
  * A component that displays all of the currently created groups as a selectable list.
@@ -114,17 +114,15 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
    */
   deleteClue() {
     if (this.state.selected && (typeof this.state.selected) === 'number') {
-      this.popupRef.current
-        ?.popupFactory(PopupTypes.Confirm, "Delete Selected Clue?")
-        .then(
-          () => {
-            API.delete("/clues/" + this.state.selected, {}).then(
-              this.props.updateClues,
-              (res) => this.handleDeleteError(res.response.status)
-            );
-            console.log("deleted clue: " + this.state.selected);
-          },
-          () => {}
+      this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Delete Selected Clue?")
+        .then(() => {
+          API.delete("/clues/" + this.state.selected, {}).then(
+            this.props.updateClues,
+            (res) => this.handleDeleteError(res.response.status)
+          );
+          console.log("deleted clue: " + this.state.selected);
+        },
+          () => { }
         );
     } else {
       this.popupRef.current?.popupFactory(PopupTypes.Notif, "No Clue Selected");
@@ -160,7 +158,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
             clues={this.props.clues}
           />
         </div>
-        <button onClick={() => this.deleteClue()}className="clue-delete">Delete Clue</button>
+        <button onClick={() => this.deleteClue()} className="clue-delete">Delete Clue</button>
         <div className="clue-map">
           <ClueMap updateClues={this.props.updateClues}
             clues={this.props.clues} selected={this.state.selected} clueLists={this.props.clueLists}
