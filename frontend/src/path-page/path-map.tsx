@@ -4,7 +4,7 @@ import "./path-page.css";
 import { Clue } from "../main-page/clue-frame/clue-frame";
 import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline } from "@react-google-maps/api";
 import API from "../utils/API";
-import Popup from "../utils/popup";
+import Popup, { PopupTypes } from "../utils/popup";
 import ReactDOM from "react-dom";
 
 /**
@@ -53,8 +53,23 @@ export default class PathMap extends React.Component<PathMapProps, PathMapState>
     addClueToPath() {
         API.put("/paths/" + this.props.currentPath + "/clue", {
             clueID: this.props.selected
-        }).then(this.props.updateInfo)
-        // TODO handle errors
+        }).then(this.props.updateInfo, (res) => this.handleAddError(res.response.status));
+    }
+
+    handleAddError(err: number) {
+        if (err === 401) {
+            // TODO display path name
+            this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "Clue already assigned to path.  Assign anyway?")
+            .then(() => {
+                API.put("/paths/" + this.props.currentPath + "/clue/override", {
+                    clueID: this.props.selected
+                }).then(this.props.updateInfo, (res) => this.handleAddError(res.response.status));
+            })
+        } else {
+            console.log(err);
+            throw new Error("Unknown Error Code.")
+        }
+
     }
 
     handleMapLoad(map: google.maps.Map<Element>) {
