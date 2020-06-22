@@ -683,31 +683,35 @@ class DatabaseWrapper {
 
       const allUnfinishedClueIDs: number[] = [];
 
-      let clueIDSQL = `SELECT clue_id, finished FROM clues WHERE finished = 0 AND`;
+      if (allClues.length !== 0) {
+        let clueIDSQL = `SELECT clue_id, finished FROM clues WHERE finished = 0 AND`;
 
-      allClues.forEach((clueID) => {
-        clueIDSQL += ` clue_id = ${clueID} OR`;
-      });
+        allClues.forEach((clueID) => {
+          clueIDSQL += ` clue_id = ${clueID} OR`;
+        });
 
-      clueIDSQL = clueIDSQL.slice(0, clueIDSQL.length - 3);
+        clueIDSQL = clueIDSQL.slice(0, clueIDSQL.length - 3);
 
-      db.all(clueIDSQL, [], (err, rows) => {
-        if (err) {
-          reject(err.message);
-        }
-        try {
-          rows.forEach((row) => {
-            if (row.finished === 0) {
-              allUnfinishedClueIDs.push(row.clue_id);
-            }
-          });
-        } catch (error) {
-          console.log(error);
-          reject(error);
-        }
+        db.all(clueIDSQL, [], (err, rows) => {
+          if (err) {
+            reject(err.message);
+          }
+          try {
+            rows.forEach((row) => {
+              if (row.finished === 0) {
+                allUnfinishedClueIDs.push(row.clue_id);
+              }
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
 
-        resolve({ name: name, clueIDs: allUnfinishedClueIDs });
-      });
+          resolve({ name: name, clueIDs: allUnfinishedClueIDs });
+        });
+      } else {
+        resolve({ name: name, clueIDs: [] });
+      }
     });
   }
 
@@ -737,32 +741,36 @@ class DatabaseWrapper {
 
       const allFinishedClueIDs: number[] = [];
 
-      let clueIDSQL = `SELECT clue_id, finished FROM clues WHERE finished = 1 AND`;
+      if (allClues.length !== 0) {
+        let clueIDSQL = `SELECT clue_id, finished FROM clues WHERE finished = 1 AND`;
 
-      allClues.forEach((clueID) => {
-        clueIDSQL += ` clue_id = ${clueID} OR`;
-      });
+        allClues.forEach((clueID) => {
+          clueIDSQL += ` clue_id = ${clueID} OR`;
+        });
 
-      clueIDSQL = clueIDSQL.slice(0, clueIDSQL.length - 3);
-      console.log(clueIDSQL);
+        clueIDSQL = clueIDSQL.slice(0, clueIDSQL.length - 3);
+        console.log(clueIDSQL);
 
-      db.all(clueIDSQL, [], (err, rows) => {
-        if (err) {
-          reject(err.message);
-        }
-        try {
-          rows.forEach((row) => {
-            if (row.finished === 1) {
-              allFinishedClueIDs.push(row.clue_id);
-            }
-          });
-        } catch (error) {
-          console.log(error);
-          reject(error);
-        }
+        db.all(clueIDSQL, [], (err, rows) => {
+          if (err) {
+            reject(err.message);
+          }
+          try {
+            rows.forEach((row) => {
+              if (row.finished === 1) {
+                allFinishedClueIDs.push(row.clue_id);
+              }
+            });
+          } catch (error) {
+            console.log(error);
+            reject(error);
+          }
 
-        resolve({ name: name, clueIDs: allFinishedClueIDs });
-      });
+          resolve({ name: name, clueIDs: allFinishedClueIDs });
+        });
+      } else {
+        resolve({ name: name, clueIDs: [] });
+      }
     });
   }
 
@@ -839,7 +847,7 @@ class DatabaseWrapper {
         [pathID, clueID],
         (err) => {
           if (err) {
-            console.log(err.message)
+            console.log(err.message);
             reject(err.message);
           } else {
             resolve({});
@@ -872,45 +880,59 @@ class DatabaseWrapper {
   }
 
   /**
-   * 
-   * @param pathID 
-   * @param clueIDs 
+   *
+   * @param pathID
+   * @param clueIDs
    */
   async orderCluesInPath(pathID: number, clueIDs: number[]): Promise<object> {
     const db = this.db;
     return new Promise(async (resolve, reject) => {
-      //@ts-ignore
-      const clueIDSInPath: number[] = (await this.getCluesofPath(pathID)).clueIDs;
+      const clueIDSInPath: number[] =
+        //@ts-ignore
+        (await this.getCluesofPath(pathID)).clueIDs;
 
-      if (!(clueIDs.length === clueIDSInPath.length && clueIDs.every(value => clueIDSInPath.includes(value)))) {
-        reject("Given clue IDs not same as existing ")
+      if (
+        !(
+          clueIDs.length === clueIDSInPath.length &&
+          clueIDs.every((value) => clueIDSInPath.includes(value))
+        )
+      ) {
+        reject("Given clue IDs not same as existing ");
       }
 
       for (let i = 0; i < clueIDs.length; i++) {
-        await this.orderClueInPath(pathID, clueIDs[i], i).catch(err => reject(err));
-
+        await this.orderClueInPath(pathID, clueIDs[i], i).catch((err) =>
+          reject(err)
+        );
       }
-      resolve({})
-    })
+      resolve({});
+    });
   }
 
   /**
-   * 
-   * @param pathID 
-   * @param clueID 
-   * @param order 
+   *
+   * @param pathID
+   * @param clueID
+   * @param order
    */
-  orderClueInPath(pathID: number, clueID: number, order: number): Promise<object> {
+  orderClueInPath(
+    pathID: number,
+    clueID: number,
+    order: number
+  ): Promise<object> {
     const db = this.db;
     return new Promise((resolve, reject) => {
-      db.run(`UPDATE paths_join_clues SET order_in_path = ${order} WHERE path_id = ${pathID} AND clue_id = ${clueID}`, (err) => {
-        if (err) {
-          console.log(err.message);
-          reject(err.message);
+      db.run(
+        `UPDATE paths_join_clues SET order_in_path = ${order} WHERE path_id = ${pathID} AND clue_id = ${clueID}`,
+        (err) => {
+          if (err) {
+            console.log(err.message);
+            reject(err.message);
+          }
+          resolve({});
         }
-        resolve({});
-      })
-    })
+      );
+    });
   }
 }
 

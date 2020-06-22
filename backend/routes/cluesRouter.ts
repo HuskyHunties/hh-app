@@ -18,7 +18,6 @@ cluesRouter.get("/", (req, res) => {
  * sends all the ids of incomplete clues
  */
 cluesRouter.get("/incomplete", (req, res) => {
-  console.log("getting incomplete clues");
   dbWrapper
     .getAllUnfinishedClueIDs()
     .then((allIncompleteClues) => res.json({ clueIDs: allIncompleteClues }))
@@ -29,7 +28,6 @@ cluesRouter.get("/incomplete", (req, res) => {
  * sends all the ids of complete clues
  */
 cluesRouter.get("/complete", (req, res) => {
-  console.log("getting complete clues");
   dbWrapper
     .getAllFinishedClueIDs()
     .then((allCompleteClues) => res.json({ clueIDs: allCompleteClues }))
