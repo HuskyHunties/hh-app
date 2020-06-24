@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://huskyhunties.github.io/hh-app",
+  "homepage": "http://huskyhunties.github.io/hh-app",
   "dependencies": {
     "@react-google-maps/api": "^1.9.3",
     "@testing-library/jest-dom": "^4.2.4",
