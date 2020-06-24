@@ -5,6 +5,7 @@
         "Unmount",
         "descs",
         "geocode",
+        "polylines",
         "reqs",
         "tsdoc"
     ],

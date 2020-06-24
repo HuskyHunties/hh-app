@@ -113,7 +113,7 @@ pathsRouter.put("/:pathID/clue", async (req, res) => {
 });
 
 /* removes the specified clue from the specified path
- */
+*/
 pathsRouter.delete("/:pathID/clue/:clueID", (req, res) => {
   const pathID = Number(req.params.pathID);
   const clueID = Number(req.params.clueID);

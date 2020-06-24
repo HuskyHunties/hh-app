@@ -6,6 +6,7 @@ axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
  */
 export default axios.create({
   //baseURL: "https://husky-hunties.azurewebsites.net",
-  baseURL: "http://localhost:3000",
+  //baseURL: "http://localhost:3000",
+  baseURL: "http://34.86.145.222:3000",
   responseType: "json",
 });
