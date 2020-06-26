@@ -7,6 +7,3 @@ secrets.json
 backend/hh.db
 backend/hh.db-shm
 backend/hh.db-wal
-
-# Include the frontend build for easy deployment on the server
-!frontend/build
