@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/hh-app/static/css/main.bda39611.chunk.css",
+    "main.js": "/hh-app/static/js/main.e32eee8b.chunk.js",
+    "main.js.map": "/hh-app/static/js/main.e32eee8b.chunk.js.map",
+    "runtime-main.js": "/hh-app/static/js/runtime-main.579f0892.js",
+    "runtime-main.js.map": "/hh-app/static/js/runtime-main.579f0892.js.map",
+    "static/js/2.60ec2cb2.chunk.js": "/hh-app/static/js/2.60ec2cb2.chunk.js",
+    "static/js/2.60ec2cb2.chunk.js.map": "/hh-app/static/js/2.60ec2cb2.chunk.js.map",
+    "index.html": "/hh-app/index.html",
+    "precache-manifest.35ed3392efb332a1797351bdc9ee3cf2.js": "/hh-app/precache-manifest.35ed3392efb332a1797351bdc9ee3cf2.js",
+    "service-worker.js": "/hh-app/service-worker.js",
+    "static/css/main.bda39611.chunk.css.map": "/hh-app/static/css/main.bda39611.chunk.css.map",
+    "static/js/2.60ec2cb2.chunk.js.LICENSE.txt": "/hh-app/static/js/2.60ec2cb2.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.579f0892.js",
+    "static/js/2.60ec2cb2.chunk.js",
+    "static/css/main.bda39611.chunk.css",
+    "static/js/main.e32eee8b.chunk.js"
+  ]
+}
