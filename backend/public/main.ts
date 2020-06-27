@@ -2,41 +2,28 @@ import * as express from "express";
 import * as logger from "morgan";
 import * as bodyParser from "body-parser";
 import * as cors from "cors";
+import * as path from "path";
 
 import groupsRouter from "../routes/groupsRouter";
 import cluesRouter from "../routes/cluesRouter";
 import pathsRouter from "../routes/pathsRouter";
 
-class Main {
-  public express: express.Application;
-  constructor() {
-    this.express = express();
-    this.middleware();
-    this.routes();
-  }
+const app = express();
 
-  private middleware(): void {
-    this.express.use(logger("dev"));
-    this.express.use(bodyParser.json());
-    this.express.use(bodyParser.urlencoded({ extended: false }));
-    this.express.use(cors());
-  }
+app.use(logger("dev"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors());
 
-  private routes(): void {
-    const router = express.Router();
+app.use(express.static(path.join(__dirname, "../frontend-build")));
+console.log(__dirname);
 
-    router.get("/", (req, res) => {
-      res.send(
-        "Whattup you gotta enter a route extension: groups, clues, paths, or crawls"
-      );
-    });
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "/frontend-build", "index.html"));
+// });
 
-    this.express.use("/", router);
+app.use("/groups", groupsRouter);
+app.use("/clues", cluesRouter);
+app.use("/paths", pathsRouter);
 
-    this.express.use("/groups", groupsRouter);
-    this.express.use("/clues", cluesRouter);
-    this.express.use("/paths", pathsRouter);
-  }
-}
-
-export default new Main().express;
+export default app;
