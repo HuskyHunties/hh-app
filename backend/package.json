@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "ts-node public/server.ts"
+    "start": "PORT=3000 ts-node public/server.ts"
   },
   "keywords": [],
   "author": "",

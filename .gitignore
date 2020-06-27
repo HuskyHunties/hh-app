@@ -8,3 +8,4 @@ backend/hh.db
 backend/hh.db-shm
 backend/hh.db-wal
 
+build
