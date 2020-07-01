@@ -299,11 +299,14 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         }
 
         const markers = this.props.clues.map((clue) => {
+            let icon = undefined;
+            try {
+                icon = this.props.settings?.colors.get(clue.list)?.valueOf();
+            } catch (e) {};
+
             return (
-                <Marker
-                    key={clue.id} position={clue.place} onClick={() => this.props.select(clue.id)}
-                    label={clue.list + clue.num} zIndex={0}
-                >
+                <Marker key={clue.id} position={clue.place} onClick={() => this.props.select(clue.id)}
+                    label={clue.list + clue.num} zIndex={0} icon={icon}>
                     {clue.id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <ClueInfo clue={clue} clueLists={this.props.clueLists} popupRef={this.props.popupRef}

@@ -7,7 +7,7 @@ export interface Settings {
 }
 
 const defaultColors = new Map();
-defaultColors.set("U", Icons.ltblue);
+defaultColors.set("U", Icons.lightblue);
 defaultColors.set("V", Icons.yellow);
 defaultColors.set("W", Icons.purple);
 defaultColors.set("X", Icons.orange);
@@ -28,7 +28,7 @@ settingsRouter.get("/", (req, res) => {
         settings = defaults;
     }
 
-    res.json(settings);
+    res.json({crawls: settings.crawls, colors: Array.from(settings.colors)});
 });
 
 settingsRouter.put("/", (req, res) => {

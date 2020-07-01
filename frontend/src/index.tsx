@@ -8,6 +8,7 @@ import API from "./utils/API";
 import Axios, { AxiosResponse } from "axios";
 import PathPage from "./path-page/path-page";
 import { Settings } from "backend/routes/settingsRouter";
+import { Icons } from "backend/utils/icons";
 
 export enum PageTypes {
   MAINPAGE = 0,
@@ -106,7 +107,11 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
     }).then(() => this.setState({ clues, clueLists }));
 
     API.get("/settings").then((res) => {
-      this.setState({ settings: res.data });
+      const settings = {
+        crawls: res.data.crawls,
+        colors: new Map<string, Icons>(res.data.colors)
+      }
+      this.setState({ settings: settings });
     })
   }
 
