@@ -97,7 +97,7 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
   render() {
     return (
       <div className="main-page">
-        <NavBarFrame />
+        <NavBarFrame updatePage={this.props.updatePage} />
         <ClueFrame clues={this.props.clues} clueLists={this.props.clueLists}
           updateClues={this.props.updateClues} settings={this.props.settings} />
         <PathFrame paths={this.state.paths} updateInfo={this.updateInfo} updatePage={this.props.updatePage} />

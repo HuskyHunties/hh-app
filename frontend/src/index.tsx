@@ -9,11 +9,12 @@ import Axios, { AxiosResponse } from "axios";
 import PathPage from "./path-page/path-page";
 import { Settings } from "backend/routes/settingsRouter";
 import { Icons } from "backend/utils/icons";
+import SettingsPage from "./settings-page/settings-page";
 
 export enum PageTypes {
   MAINPAGE = 0,
   ROUTES = 1,
-  IMAGES = 2
+  SETTINGS = 2
 }
 
 /**
@@ -131,8 +132,8 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
           currentPath={this.state.currentPath!} updatePage={this.updatePage} />
         break;
 
-      case PageTypes.IMAGES:
-        page = <div>Page not yet implemented</div>
+      case PageTypes.SETTINGS:
+        page = <SettingsPage updatePage={this.updatePage} settings={this.state.settings} />
         break;
 
       default:

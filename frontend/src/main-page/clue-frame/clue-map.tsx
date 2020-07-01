@@ -8,6 +8,7 @@ import Popup, { PopupTypes } from "../../utils/popup";
 import API from "../../utils/API";
 import searchPin from "../../utils/map-icons/pin.png";
 import { Settings } from "backend/routes/settingsRouter";
+import urlMap from "backend/utils/icons";
 
 /**
  * Properties type for the ClueInfo Component
@@ -301,7 +302,8 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         const markers = this.props.clues.map((clue) => {
             let icon = undefined;
             try {
-                icon = this.props.settings?.colors.get(clue.list)?.valueOf();
+                icon = urlMap.get(this.props.settings?.colors.get(clue.list)!)
+
             } catch (e) {};
 
             return (

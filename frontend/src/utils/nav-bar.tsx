@@ -1,10 +1,13 @@
 import React from "react";
 import "../css/nav-bar.css";
+import { PageTypes } from "..";
 
 /**
  * Properties type for the NavBarFrame Component
  */
-interface NavBarFrameProps {}
+interface NavBarFrameProps {
+  updatePage(type: PageTypes, routeID?: number): void;
+}
 
 /**
  * State type for the NavBarFrame Component
@@ -26,17 +29,14 @@ function switchTheme(dark: boolean) {
 /**
  * Class to represent the Navigation Bar Component
  */
-export default class NavBarFrame extends React.Component<
-  NavBarFrameProps,
-  NavBarFrameState
-> {
+export default class NavBarFrame extends React.Component<NavBarFrameProps,NavBarFrameState> {
   /**
    * Renders the component.
    */
   render() {
     return (
       <div className="nav-bar">
-        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Navigation Bar</a>
+        <div onClick={() => this.props.updatePage(PageTypes.SETTINGS)} className={"settings"}>Settings</div>
         {/* Theme Toggle Swtich */}
         <div className="theme-switch-wrapper">
           <label className="theme-switch" htmlFor="checkbox">
