@@ -7,6 +7,7 @@ import * as path from "path";
 import groupsRouter from "../routes/groupsRouter";
 import cluesRouter from "../routes/cluesRouter";
 import pathsRouter from "../routes/pathsRouter";
+import settingsRouter from "../routes/settingsRouter";
 
 const app = express();
 
@@ -21,5 +22,6 @@ console.log(__dirname);
 app.use("/groups", groupsRouter);
 app.use("/clues", cluesRouter);
 app.use("/paths", pathsRouter);
+app.use("/settings", settingsRouter);
 
 export default app;

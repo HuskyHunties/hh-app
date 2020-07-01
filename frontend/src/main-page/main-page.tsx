@@ -7,6 +7,7 @@ import PathFrame from "./path-frame/path-frame";
 import GroupFrame, { Group } from "./group-frame/group-frame";
 import API from "../utils/API";
 import { PageTypes } from "..";
+import { Settings } from "backend/routes/settingsRouter";
 
 /**
  * Properties type for the MainPage Component.
@@ -16,6 +17,7 @@ interface MainPageProps {
   clueLists: Set<string>;
   updateClues(): void,
   updatePage(type: PageTypes, routeID?: number): void;
+  settings?: Settings;
 }
 
 /**
@@ -97,7 +99,7 @@ export default class MainPage extends React.Component<MainPageProps, MainPageSta
       <div className="main-page">
         <NavBarFrame />
         <ClueFrame clues={this.props.clues} clueLists={this.props.clueLists}
-          updateClues={this.props.updateClues} />
+          updateClues={this.props.updateClues} settings={this.props.settings} />
         <PathFrame paths={this.state.paths} updateInfo={this.updateInfo} updatePage={this.props.updatePage} />
         <GroupFrame groups={this.state.groups}
           paths={this.state.paths} updateInfo={this.updateInfo}

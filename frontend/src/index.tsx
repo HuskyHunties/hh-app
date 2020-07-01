@@ -7,6 +7,7 @@ import { Clue } from "./main-page/clue-frame/clue-frame";
 import API from "./utils/API";
 import Axios, { AxiosResponse } from "axios";
 import PathPage from "./path-page/path-page";
+import { Settings } from "backend/routes/settingsRouter";
 
 export enum PageTypes {
   MAINPAGE = 0,
@@ -24,9 +25,10 @@ interface PageLoaderProps { }
  */
 interface PageLoaderState {
   currentPage: PageTypes;
-  clues: Map<number,Clue>;
+  clues: Map<number, Clue>;
   clueLists: Set<string>;
   currentPath?: number;
+  settings?: Settings;
 }
 
 /**
@@ -81,6 +83,7 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
     const clues: Map<number, Clue> = new Map();
     let ids: number[] = [];
     const clueLists = new Set<string>();
+
     API.get("/clues/").then((res) => {
       ids = res.data.clueIDs;
       return res.data.clueIDs.map((id: number) => {
@@ -101,6 +104,10 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
         clueLists.add((clue.listID as string).toUpperCase())
       });
     }).then(() => this.setState({ clues, clueLists }));
+
+    API.get("/settings").then((res) => {
+      this.setState({ settings: res.data });
+    })
   }
 
   /**
@@ -111,12 +118,12 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
     switch (this.state.currentPage) {
       case PageTypes.MAINPAGE:
         page = <MainPage clues={Array.from(this.state.clues.values())} clueLists={this.state.clueLists}
-          updateClues={this.updateClues} updatePage={this.updatePage} />;
+          updateClues={this.updateClues} updatePage={this.updatePage} settings={this.state.settings} />;
         break;
 
       case PageTypes.ROUTES:
         page = <PathPage clues={this.state.clues} clueLists={this.state.clueLists}
-        currentPath={this.state.currentPath!} updatePage={this.updatePage} />
+          currentPath={this.state.currentPath!} updatePage={this.updatePage} />
         break;
 
       case PageTypes.IMAGES:

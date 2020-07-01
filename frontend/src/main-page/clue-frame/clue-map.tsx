@@ -7,6 +7,7 @@ import "./maps.css";
 import Popup, { PopupTypes } from "../../utils/popup";
 import API from "../../utils/API";
 import searchPin from "../../utils/map-icons/pin.png";
+import { Settings } from "backend/routes/settingsRouter";
 
 /**
  * Properties type for the ClueInfo Component
@@ -198,6 +199,7 @@ interface ClueMapProps {
     popupRef: RefObject<Popup>;
     updateClues(): void;
     deleteClue(): void;
+    settings?: Settings;
 }
 
 /**
