@@ -35,7 +35,7 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
         const nonCrawls = this.props.cluesLists;
         this.props.settings?.crawls.forEach((crawl) => nonCrawls?.delete(crawl));
         const listMap = new Map<number, string>();
-        Array.from(nonCrawls!).forEach((list, idx) => listMap.set(idx, list));
+        Array.from(nonCrawls!).sort().forEach((list, idx) => listMap.set(idx, list));
         this.popupRef.current?.popupFactory(PopupTypes.DropDown, "Which list should be added?", listMap)
             .then((num) => {
                 if (num) {
@@ -65,7 +65,7 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
     deleteCrawl(crawl: string) {
         this.popupRef.current?.popupFactory(PopupTypes.Confirm, "Remove crawl " + crawl + "?")
             .then((num) => {
-                API.delete("/settings/crawl/" + { crawl }).then(this.props.updateInfo, (res) => this.handleDeleteError(res.response.status));
+                API.delete("/settings/crawl/" + crawl ).then(this.props.updateInfo, (res) => this.handleDeleteError(res.response.status));
             }, this.props.updateInfo);
     }
 
@@ -93,7 +93,6 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
             }
         })
 
-        console.log(colors);
         API.put("/settings/crawl/colors", { colors: Array.from(colors) }).then(() => this.props.updatePage(PageTypes.MAINPAGE),
             (res) => this.handleSaveError(res.response.status));
     }
@@ -122,7 +121,7 @@ export default class SettingsPage extends React.Component<SettingsPageProps, Set
             newMap?.set(crawl, e.target.value as Icons);
             this.setState({newColors: newMap});
         }
-        const crawls = this.props.settings?.crawls.map((crawl) => {
+        const crawls = this.props.settings?.crawls.sort().map((crawl) => {
             return <div key={crawl} className={"crawl-div"}>
                 {crawl + ": "}
                 <select value={this.state.newColors?.get(crawl)} onChange={(e) => changeColor(e, crawl)}>

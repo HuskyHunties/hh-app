@@ -64,6 +64,7 @@ settingsRouter.delete("/crawl/:name", (req, res) => {
         settings.crawls = settings.crawls.filter((crawlList) => crawlList != crawl);
         settings.colors.delete(crawl);
         res.send({});
+        console.log(req.params);
     }
 });
 
