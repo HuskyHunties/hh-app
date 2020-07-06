@@ -7,6 +7,8 @@ import "./maps.css";
 import Popup, { PopupTypes } from "../../utils/popup";
 import API from "../../utils/API";
 import searchPin from "../../utils/map-icons/pin.png";
+import { Settings } from "backend/routes/settingsRouter";
+import urlMap from "../../utils/icons";
 
 /**
  * Properties type for the ClueInfo Component
@@ -165,17 +167,17 @@ class ClueInfo extends React.Component<ClueInfoProps, ClueInfoState> {
 
         return <div style={{ background: "#232323" }}>
             Name: <input type="text" value={this.state.name} placeholder="Clue Name" autoFocus
-                onChange={(e) => this.setState({ name: e.target.value })} 
+                onChange={(e) => this.setState({ name: e.target.value })}
                 onKeyPress={(e) => this.handleKeypress(e)} /> <br />
             Description: <input type="text" value={this.state.desc} placeholder="Clue Description"
-                onChange={(e) => this.setState({ desc: e.target.value })} 
+                onChange={(e) => this.setState({ desc: e.target.value })}
                 onKeyPress={(e) => this.handleKeypress(e)} /> <br />
             Clue List: <input list="clue-lists" value={this.state.list} style={{ width: "30px" }}
-                onChange={(e) => this.setState({ list: e.target.value })} 
+                onChange={(e) => this.setState({ list: e.target.value })}
                 onKeyPress={(e) => this.handleKeypress(e)} />
             {datalist}
             Clue Number: <input type="text" value={this.state.num} style={{ width: "30px" }}
-                onChange={(e) => this.setState({ num: e.target.value })} 
+                onChange={(e) => this.setState({ num: e.target.value })}
                 onKeyPress={(e) => this.handleKeypress(e)} /> <br />
             {this.clue ? <div>
                 <button onClick={() => this.addModifyClue()}>Modify Clue</button>
@@ -198,6 +200,7 @@ interface ClueMapProps {
     popupRef: RefObject<Popup>;
     updateClues(): void;
     deleteClue(): void;
+    settings?: Settings;
 }
 
 /**
@@ -223,7 +226,7 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         "icon",
         "types",
         "geometry",
-      ];
+    ];
 
     constructor(props: ClueMapProps) {
         super(props);
@@ -297,11 +300,21 @@ export default class ClueMap extends React.Component<ClueMapProps, ClueMapState>
         }
 
         const markers = this.props.clues.map((clue) => {
+            let icon: google.maps.Icon | undefined;
+            try {
+                const img = urlMap.get(this.props.settings?.colors.get(clue.list)!);
+                if (img) {
+                    icon = {
+                        url: img!,
+                        labelOrigin: new google.maps.Point(24, 16),
+                        scaledSize: new google.maps.Size(48, 48)
+                    }
+                }
+            } catch (e) { };
+
             return (
-                <Marker
-                    key={clue.id} position={clue.place} onClick={() => this.props.select(clue.id)}
-                    label={clue.list + clue.num} zIndex={0}
-                >
+                <Marker key={clue.id} position={clue.place} onClick={() => this.props.select(clue.id)}
+                    label={clue.list + clue.num} zIndex={0} icon={icon}>
                     {clue.id === this.props.selected ?
                         <InfoWindow onCloseClick={() => this.props.select(undefined)}>
                             <ClueInfo clue={clue} clueLists={this.props.clueLists} popupRef={this.props.popupRef}

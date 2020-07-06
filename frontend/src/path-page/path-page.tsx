@@ -6,6 +6,7 @@ import API from "../utils/API";
 import PathInfo from "./path-info";
 import PathMap from "./path-map";
 import Popup, { PopupTypes } from "../utils/popup";
+import { Settings } from "backend/routes/settingsRouter";
 
 /**
  * Properties type for PathPage
@@ -15,6 +16,7 @@ interface PathPageProps {
     clueLists: Set<string>;
     currentPath: number;
     updatePage(type: PageTypes): void;
+    settings?: Settings;
 }
 
 /**
@@ -129,7 +131,7 @@ export default class PathPage extends React.Component<PathPageProps, PathPageSta
                     popupRef={this.popupRef} removeClue={this.removeClue} />
                 <PathMap clues={Array.from(this.props.clues.values())} clueLists={this.props.clueLists} pathClues={this.state.pathClues}
                     select={this.setSelection} selected={this.state.selected} currentPath={this.props.currentPath}
-                    updateInfo={this.updateInfo} popupRef={this.popupRef} removeClue={this.removeClue} />
+                    updateInfo={this.updateInfo} popupRef={this.popupRef} removeClue={this.removeClue} settings={this.props.settings} />
                 <Popup ref={this.popupRef} />
             </div>
         )

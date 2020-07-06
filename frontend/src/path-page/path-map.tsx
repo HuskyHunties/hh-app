@@ -6,6 +6,8 @@ import { GoogleMap, LoadScript, Marker, InfoWindow, Polyline } from "@react-goog
 import API from "../utils/API";
 import Popup, { PopupTypes } from "../utils/popup";
 import ReactDOM from "react-dom";
+import urlMap from "../utils/icons";
+import { Settings } from "backend/routes/settingsRouter";
 
 /**
  * Props type for the Path Map component.
@@ -20,6 +22,7 @@ interface PathMapProps {
     updateInfo(): void;
     popupRef: RefObject<Popup>;
     removeClue(): void;
+    settings?: Settings;
 }
 
 /**
@@ -60,11 +63,11 @@ export default class PathMap extends React.Component<PathMapProps, PathMapState>
         if (err === 401) {
             // TODO display path name
             this.props.popupRef.current?.popupFactory(PopupTypes.Confirm, "Clue already assigned to path.  Assign anyway?")
-            .then(() => {
-                API.put("/paths/" + this.props.currentPath + "/clue/override", {
-                    clueID: this.props.selected
-                }).then(this.props.updateInfo, (res) => this.handleAddError(res.response.status));
-            })
+                .then(() => {
+                    API.put("/paths/" + this.props.currentPath + "/clue/override", {
+                        clueID: this.props.selected
+                    }).then(this.props.updateInfo, (res) => this.handleAddError(res.response.status));
+                })
         } else {
             console.log(err);
             throw new Error("Unknown Error Code.")
@@ -95,7 +98,20 @@ export default class PathMap extends React.Component<PathMapProps, PathMapState>
         const mapClues = this.props.clues.filter((clue) => !pathClueIDs.includes(clue.id));
 
         const clueMarkers = mapClues.map((clue) => {
-            return <Marker key={clue.id} label={clue.list + clue.num} position={clue.place} onClick={() => this.props.select(clue.id)} >
+            let icon: google.maps.Icon | undefined;
+            try {
+                const img = urlMap.get(this.props.settings?.colors.get(clue.list)!);
+                if (img) {
+                    icon = {
+                        url: img!,
+                        labelOrigin: new google.maps.Point(24, 16),
+                        scaledSize: new google.maps.Size(48, 48)
+                    }
+                }
+            } catch (e) { };
+
+            return <Marker key={clue.id} position={clue.place} onClick={() => this.props.select(clue.id)}
+                icon={icon} label={clue.list + clue.num}>
                 {clue.id === this.props.selected ?
                     <InfoWindow>
                         <div style={{ background: "#232323" }}>
@@ -125,11 +141,11 @@ export default class PathMap extends React.Component<PathMapProps, PathMapState>
                 </Marker>
             });
 
-            const lineSymbol = {path: 2}; //google.maps.SymbolPath.FORWARD_OPEN_ARROW
-            const polyOptions = {icons: [{icon: lineSymbol, offset: "100%"}], clickable: false};
+            const lineSymbol = { path: 2 }; //google.maps.SymbolPath.FORWARD_OPEN_ARROW
+            const polyOptions = { icons: [{ icon: lineSymbol, offset: "100%" }], clickable: false };
             const pathCluesPlaces = this.props.pathClues.map((clue) => clue.place);
             for (let i = 0; i < this.props.pathClues.length - 1; i++) {
-                polylines.push(<Polyline key={"pl" + i} path={pathCluesPlaces.slice(i, i+2)} options={polyOptions} />)
+                polylines.push(<Polyline key={"pl" + i} path={pathCluesPlaces.slice(i, i + 2)} options={polyOptions} />)
             }
 
         }

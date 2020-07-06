@@ -1,0 +1,25 @@
+/* Styling for the save changes button */
+.save-changes {
+    position: absolute;
+    left: 5%;
+    width: 40%;
+    height: 10%;
+    bottom: 25px;
+}
+
+/* Styling for the divs for different crawls */
+.crawl-div {
+    position: relative;
+    left: 5%;
+    text-align: left;
+    margin: 5px;
+}
+
+/* Styling for the add crawl button */
+.add-crawl {
+    position: absolute;
+    left: 5%;
+    width: 40%;
+    height: 10%;
+    bottom: 15%;
+}

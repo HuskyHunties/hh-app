@@ -3,6 +3,7 @@ import ClueMap from "./clue-map";
 import "./clue-frame.css";
 import Popup, { PopupTypes } from "../../utils/popup";
 import API from "../../utils/API";
+import { Settings } from "backend/routes/settingsRouter";
 
 /**
  * Holds information about a clue
@@ -83,6 +84,7 @@ interface ClueFrameProps {
   clues: Clue[];
   clueLists: Set<string>;
   updateClues(): void;
+  settings?: Settings;
 }
 
 /**
@@ -163,7 +165,7 @@ export default class ClueFrame extends React.Component<ClueFrameProps, ClueFrame
           <ClueMap updateClues={this.props.updateClues}
             clues={this.props.clues} selected={this.state.selected} clueLists={this.props.clueLists}
             select={(id: number) => this.setState({ selected: id })} popupRef={this.popupRef}
-            deleteClue={() => this.deleteClue()}
+            deleteClue={() => this.deleteClue()} settings={this.props.settings}
           />
         </div>
         <Popup ref={this.popupRef} />
