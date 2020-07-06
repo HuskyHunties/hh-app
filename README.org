@@ -2,15 +2,6 @@
 
 This is an app designed to be used by our team during Northeastern's Husky Hunt Competition
 
-* Deploying
-*After Frontend Changes*:
-- Commit changes and merge them into the master branch
-- Run the command "yarn run deploy"
-- After a minute or two, the changes should automatically be seen at https://huskyhunties.github.io/hh-app/
-
-*After Backend Changes*:
-- Ask Michael to Redeploy it
-
 * Logistics
 *API Team*:
 - Michael
