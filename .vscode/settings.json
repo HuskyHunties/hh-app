@@ -4,7 +4,9 @@
         "Notif",
         "Unmount",
         "descs",
+        "divs",
         "geocode",
+        "lightblue",
         "polylines",
         "reqs",
         "tsdoc"

@@ -72,14 +72,18 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
       throw new Error("Must supply route ID");
     }
 
+    this.updateClues();
+
     this.setState({
       currentPage: type,
       currentPath: routeID
     })
+
+    
   }
 
   /**
-   * Updates the clues stored in state by making API calls
+   * Updates the clues and settings stored in state by making API calls
    */
   private updateClues() {
     const clues: Map<number, Clue> = new Map();
@@ -129,11 +133,12 @@ class PageLoader extends React.Component<PageLoaderProps, PageLoaderState> {
 
       case PageTypes.ROUTES:
         page = <PathPage clues={this.state.clues} clueLists={this.state.clueLists}
-          currentPath={this.state.currentPath!} updatePage={this.updatePage} />
+          currentPath={this.state.currentPath!} updatePage={this.updatePage} settings={this.state.settings} />
         break;
 
       case PageTypes.SETTINGS:
-        page = <SettingsPage updatePage={this.updatePage} settings={this.state.settings} />
+        page = <SettingsPage updatePage={this.updatePage} settings={this.state.settings} cluesLists={this.state.clueLists}
+          updateInfo={this.updateClues} />
         break;
 
       default:

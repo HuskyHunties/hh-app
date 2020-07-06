@@ -23,6 +23,11 @@ const settingsRouter: express.Router = express.Router();
 
 let settings: Settings;
 
+/**
+ * Gets the setting objects
+ * crawls: array of crawl names
+ * colors: array of key value pairs for a crawl and a color
+ */
 settingsRouter.get("/", (req, res) => {
     if (!settings) {
         settings = defaults;
@@ -31,9 +36,47 @@ settingsRouter.get("/", (req, res) => {
     res.json({crawls: settings.crawls, colors: Array.from(settings.colors)});
 });
 
-settingsRouter.put("/", (req, res) => {
-    // TODO make this much better at error handling
-    settings = req.params as unknown as Settings;
+/**
+ * Add a new crawl to the list
+ * 401: already a crawl
+ */
+settingsRouter.post("/crawl", (req, res) => {
+    const newCrawl = req.body.newCrawl;
+    if (settings.crawls.includes(newCrawl)) {
+        res.status(401).send("Already a crawl")
+    } else {
+        settings.crawls.push(newCrawl);
+        settings.colors.set(newCrawl, Icons.red);
+        res.send({});
+    }
+});
+
+/**
+ * Delete a crawl from the list
+ * 401: not a crawl
+ */
+settingsRouter.delete("/crawl/:name", (req, res) => {
+    const crawl = req.params.name;
+    console.log(crawl);
+    if (!settings.crawls.includes(crawl)) {
+        res.status(401).send("Not a crawl")
+    } else {
+        settings.crawls = settings.crawls.filter((crawlList) => crawlList != crawl);
+        settings.colors.delete(crawl);
+        res.send({});
+    }
+});
+
+/**
+ * Sets the new colors in the settings colors map
+ */
+settingsRouter.put("/crawl/colors", (req, res) => {
+    const colors = new Map<string, Icons>(req.body.colors);
+    colors.forEach((color, crawl) => {
+        if (settings.crawls.includes(crawl)) {
+            settings.colors.set(crawl, color);
+        }
+    })
     res.send({});
 });
 
