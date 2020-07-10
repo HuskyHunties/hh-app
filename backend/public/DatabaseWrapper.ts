@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as sqlite3 from "sqlite3";
-import { rejects } from "assert";
 
 /**
  * Wrapper class for the database to provide various ways to interact with it
