@@ -748,7 +748,7 @@ class DatabaseWrapper {
         });
 
         clueIDSQL = clueIDSQL.slice(0, clueIDSQL.length - 3);
-        console.log(clueIDSQL);
+        //console.log(clueIDSQL);
 
         db.all(clueIDSQL, [], (err, rows) => {
           if (err) {
