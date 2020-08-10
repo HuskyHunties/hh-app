@@ -1,6 +1,15 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as sqlite3 from "sqlite3";
-
+class Clue {
+  name: string;
+  listID: string;
+  clueNumber: number;
+  description: string;
+  lat: number;
+  long: number;
+  finished: number;
+}
 /**
  * Wrapper class for the database to provide various ways to interact with it
  */
@@ -189,7 +198,7 @@ class DatabaseWrapper {
    * @param clueID - the id of the clue being queried
    * @returns an object containing the information on this clue
    */
-  getInfoOfClue(clueID: number): Promise<object> {
+  getInfoOfClue(clueID: number): Promise<Clue> {
     //TODO updatae with new columns of database
     const db = this.db;
     let name: string;
